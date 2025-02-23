@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Container</title>
+    <link rel="stylesheet" href="container.css">
+</head>
+<body>
+
+
+    <div class="form-container">
+	
+	<div class="container">	
+		
+	<div class="navbar">
+		<a href="index.html" class="home-icon">
+                <img src="home-icon.png" alt="Home" width="32">
+		</a>
+		<div class="dropdown">
+			<button class="dropbtn">
+                    <img src="menu-icon.png" alt="Menu" width="24">
+			</button>
+			<div class="dropdown-content">
+			<a href="container.html" class="active">Add Container</a>
+			<a href="containers.html">Container List</a>
+			<a href="buyers.html">Add Buyer</a>
+			<a href="inventory.html">Inventory</a>
+			<a href="purchase.html">Purchase History</a>
+			<a href="received-payment.html">Received Payment</a>
+			<a href="payment-history.html">Payment History</a>
+			<a href="sales-statement.html">Balance Sheet</a>
+			<a href="purchase-return.html"> Purchase Return </a>
+			<a href="return-history.html"> Return History </a>
+			<a href="buyer-timeline.html"> Buyer Timeline </a>			
+			</div>
+		</div>
+	</div>
+	
+	<div class="logo">
+         <img src="logo.png" alt="Company Logo">
+    </div>
+
+	          
+	   <h1>Add Container</h1>
+        <form action="/containers/add" method="POST">
+            <label for="container_number">Container Number:</label>
+            <input type="text" id="container_number" name="container_number" required>
+
+            <label for="weight">Weight (kg):</label>
+            <input type="text" id="weight" name="weight" step="0.01" required>
+
+            <label for="arrival_date">Arrival Date:</label>
+            <input type="date" id="arrival_date" name="arrival_date" required>
+
+            <button type="submit">Add Container</button>
+        </form>
+    </div>
+
+    <div id="success-popup">
+        Container added successfully!
+    </div>
+
+    <script src="container.js"></script>
+	
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Timeline</title>
+    <link rel="stylesheet" href="buyer-timeline.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+ 
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <a href="index.html" class="home-icon"><img src="home-icon.png" alt="Home" width="24"></a>
+            <div class="dropdown">
+                <button class="dropbtn"><img src="menu-icon.png" alt="Menu" width="24"></button>
+                <div class="dropdown-content">
+                    <a href="container.html">Add Container</a>
+                    <a href="containers.html">Container List</a>
+                    <a href="buyers.html">Add Buyer</a>
+                    <a href="inventory.html">Inventory</a>
+                    <a href="purchase.html">Purchase History</a>
+                    <a href="received-payment.html">Received Payment</a>
+                    <a href="payment-history.html">Payment History</a>
+                    <a href="sales-statement.html"> Sales Statement </a>
+					<a href="purchase-return.html"> Purchase Return </a>
+					<a href="return-history.html"> Return History </a>
+					<a href="buyer-timeline.html"class="active"> Buyer Timeline </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="logo">
+            <img src="logo.png" alt="Company Logo">
+        </div>
+
+        <h1>Buyer Timeline</h1>
+
+        <label>Select Buyer:</label>
+        <select id="buyer-dropdown"></select>
+
+<table id="timeline-table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Particulars</th>
+            <th>Details</th>
+            <th>Qnty</th>
+            <th>Rate</th>
+            <th>Cash</th>
+            <th>Bank</th>
+            <th>Non Cash</th>
+            <th>Bill Amount</th>
+            <th>Total Taka</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+        <tr>
+<td colspan="5" style="text-align: right; padding-right: 20px;"><strong>Total</strong></td>
+            <td id="total-cash">0</td>
+            <td id="total-bank">0</td>
+            <td id="total-non-cash">0</td>
+            <td id="total-bill">0</td>
+            <td id="total-taka">0</td>
+        </tr>
+    </tfoot>
+</table>
+		<button id="export-excel">Export to Excel</button>
+		<button id="export-pdf">Export to PDF</button>
+        <script src="buyer-timeline.js"></script>
+
+    </div>
+</body>
+</html>

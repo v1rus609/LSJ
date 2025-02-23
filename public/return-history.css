@@ -1,0 +1,339 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    padding: 0;
+    display: flex;
+    text-align: center;
+    justify-content: space-around;
+    align-items: stretch;
+}
+
+
+/* Logo Styling */
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    max-width: 100px;
+    margin: 0 auto 10px;
+    display: block;
+}
+
+.container {
+    width: 100%;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 1.5rem;
+    color: #333;
+    text-align: center;
+}
+
+/* Table Styles */
+#return-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+#return-history-table th, #return-history-table td {
+    padding: 5px;
+    text-align: left;
+    font-size: 0.6rem;
+    border: 1px solid #ddd;
+}
+
+#return-history-table th {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 0.6rem;
+}
+
+#return-history-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#return-history-table tr:hover {
+    background-color: #ddd;
+}
+/* General filter container */
+.filters {
+    margin-bottom: -5%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Individual filter group */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+/* Label styles */
+.filters label {
+    font-weight: bold;
+    font-size: 0.7rem;
+    color: #333;
+}
+
+/* Select dropdown styles for Buyer and Container */
+#buyer-filter, #container-filter {
+    padding: 5px;
+    margin-top: 0%;
+    font-size: 0.7rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+/* Date input field styles */
+#start-date, #end-date {
+    padding: 5px;
+    margin-top: 0%;
+    font-size: 0.7rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Styling for the "Select Buyer" and "Select Container" dropdown options */
+#buyer-filter option, #container-filter option {
+    padding: 10px;
+    font-size: 0.7rem;
+}
+
+/* Add space between filters */
+.filters .form-group {
+    margin-bottom: 10px;
+}
+
+/* Ensuring the filters are aligned neatly */
+.filters label, .filters select, .filters input {
+    width: 100%;
+    text-align: left;
+}
+
+.home-icon img {
+			max-width: 100%;
+			display: block;
+		}
+		
+.dropbtn img {
+			position: absolute;
+			display: block;
+			width: 200%;
+			float: left;
+			top: 0%;
+			left: -50%;
+		}
+		
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-size: 0.8rem;
+}
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+
+
+.dropdown-content {
+
+			display: none;
+			position: absolute;
+			float: left;
+			top: 140%;
+			left: -140px;
+			text-align: left;
+			background-color: white;
+			min-width: 160px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+			z-index: 1;
+		}
+		
+
+
+.dropdown-content a {
+    color: black;
+    padding: 15px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+.dropdown:hover .dropdown-content {
+    display: none;
+}
+
+.navbar a.active {
+    font-weight: bold;
+    background-color: #2dabe2;
+    color: white;
+    border-radius: 0px;
+    padding: 15px;
+}
+
+
+/* Style for the "Export to Excel" button */
+#export-excel-return-history {
+	padding: 10px 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    transition: background-color 0.3s, transform 0.3s ease;
+    background: linear-gradient(to bottom, #37e57e, #77fbac);  /* Green background */
+    color: white;
+    margin-right: 10px;  /* Add some space between the buttons */
+}
+
+#export-excel-return-history:hover {
+    background-color: #45a049;  /* Darker green on hover */
+    transform: scale(1.05);  /* Slightly grow the button */
+}
+
+/* Style for the "Export Return History to PDF" button */
+#export-pdf-return-history {
+	padding: 10px 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    transition: background-color 0.3s, transform 0.3s ease;
+    background: linear-gradient(to bottom, #2dabe2, #83d9ff);  /* Blue background */
+    color: white;
+}
+
+#export-pdf-return-history:hover {
+    background-color: #0056b3;  /* Darker blue on hover */
+    transform: scale(1.05);  /* Slightly grow the button */
+}
+
+/* Optionally, add some styles for the buttons' container */
+button:focus {
+    outline: none; /* Remove the default outline on focus */
+}
+
+button:active {
+    transform: scale(0.98);  /* Shrink the button when clicked */
+}
+
+
+@media (min-width: 1281px) {
+	/* General Styles */
+			body {
+			font-family: Arial, sans-serif;
+			background-color: #f9f9f9;
+			font-size: 1.0rem;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			align-items: center; /* Center vertically */
+			justify-content: center; /* Center horizontally */
+			min-height: 100vh; /* Ensure full height */
+			text-align: center;
+		}
+
+/* Logo Styling */
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    max-width: 100px;
+    margin: 0 auto 10px;
+    display: block;
+}
+
+.container {
+    width: 50%;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+/* Table Styles */
+#return-history-table {
+    width: 100%;
+
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#return-history-table th, #return-history-table td {
+    padding: 10px;
+		font-size:1rem;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+#return-history-table th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#return-history-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#return-history-table tr:hover {
+    background-color: #ddd;
+}
+/* Filters Section */
+.filters {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+	align-items: center;
+}
+
+.filters label {
+    font-weight: bold;
+    margin-right: 5px;
+	font-size: 0.8em;
+}
+
+}

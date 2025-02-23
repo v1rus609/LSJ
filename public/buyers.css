@@ -1,0 +1,432 @@
+  body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            display: flex;
+            min-height: 100vh;
+            flex-wrap: nowrap;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .container {
+            width: 90%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+		
+.home-icon img {
+	display: block;
+	width: 60px;
+}
+		
+		.dropbtn img {
+			position: absolute;
+			display: block;
+			width: 350%;
+			float: left;
+			top: -50%;
+			left: -300%;
+		}
+		
+		.dropbtn:hover {
+		background: none; /* No background change on hover */
+		}
+		
+        .logo img {
+            max-width: 25%;
+            margin-bottom: 10px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+        .form-container form {
+            text-align: left;
+        }
+        .form-container label {
+            display: block;
+            margin: 25px 0 5px;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        .form-container input {
+            width: 94%;
+            padding: 25px;
+            font-size: 2.0rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-container button {
+            width: 100%;
+            padding: 40px;
+            font-size: 2.0rem;
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background: linear-gradient(to bottom, #1a92c7, #6fc9ff);
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .search-container input {
+            width: calc(100% - 20px);
+            max-width: 400px;
+            padding: 25px;
+            font-size: 1.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            text-align: left;
+			 font-size: 1.5rem;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        table th {
+            background: #f4f4f4;
+            font-weight: bold;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .error-message {
+            color: red;
+            font-size: 1rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+		
+		button {
+		background: linear-gradient(to bottom, #e5363b, #fb7679);
+		color: white;
+		border: none;
+		padding: 10px;
+		border-radius: 5px;
+		cursor: pointer;
+		}
+
+		button:hover {
+		background: linear-gradient(to bottom, #ad282c, #fb7679);
+		}
+		
+		.navbar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 20px 20px;
+		}
+		
+		/* Delete button specific styling */
+		.delete-btn {
+			background: linear-gradient(to bottom, #e5363b, #fb7679);  /* Red gradient */
+			color: white;
+			border: none;
+			padding: 20px;
+			width:100%;
+			border-radius: 5px;
+			cursor: pointer;
+			font-size: 1rem;
+			transition: background 0.3s ease;
+		}
+
+		.delete-btn:hover {
+			background: linear-gradient(to bottom, #ad282c, #fb7679);  /* Darker red on hover */
+		}
+
+		.delete-btn:focus {
+			outline: none;  /* Removes the outline when clicked */
+		}
+
+		.navbar a {
+			text-decoration: none;
+			color: white;
+			font-size: 1rem;
+		}
+
+		.dropdown {
+			position: relative;
+			display: inline-block;
+		}
+
+		.dropbtn {
+			background: none;
+			border: none;
+			cursor: pointer;
+		}
+
+		.dropdown-content {
+			border-radius: 10px;
+			display: none;
+			position: absolute;
+			float: left;
+			top: 265%;
+			left: -290px;
+			text-align: left;
+			background-color: white;
+			min-width: 300px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+			z-index: 1;
+		}
+
+		.dropdown-content a {
+			color: black;
+			font-size: 1.8rem;
+			padding: 50px 16px;
+			text-decoration: none;
+			display: block;
+		}
+
+		.dropdown-content a:hover {
+			background-color: #ddd;
+		}
+
+		.navbar a.active {
+			font-size: 1.8rem;
+			font-weight: bold;
+			background-color: #2dabe2;
+			color: white;
+			border-radius: 0px;
+			padding: 50px;
+		}
+			
+		
+		@media (min-width: 1281px) {
+			
+			  body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            display: flex;
+            min-height: 100vh;
+            flex-wrap: nowrap;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            width: 90%;
+			max-width: 520px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+.home-icon img {
+	display: block;
+	width: 32px;
+}
+		
+		.dropbtn img {
+			position: absolute;
+			display: block;
+			width: 200%;
+			float: left;
+			top: -10%;
+			left: -110%;
+		}
+		
+        .logo img {
+            max-width: 100px;
+            margin-bottom: 0px;
+        }
+        h1 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+        .form-container form {
+            text-align: left;
+        }
+        .form-container label {
+            display: block;
+            margin: 10px 0 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .form-container input {
+            width: 97%;
+            padding: 10px;
+            font-size: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background: linear-gradient(to bottom, #1a92c7, #6fc9ff);
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .search-container input {
+            width: calc(100% - 20px);
+            max-width: 260px;
+            padding: 10px;
+            font-size: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            text-align: left;
+			 font-size: 0.9rem;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        table th {
+            background: #f4f4f4;
+            font-weight: bold;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .error-message {
+            color: red;
+            font-size: 1rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+		
+		button {
+		background: linear-gradient(to bottom, #e5363b, #fb7679);
+		color: white;
+		border: none;
+		padding: 10px;
+		border-radius: 5px;
+		cursor: pointer;
+		}
+
+		button:hover {
+		background: linear-gradient(to bottom, #ad282c, #fb7679);
+		}
+		
+		.navbar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 10px 20px;
+		}
+		
+		/* Delete button specific styling */
+		.delete-btn {
+			background: linear-gradient(to bottom, #e5363b, #fb7679);  /* Red gradient */
+			color: white;
+			border: none;
+			padding: 8px;
+			width:100%;
+			border-radius: 5px;
+			cursor: pointer;
+			font-size: 0.8rem;
+			transition: background 0.3s ease;
+		}
+
+		.delete-btn:hover {
+			background: linear-gradient(to bottom, #ad282c, #fb7679);  /* Darker red on hover */
+		}
+
+		.delete-btn:focus {
+			outline: none;  /* Removes the outline when clicked */
+		}
+
+		.navbar a {
+			text-decoration: none;
+			color: white;
+			font-size: 1rem;
+		}
+
+		.dropdown {
+			position: relative;
+			display: inline-block;
+		}
+
+		.dropbtn {
+			background: none;
+			border: none;
+			cursor: pointer;
+		}
+		
+		.dropbtn:hover {
+		background: none; /* No background change on hover */
+		}
+		
+		.dropdown-content {
+			border-radius: 10px;
+			display: none;
+			position: absolute;
+			float: left;
+			top: 140%;
+			left: -280px;
+			text-align: left;
+			background-color: white;
+			min-width: 300px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+			z-index: 1;
+		}
+
+		.dropdown-content a {
+			color: black;
+			font-size: 1.0rem;
+			padding: 10px 16px;
+			text-decoration: none;
+			display: block;
+		}
+
+		.dropdown-content a:hover {
+					background-color: #ddd;
+				}
+
+
+		.navbar a.active {
+			font-size: 1.0rem;
+			font-weight: bold;
+			background-color: #2dabe2;
+			color: white;
+			border-radius: 0px;
+			padding: 10px;
+		}
+			
+}

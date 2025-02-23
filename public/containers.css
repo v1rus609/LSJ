@@ -1,0 +1,296 @@
+ body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            display: flex;
+            min-height: 100vh;
+            flex-wrap: nowrap;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .container {
+            width: 88%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+        }
+		
+
+		
+		
+		
+	   .logo img {
+            max-width: 25%;
+            margin-top: 10px;
+			margin-bottom: 10px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .search-container input {
+            width: calc(100% - 20px);
+            max-width: 400px;
+            padding: 30px;
+            font-size: 1.8rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+        table th, table td {
+            text-align: left;
+			font-size: 1.5rem;
+            padding: 25px;
+            border: 1px solid #ddd;
+        }
+        table th {
+			font-size: 1.5rem;
+            background: #f4f4f4;
+            font-weight: bold;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .error-message {
+            color: red;
+            font-size: 1rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+		
+				.navbar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 10px 20px;
+
+		}
+
+		.navbar a {
+			text-decoration: none;
+			color: white;
+			font-size: 1rem;
+		}
+
+.home-icon img {
+	display: block;
+	width: 60px;
+}
+		.dropdown {
+			position: relative;
+			display: inline-block;
+		}
+
+		.dropbtn {
+			background: none;
+			border: none;
+			cursor: pointer;
+		}
+
+		.dropbtn img {
+			position: absolute;
+			display: block;
+			width: 560%;
+			float: left;
+			top: -105%;
+			left: -465%;
+		}
+
+		.dropdown-content {
+			border-radius: 10px;
+			display: none;
+			position: absolute;
+			float: left;
+			top: 265%;
+			left: -290px;
+			text-align: left;
+			background-color: white;
+			min-width: 300px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+			z-index: 1;
+		}
+
+		.dropdown-content a {
+			color: black;
+			font-size: 1.8rem;
+			padding: 50px 16px;
+			text-decoration: none;
+			display: block;
+		}
+
+		.dropdown-content a:hover {
+			background-color: #ddd;
+		}
+
+
+		.navbar a.active {
+			font-size: 1.8rem;
+			font-weight: bold;
+			background-color: #2dabe2;
+			color: white;
+			border-radius: 0px;
+			padding: 50px;
+		}
+		
+		@media (min-width: 1281px) {
+ body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            display: flex;
+            min-height: 100vh;
+            flex-wrap: nowrap;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            width: 60%;
+            max-width: 600px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+        .logo img {
+            max-width: 100px;
+            margin-bottom: -10px;
+        }
+        h1 {
+            font-size: 1.5rem;
+            color: #333;
+			margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .search-container input {
+            width: calc(100% - 20px);
+            max-width: 400px;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            text-align: left;
+            padding: 10px;
+			font-size: 1rem;
+            border: 1px solid #ddd;
+        }
+        table th {
+            background: #f4f4f4;
+            font-weight: bold;
+			font-size: 1rem;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .error-message {
+            color: red;
+            font-size: 1rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+		.navbar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 10px 20px;
+
+		}
+
+		.navbar a {
+			text-decoration: none;
+			color: white;
+			font-size: 1rem;
+		}
+
+.home-icon img {
+	display: block;
+	width: 32px;
+}
+
+		.dropdown {
+			position: relative;
+			display: inline-block;
+		}
+
+		.dropbtn {
+			background: none;
+			border: none;
+			cursor: pointer;
+		}
+		
+		.dropbtn img {
+        position: absolute;
+        display: block;
+        width: 300%;
+        float: left;
+        top: -30%;
+        left: -100%;
+    }
+
+		.dropdown-content {
+			border-radius: 8px;
+			display: none;
+			position: absolute;
+			float: left;
+			top: 140%;
+			left: -1210%;
+			text-align: left;
+			background-color: white;
+			min-width: 170px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+			z-index: 1;
+		}
+
+		.dropdown-content a {
+			color: black;
+			font-size: 1rem;
+			padding: 10px 16px;
+			text-decoration: none;
+			display: block;
+		}
+
+		.dropdown-content a:hover {
+			background-color: #ddd;
+		}
+
+		.navbar a.active {
+			font-size: 1rem;
+			font-weight: bold;
+			background-color: #2dabe2;
+			color: white;
+			border-radius: 0px;
+			padding: 10px;
+		}
+}
+}

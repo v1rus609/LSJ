@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sell Inventory</title>
+    <link rel="stylesheet" href="inventory.css">
+</head>
+<body>
+    <form id="sell-form">
+		<div class="navbar">
+		<a href="index.html" class="home-icon">
+                <img src="home-icon.png" alt="Home" width="32">
+		</a>
+		<div class="dropdown">
+			<button class="dropbtn">
+				<img src="menu-icon.png" alt="Menu">
+			</button>
+			<div class="dropdown-content">
+ 			<a href="container.html">Add Container</a>
+			<a href="containers.html">Container List</a>
+			<a href="buyers.html">Add Buyer</a>
+			<a href="inventory.html"class="active">Inventory</a>
+			<a href="purchase.html">Purchase History</a>
+			<a href="received-payment.html">Received Payment</a>
+			<a href="payment-history.html">Payment History</a>
+			<a href="sales-statement.html"> Sales Statement </a>
+			<a href="purchase-return.html"> Purchase Return </a>
+			<a href="return-history.html"> Return History </a>
+			<a href="buyer-timeline.html"> Buyer Timeline </a>
+			</div>
+		</div>
+	</div>
+	<div class="logo">
+        <img src="logo.png" alt="Company Logo">
+    </div>
+	<h1>Sell Inventory</h1>
+	
+		<label for="buyer-search">Search Buyer:</label><br>
+		<input type="text" id="buyer-search" placeholder="Search Buyer..."><br><br>
+        <!-- Select Buyer -->
+        <label>Select Buyer:</label><br>
+        <select name="buyer_id" id="buyer-dropdown" required>
+            <option value="">Select a Buyer</option>
+        </select><br><br>
+
+        <!-- Purchase Date -->
+        <label>Purchase Date:</label><br>
+        <input type="date" name="purchase_date" id="purchase-date" required><br><br>
+
+        <!-- Container Section -->
+        <div id="container-section">
+            <div class="container-group">
+				<label>Select Container:</label><br>
+				<input type="text" class="container-search" placeholder="Search Container..."><br><br>
+				<select name="container_id[]" class="container-dropdown" required>
+					<option value="">Select a Container</option>
+				</select><br><br>
+
+                <label>Weight Sold (KG):</label><br>
+                <input type="text" name="weight_sold[]" class="weight-sold" step="0.01" required><br><br>
+
+                <label>Price Per KG:</label><br>
+                <input type="text" name="price_per_kg[]" class="price-per-kg" step="0.01" required><br><br>
+
+                <label>Paid Amount (For This Container):</label><br>
+                <input type="text" name="paid_amount[]" class="paid-amount" step="0.01" required><br><br>
+
+                <label>Unpaid Amount (For This Container):</label><br>
+                <input type="text" name="unpaid_amount[]" class="unpaid-amount" readonly><br><br>
+
+                <button type="button" class="add-container">Add Container</button>
+                <button type="button" class="remove-container">Remove</button><br><br>
+            </div>
+        </div>
+
+        <!-- Total Price -->
+        <label>Total Price:</label><br>
+        <input type="text" id="total-price" name="total_price" readonly><br><br>
+
+        <button type="submit">Sell</button>
+    </form>
+
+    <!-- Success Message Popup -->
+    <div id="success-popup" style="display: none;">
+        Success! Product Sold
+    </div>
+
+    <script src="inventory.js"></script>
+</body>
+</html>

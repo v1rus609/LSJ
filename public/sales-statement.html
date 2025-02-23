@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Statement</title>
+    <link rel="stylesheet" href="sales-statement.css"> <!-- Optional CSS -->
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <a href="index.html" class="home-icon">
+                <img src="home-icon.png" alt="Home" width="28">
+            </a>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <img src="menu-icon.png" alt="Menu">
+                </button>
+                <div class="dropdown-content">
+                    <a href="container.html">Add Container</a>
+                    <a href="containers.html">Container List</a>
+                    <a href="buyers.html">Add Buyer</a>
+                    <a href="inventory.html">Inventory</a>
+                    <a href="purchase.html">Purchase History</a>
+                    <a href="received-payment.html">Received Payment</a>
+                    <a href="payment-history.html">Payment History</a>
+                    <a href="sales-statement.html" class="active"> Sales Statement </a>
+					<a href="purchase-return.html"> Purchase Return </a>
+					<a href="return-history.html"> Return History </a>
+					<a href="buyer-timeline.html"> Buyer Timeline </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="logo">
+            <img src="logo.png" alt="Company Logo">
+        </div>
+
+        <h1>Sales Statement</h1>
+
+        <div class="filter-and-table-container">
+            <div class="filter-section">
+                <!-- Buyer Selector (Side by Side) -->
+                <div class="filter-row">
+                    <label for="buyer-filter">Select Buyer:</label>
+                    <select id="buyer-filter">
+                        <option value="all">All Buyers</option>
+                        <!-- Options populated dynamically -->
+                    </select>
+                </div>
+
+                <!-- Date Filters and Apply Button (Side by Side) -->
+                <div class="filter-row">
+                    <div>
+                        <label for="start-date">From:</label>
+                        <input type="date" id="start-date">
+                    </div>
+                    <div>
+                        <label for="end-date">To:</label>
+                        <input type="date" id="end-date">
+                    </div>
+                    <button id="apply-filters">Filter</button>
+                </div>
+            </div>
+
+            <table id="sales-statement-table">
+                <thead>
+                    <tr>
+                        <th>SL No</th>
+                        <th>Name of Party</th>
+                        <th>Amount (BDT)</th>
+                        <th>Receipt (BDT)</th>
+                        <th>Balance (BDT)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be dynamically added here -->
+                </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="2"><strong>Totals</strong></td>
+            <td id="sum-total-purchase">0</td>
+            <td id="sum-total-paid">0</td> <!-- ✅ Corrected -->
+            <td id="sum-total-unpaid">0</td>
+        </tr>
+    </tfoot>
+</table>
+            <br>
+            <button id="export-sales-statement">Export to Excel</button>
+			<button id="export-sales-statement-pdf">Export to PDF</button>
+        </div>
+        <script src="sales-statement.js"></script> <!-- Link to the JavaScript file -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    </body>
+</html>

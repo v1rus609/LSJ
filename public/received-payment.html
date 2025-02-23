@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Received Payment</title>
+    <link rel="stylesheet" href="received-payment.css">
+</head>
+<body>
+
+    <form id="payment-form">
+        <div class="navbar">
+            <a href="index.html" class="home-icon">
+                <img src="home-icon.png" alt="Home" width="32">
+            </a>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <img src="menu-icon.png" alt="Menu">
+                </button>
+                <div class="dropdown-content">
+                    <a href="container.html">Add Container</a>
+                    <a href="containers.html">Container List</a>
+                    <a href="buyers.html">Add Buyer</a>
+                    <a href="inventory.html">Inventory</a>
+                    <a href="purchase.html">Purchase History</a>
+                    <a href="received-payment.html" class="active">Received Payment</a>
+                    <a href="payment-history.html">Payment History</a>
+                    <a href="sales-statement.html">Sales Statement</a>
+                    <a href="purchase-return.html">Purchase Return</a>
+                    <a href="return-history.html">Return History</a>
+					<a href="buyer-timeline.html"> Buyer Timeline </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="logo">
+            <img src="logo.png" alt="Company Logo">
+        </div>
+
+        <h1>Received Payment</h1>
+
+        <!-- Select Buyer -->
+        <label>Select Buyer:</label><br>
+        <select id="buyer-dropdown" required>
+            <option value="">Select a Buyer</option>
+        </select><br><br>
+
+        <!-- Display Unpaid Balance -->
+        <label>Unpaid Balance (BDT):</label><br>
+        <span id="unpaid-amount">0</span><br><br> <!-- 🔹 Shows unpaid amount -->
+
+        <!-- Payment Date -->
+        <label>Payment Date:</label><br>
+        <input type="date" id="payment-date" required><br><br>
+
+        <!-- Payment Method -->
+        <label>Payment Method:</label><br>
+        <select id="payment-method" required>
+            <option value="cash">Cash</option>
+            <option value="bank">Bank</option>
+        </select><br><br>
+
+        <!-- Particulars (for Bank Payment only) -->
+        <label>Particulars:</label><br>
+        <input type="text" id="particulars" placeholder="Enter bank particulars" disabled><br><br>
+
+        <!-- Payment Amount -->
+        <label>Payment Amount:</label><br>
+        <input type="text" id="payment-amount" step="0.01" data-max-amount="0" required><br><br>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-payment">Submit Payment</button>
+    </form>
+
+    <div id="success-popup" style="display: none;">
+        Payment Received Successfully!
+    </div>
+
+    <script src="received-payment.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment History</title>
+    <link rel="stylesheet" href="payment-history.css">
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <a href="index.html" class="home-icon">
+                <img src="home-icon.png" alt="Home" width="32">
+            </a>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <img src="menu-icon.png" alt="Menu">
+                </button>
+                <div class="dropdown-content">
+                    <a href="container.html">Add Container</a>
+                    <a href="containers.html">Container List</a>
+                    <a href="buyers.html">Add Buyer</a>
+                    <a href="inventory.html">Inventory</a>
+                    <a href="purchase.html">Purchase History</a>
+                    <a href="received-payment.html">Received Payment</a>
+                    <a href="payment-history.html" class="active">Payment History</a>
+                    <a href="sales-statement.html"> Sales Statement </a>
+					<a href="purchase-return.html"> Purchase Return </a>
+					<a href="return-history.html"> Return History </a>
+					<a href="buyer-timeline.html"> Buyer Timeline </a>			
+                </div>
+            </div>
+        </div>
+        
+        <div class="logo">
+            <img src="logo.png" alt="Company Logo">
+        </div>
+        
+        <h1>Payment History</h1>
+        
+        <label for="buyer-filter">Filter by Buyer:</label>
+        <select id="buyer-filter">
+            <!-- Buyer options populated dynamically -->
+        </select> <br><br>
+
+        <div class="filter-and-table-container">
+            <div class="filter-section">
+                <label for="start-date">From:</label>
+                <input type="date" id="start-date">
+
+                <label for="end-date">To:</label>
+                <input type="date" id="end-date">
+
+                <button id="apply-date-filter">Filter</button>
+            </div>
+
+            <!-- Payment History Table -->
+            <table id="payment-history-table">
+                <thead>
+                    <tr>
+						<th>Name of Party</th>
+                        <th>Date</th>
+                        <th>Particulars</th>
+                        <th>Bank</th>
+                        <th>Cash</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be dynamically populated -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="5">Total Received</th>
+                        <th id="total-received">0</th>
+                    </tr>
+                </tfoot>
+            </table>
+			</div>
+            <!-- Export to Excel Button -->
+            <button id="export-payment-history">Export to Excel</button>
+			<button id="export-payment-history-pdf">Export to PDF</button>
+        
+
+        <!-- Include XLSX Library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        <script src="payment-history.js"></script>
+    </body>
+</html>

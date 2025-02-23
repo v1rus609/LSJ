@@ -1,0 +1,234 @@
+/* General Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    height: 100vh;
+}
+
+.container {
+    width: 90%;
+	height: max-content;
+    text-align: center;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+/* Logo Styles */
+.logo img {
+    max-width: 25%;
+    margin-bottom: 25px;
+    margin-top: 30px;
+}
+
+/* Menu Styles */
+.menu {
+    margin: 20px 0;
+}
+
+.menu a {
+    display: block;
+    text-decoration: none;
+    color: white;
+    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+    padding: 35px 15px;
+    margin: 10px 0;
+    border-radius: 15px;
+    font-size: 2rem;
+	font-weight: normal;
+    transition: background 0.3s;
+}
+
+.menu a:hover {
+    background: linear-gradient(to bottom, #1a92c7, #6fc9ff);
+}
+
+/* Counter Section */
+.counter {
+    background: linear-gradient(to bottom, #37e57e, #77fbac);
+    color: white;
+    padding: 40px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.counter span {
+    text-align: center;
+}
+
+.counter .value {
+    font-size: 5.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.counter .label {
+    font-size: 3.0rem;
+}
+
+.counter button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 6.5rem;
+    cursor: pointer;
+    margin: 10px;
+}
+
+.counter[data-type="unpaid"] {
+    background: linear-gradient(to bottom, #e5363b, #fb7679);
+}
+
+.counter[data-type="buyers"] {
+    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+}
+
+.counter[data-type="containers"] {
+    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+}
+
+
+@media (min-width: 1024px) {
+    .logo img {
+        max-width: 25%;
+		margin-bottom: -15px;
+		margin-top: 10px;
+    }
+	
+	body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+	}
+	
+	.menu a {
+    display: block;
+    text-decoration: none;
+    color: white;
+    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+    padding: 10px 15px;
+    margin: 5px 0;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    transition: background 0.3s;
+	}
+	
+	.container {
+    width: 85%;
+    max-width: 600px;
+    text-align: center;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+	}
+	
+	.counter {
+    background: linear-gradient(to bottom, #37e57e, #77fbac);
+    color: white;
+    padding: 8px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -15px;
+	}
+	
+	.counter .value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+	}
+	
+	.counter .label {
+    font-size: 1.0rem;
+	}
+}
+
+
+@media (min-width: 1281px) {
+    .logo img {
+        max-width: 25%;
+		margin-bottom: 5px;
+		margin-top: 10px;
+    }
+	
+	body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+	}
+	
+	.menu a {
+    display: block;
+    text-decoration: none;
+    color: white;
+    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+    padding: 15px 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    font-size: 1.0rem;
+    transition: background 0.3s;
+	}
+	
+	.container {
+    width: 85%;
+    max-width: 600px;
+    text-align: center;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+	}
+	
+	.counter {
+    background: linear-gradient(to bottom, #37e57e, #77fbac);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+	}
+	
+	.counter .value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+	}
+	
+	.counter .label {
+    font-size: 1.2rem;
+	}
+.counter button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2.5rem;
+    cursor: pointer;
+    margin: 10px;
+}
+
+
+}
+

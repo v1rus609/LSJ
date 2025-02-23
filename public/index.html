@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LSI Management System</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="logo.png" alt="Company Logo">
+        </div>
+        <div class="menu">
+            <a href="container.html">Add Container</a>
+            <a href="containers.html">Container List</a>
+            <a href="buyers.html">Add Buyer</a>
+            <a href="inventory.html">Sell Inventory</a>
+            <a href="purchase.html">Purchase History</a>
+			<a href="received-payment.html">Received Payment</a>
+			<a href="payment-history.html">Payment History</a>
+            <a href="sales-statement.html"> Sales Statement </a>
+			<a href="purchase-return.html"> Purchase Return </a>
+			<a href="return-history.html"> Return History </a>
+			<a href="buyer-timeline.html"> Buyer Timeline </a>
+        </div>
+        <div class="counter" id="metric-display">
+            <button onclick="prevMetric()">&#8249;</button>
+            <div>
+                <div class="value" id="metric-value">Loading...</div>
+                <div class="label" id="metric-label">Metric Label</div>
+            </div>
+            <button onclick="nextMetric()">&#8250;</button>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+	
+</body>
+</html>

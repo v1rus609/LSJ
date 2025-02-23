@@ -1,0 +1,413 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    display: flex
+;
+    min-height: 100vh;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Logo Styling */
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    max-width: 25%;
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #333;
+	text-align: center;
+}
+
+form {
+	width: 90%;
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    text-align: left;
+}
+
+label {
+    font-size: 1.8rem;
+    text-align: left;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    font-size: 1.9rem;
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+select {
+    width: 100%;
+    font-size: 1.9rem;
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+select option {
+    padding: 12px;
+    font-weight: bold;
+    font-size: 0.5rem;
+    background-color: white; /* Option background */
+    color: #333; /* Text color */
+}
+
+/* Add Container Button - Blue */
+.add-container {
+    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+    color: white;
+    border: none;
+    font-size: 1.8rem;
+    padding: 20px 70px;
+	font-weight:bold;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-container:hover {
+    background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
+}
+
+/* Remove Button - Red */
+.remove-container {
+    background: linear-gradient(to bottom, #e5363b, #fb7679);
+    color: white;
+    border: none;
+    font-size: 1.8rem;
+    padding: 20px 70px;
+	font-weight:bold;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.remove-container:hover {
+    background-color: #a71d2a; /* Darker Red on hover */
+}
+
+/* Sell Button - Green */
+form button[type="submit"] {
+    background: linear-gradient(to bottom, #37e57e, #77fbac);
+	width: 100%;
+    color: white;
+    border: none;
+    font-size: 2.5rem;
+	font-weight:bold;
+    padding: 30px 0px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+form button[type="submit"]:hover {
+    background: linear-gradient(to bottom, #2ac363, #63e29b);
+}
+
+
+#success-popup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+				.navbar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 20px 20px;
+
+		}
+
+		.navbar a {
+			text-decoration: none;
+			color: white;
+			font-size: 1rem;
+		}
+
+.home-icon img {
+	display: block;
+	width: 60px;
+}
+
+		.dropdown {
+			position: relative;
+			display: inline-block;
+		}
+
+		.dropbtn {
+			background: none;
+			border: none;
+			cursor: pointer;
+		}
+
+		.dropbtn img {
+			position: absolute;
+			display: block;
+			width: 560%;
+			float: left;
+			top: -105%;
+			left: -465%;
+		}
+
+		.dropdown-content {
+			border-radius: 10px;
+			display: none;
+			position: absolute;
+			float: left;
+			top: 265%;
+			left: -290px;
+			text-align: left;
+			background-color: white;
+			min-width: 300px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+			z-index: 1;
+		}
+
+		.dropdown-content a {
+			color: black;
+			font-size: 1.8rem;
+			padding: 50px 16px;
+			text-decoration: none;
+			display: block;
+		}
+
+		.dropdown-content a:hover {
+			background-color: #ddd;
+		}
+
+
+		.navbar a.active {
+			font-size: 1.8rem;
+			font-weight: bold;
+			background-color: #2dabe2;
+			color: white;
+			border-radius: 0px;
+			padding: 50px;
+		}
+
+@media (min-width: 1281px) {
+	
+	body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Logo Styling */
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    max-width: 100px;
+    margin: 0 auto 10px;
+    display: block;
+}
+
+h1 {
+    font-size: 1.5rem;
+    color: #333;
+	margin-bottom: 5px;
+	text-align: center;
+}
+
+form {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+label {
+	margin-bottom: -10px;
+	margin-top: -1%;
+    font-weight: bold;
+    font-size: 0.8rem;
+    margin-bottom: -2%;
+    display: block;
+    text-align: left;
+}
+
+input {
+	font-size: 0.8rem;
+    width: 100%;
+	margin-top: 0px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+select {
+	font-size: 0.8rem;
+    width: 100%;
+	margin-top: 0px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+/* Add Container Button - Blue */
+.add-container {
+	font-size: 0.8rem;
+    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-container:hover {
+    background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
+}
+
+/* Remove Button - Red */
+.remove-container {
+	font-size: 0.8rem;
+    background: linear-gradient(to bottom, #e5363b, #fb7679);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.remove-container:hover {
+    background-color: #a71d2a; /* Darker Red on hover */
+}
+
+/* Sell Button - Green */
+form button[type="submit"] {
+	font-size: 1.0rem;
+    background: linear-gradient(to bottom, #37e57e, #77fbac);
+	width: 100%;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+form button[type="submit"]:hover {
+    background: linear-gradient(to bottom, #2ac363, #63e29b);
+}
+
+#success-popup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+			.navbar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 10px 20px;
+
+		}
+
+		.navbar a {
+			text-decoration: none;
+			color: white;
+			font-size: 1rem;
+		}
+
+.home-icon img {
+	display: block;
+	width: 32px;
+}
+
+		.dropdown {
+			position: relative;
+			display: inline-block;
+		}
+
+		.dropbtn {
+			background: none;
+			border: none;
+			cursor: pointer;
+		}
+		
+		.dropbtn img {
+        position: absolute;
+        display: block;
+        width: 300%;
+        float: left;
+        top: -30%;
+        left: -100%;
+    }
+
+		.dropdown-content {
+			border-radius: 8px;
+			display: none;
+			position: absolute;
+			float: left;
+			top: 140%;
+			left: -1210%;
+			text-align: left;
+			background-color: white;
+			min-width: 170px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+			z-index: 1;
+		}
+
+		.dropdown-content a {
+			color: black;
+			font-size: 1rem;
+			padding: 10px 16px;
+			text-decoration: none;
+			display: block;
+		}
+
+		.dropdown-content a:hover {
+			background-color: #ddd;
+		}
+
+		.navbar a.active {
+			font-size: 1rem;
+			font-weight: bold;
+			background-color: #2dabe2;
+			color: white;
+			border-radius: 0px;
+			padding: 10px;
+		}		
+	
+}	

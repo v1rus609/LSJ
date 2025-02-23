@@ -1,0 +1,343 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: flex-start; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    min-height: 100vh; /* Ensure full height */
+    text-align: center;
+}
+
+
+/* Logo Styling */
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    max-width: 25%;
+    margin: 0 auto 10px;
+    display: block;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #333;
+	text-align: center;
+}
+
+
+form {
+	font-weight:bold;
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 90%; /* For responsiveness */
+    text-align: left;
+}
+
+label {
+    font-weight: bold;
+    font-size: 2rem;
+    margin-bottom: 5px;
+    display: block;
+    text-align: left;
+}
+
+input, select {
+    width: 100%;
+	font-size: 2em;
+    padding: 30px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+}
+
+option {
+	font-size: 1rem;
+}
+
+.submit-payment[type="submit"] {
+    background: linear-gradient(to bottom, #37e57e, #77fbac);
+	width: 100%;
+	font-weight: bold;
+    color: white;
+	font-size: 2.5rem;
+    border: none;
+    padding: 20px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.submit-payment[type="submit"]:hover {
+    background: linear-gradient(to bottom, #2ac363, #63e29b);
+}
+
+#success-popup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.home-icon img {
+	display: block;
+	width: 60px;
+}
+		
+		.dropbtn img {
+			position: absolute;
+			display: block;
+			width: 560%;
+			float: left;
+			top: -95%;
+			left: -400%;
+		}
+		
+				.navbar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 20px 20px;
+		}
+
+		.navbar a {
+			text-decoration: none;
+			color: white;
+			font-size: 1rem;
+		}
+
+		.dropdown {
+			position: relative;
+			display: inline-block;
+		}
+
+		.dropbtn {
+			background: none;
+			border: none;
+			cursor: pointer;
+		}
+
+		.dropdown-content {
+			border-radius: 10px;
+			display: none;
+			position: absolute;
+			float: left;
+			top: 265%;
+			left: -340px;
+			text-align: left;
+			background-color: white;
+			min-width: 355px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+			z-index: 1;
+		}
+
+		.dropdown-content a {
+			color: black;
+			font-weight:normal;
+			font-size: 1.8rem;
+			padding: 50px 16px;
+			text-decoration: none;
+			display: block;
+		}
+
+		.dropdown-content a:hover {
+			background-color: #ddd;
+		}
+
+		.navbar a.active {
+			font-size: 1.8rem;
+			font-weight: bold;
+			background-color: #2dabe2;
+			color: white;
+			border-radius: 0px;
+			padding: 50px;
+		}
+
+@media (min-width: 1281px) {
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    min-height: 100vh; /* Ensure full height */
+    text-align: center;
+}
+
+
+/* Logo Styling */
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    max-width: 100px;
+    margin: 0 auto 10px;
+    display: block;
+}
+
+.home-icon img {
+	display: block;
+	width: 32px;
+}
+
+h1 {
+    font-size: 1.5rem;
+    color: #333;
+	text-align: center;
+}
+
+
+form {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 90%; /* For responsiveness */
+    text-align: left;
+}
+
+label {
+    font-weight: bold;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    display: block;
+    text-align: left;
+}
+
+input, select {
+	font-size:1rem;
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+}
+
+
+.submit-payment[type="submit"] {
+	font-size: 1rem;
+    background: linear-gradient(to bottom, #37e57e, #77fbac);
+	width: 100%;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.submit-payment[type="submit"]:hover {
+    background: linear-gradient(to bottom, #2ac363, #63e29b);
+}
+
+#success-popup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+		.dropbtn img {
+			position: absolute;
+			display: block;
+			width: 300%;
+			float: left;
+			top: -10%;
+			left: -110%;
+		}
+		
+
+		.navbar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 10px 20px;
+		}
+
+		.navbar a {
+			text-decoration: none;
+			color: white;
+			font-size: 1rem;
+		}
+
+		.dropdown {
+			position: relative;
+			display: inline-block;
+		}
+
+		.dropbtn {
+			background: none;
+			border: none;
+			cursor: pointer;
+		}
+		
+		.dropbtn:hover {
+		background: none; /* No background change on hover */
+		}
+		
+		.dropdown-content {
+			border-radius: 10px;
+			display: none;
+			position: absolute;
+			float: left;
+			top: 140%;
+			left: -280px;
+			text-align: left;
+			background-color: white;
+			min-width: 300px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+			z-index: 1;
+		}
+
+		.dropdown-content a {
+			color: black;
+			font-weight:normal;
+			font-size: 1.0rem;
+			padding: 10px 16px;
+			text-decoration: none;
+			display: block;
+		}
+
+		.dropdown-content a:hover {
+					background-color: #ddd;
+				}
+
+
+		.navbar a.active {
+			font-size: 1.0rem;
+			font-weight: bold;
+			background-color: #2dabe2;
+			color: white;
+			border-radius: 0px;
+			padding: 10px;
+		}
+
+
+
+
+
+
+}
