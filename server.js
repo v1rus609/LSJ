@@ -11,6 +11,7 @@ const fs = require('fs');
 
 const app = express();
 const db = new sqlite3.Database('./database.db');
+const port = 5000;
 app.use('/invoices', express.static(path.join(__dirname, 'invoices')));
 app.use('/exports', express.static(path.join(__dirname, 'exports')));
 
@@ -1099,6 +1100,6 @@ app.get('/buyers/location/:id', (req, res) => {
 });
 
 // Start the Server
-app.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
+app.listen(process.env.PORT || port, () => {
+    console.log(`Listening on port ${port}`);
 });
