@@ -12,6 +12,7 @@ const fs = require('fs');
 const app = express();
 const db = new sqlite3.Database('./database.db');
 const port = 5000;
+
 app.use('/invoices', express.static(path.join(__dirname, 'invoices')));
 app.use('/exports', express.static(path.join(__dirname, 'exports')));
 
@@ -215,7 +216,7 @@ app.get('/purchases', (req, res) => {
     let query = `
         SELECT
             sales.id AS sale_id,
-            buyers.name AS buyer_name,
+            buyers.name AS buyer_name,  -- Join buyers table to get the buyer name
             containers.container_number AS container_number,
             sales.purchase_date,
             sales.weight_sold,
@@ -224,7 +225,7 @@ app.get('/purchases', (req, res) => {
             sales.unpaid_amount,
             sales.total_price
         FROM sales
-        JOIN buyers ON sales.buyer_id = buyers.id
+        JOIN buyers ON sales.buyer_id = buyers.id  -- Join the buyers table on buyer_id
         JOIN containers ON sales.container_id = containers.id
         WHERE 1 = 1
     `;
@@ -239,6 +240,7 @@ app.get('/purchases', (req, res) => {
         params.push(container);
     }
 
+
     db.all(query, params, (err, rows) => {
         if (err) {
             console.error('Error fetching purchase history:', err.message);
@@ -247,6 +249,8 @@ app.get('/purchases', (req, res) => {
         res.json(rows);
     });
 });
+
+
 
 // Dashboard Metrics
 // Dashboard Metrics with Fixed Total Unpaid Calculation
@@ -1098,6 +1102,106 @@ app.get('/buyers/location/:id', (req, res) => {
         }
     });
 });
+
+// Fetch a purchase record for editing
+app.get('/purchase-record/:id', (req, res) => {
+    const id = req.params.id;
+
+    const query = `
+        SELECT
+            sales.id AS sale_id,
+            buyers.name AS buyer_name,  -- Join buyers table to get the buyer name
+            sales.purchase_date,
+            sales.weight_sold,
+            sales.price_per_kg,
+            sales.paid_amount,
+            sales.unpaid_amount,
+            sales.total_price
+        FROM sales
+        JOIN buyers ON sales.buyer_id = buyers.id  -- Join the buyers table on buyer_id
+        WHERE sales.id = ?
+    `;
+
+    db.get('SELECT sales.id AS sale_id, sales.buyer_id, buyers.name AS buyer_name, sales.purchase_date, sales.weight_sold, sales.price_per_kg, sales.paid_amount, sales.unpaid_amount, sales.total_price FROM sales JOIN buyers ON sales.buyer_id = buyers.id WHERE sales.id = ?', [id], (err, result) => {
+        if (err) {
+            console.error('Error fetching purchase record:', err);
+            return res.status(500).send('Error fetching purchase record');
+        }
+        if (result) {
+            res.json(result); // Now the result includes buyer_id
+        } else {
+            res.status(404).json({ error: 'Record not found' });
+        }
+    });
+});
+
+
+
+// Update a purchase record
+app.put('/purchase-record/update', (req, res) => {
+    console.log('Request body:', req.body);  // Log the incoming request body
+
+    const { purchase_date, buyer_id, weight_sold, price_per_kg, paid_amount, unpaid_amount, total_price, id } = req.body;
+
+    // Validation
+    if (!buyer_id) {
+        console.error('Buyer ID is missing');
+        return res.status(400).json({ success: false, error: 'Buyer ID is required' });
+    }
+    if (!purchase_date || !weight_sold || !price_per_kg || !paid_amount || !unpaid_amount || !total_price || !id) {
+        console.error('Missing required fields');
+        return res.status(400).json({ success: false, error: 'Missing required fields' });
+    }
+
+    // Ensure that buyer exists in the database
+    db.get('SELECT id FROM buyers WHERE id = ?', [buyer_id], (err, buyer) => {
+        if (err) {
+            console.error('Error finding buyer:', err);
+            return res.status(500).json({ success: false, error: 'Error finding buyer' });
+        }
+
+        if (!buyer) {
+            return res.status(404).json({ success: false, error: 'Buyer not found' });
+        }
+
+        // Now update the record in the sales table
+        const query = `
+			UPDATE sales 
+			SET purchase_date = ?, buyer_id = ?, weight_sold = ?, price_per_kg = ?, paid_amount = ?, unpaid_amount = ?, total_price = ? 
+			WHERE id = ?
+		`;
+
+        const params = [purchase_date, buyer_id, weight_sold, price_per_kg, paid_amount, unpaid_amount, total_price, id];
+
+        // Log the query and parameters for debugging
+        console.log('Running query:', query);
+        console.log('With params:', params);
+
+        db.run(query, params, function (err) {
+            if (err) {
+                console.error('Error updating purchase record:', err);
+                return res.status(500).json({ success: false, error: 'Failed to update record' });
+            }
+
+            // Log the result of the update
+            console.log(`Updated purchase record with ID: ${id}`);
+            res.json({ success: true });
+        });
+    });
+});
+
+// Delete a purchase record
+app.delete('/purchase-record/delete/:id', (req, res) => {
+    const id = req.params.id;
+    db.run('DELETE FROM sales WHERE id = ?', [id], function(err) {
+        if (err) {
+            console.error('Error deleting purchase record:', err);
+            return res.status(500).json({ success: false, error: 'Failed to delete record' });
+        }
+        res.json({ success: true });
+    });
+});
+
 
 // Start the Server
 app.listen(process.env.PORT || port, () => {
