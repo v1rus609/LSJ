@@ -11,8 +11,6 @@ const fs = require('fs');
 
 const app = express();
 const db = new sqlite3.Database('./database.db');
-const port = 5000;
-
 app.use('/invoices', express.static(path.join(__dirname, 'invoices')));
 app.use('/exports', express.static(path.join(__dirname, 'exports')));
 
@@ -118,7 +116,7 @@ app.get('/payments/history', (req, res) => {
     const { buyer_name, start_date, end_date } = req.query;
 
     let query = `
-        SELECT buyer_name, payment_date, particulars, bank_amount, cash_amount,
+        SELECT id, buyer_name, payment_date, particulars, bank_amount, cash_amount, payment_method,
                (IFNULL(bank_amount, 0) + IFNULL(cash_amount, 0)) AS total
         FROM payment_history
         WHERE 1=1
@@ -623,7 +621,7 @@ app.get('/payments/history', (req, res) => {
     const { buyer_name, start_date, end_date } = req.query;
 
     let query = `
-        SELECT payment_date, particulars, bank_amount, cash_amount, buyer_name,
+        SELECT id, payment_date, particulars, bank_amount, cash_amount, buyer_name,
                (IFNULL(bank_amount, 0) + IFNULL(cash_amount, 0)) AS total
         FROM payment_history
         WHERE 1=1
@@ -1190,6 +1188,10 @@ app.put('/purchase-record/update', (req, res) => {
     });
 });
 
+
+
+
+
 // Delete a purchase record
 app.delete('/purchase-record/delete/:id', (req, res) => {
     const id = req.params.id;
@@ -1203,7 +1205,226 @@ app.delete('/purchase-record/delete/:id', (req, res) => {
 });
 
 
+// Get all purchase return records with optional filters for buyer, container, start date, and end date
+app.get('/purchase-returns', (req, res) => {
+    const { buyer, container, start_date, end_date } = req.query;
+
+    let query = `
+        SELECT id, return_date, particulars, returned_kg, returned_price_per_kg, total_amount, buyer_id, container_id 
+        FROM purchase_returns
+        WHERE 1=1
+    `;
+    const params = [];
+
+    if (buyer && buyer !== "0") {
+        query += ` AND buyer_id = ?`;
+        params.push(buyer);
+    }
+
+    if (container && container !== "0") {
+        query += ` AND container_id = ?`;
+        params.push(container);
+    }
+
+    if (start_date) {
+        query += ` AND return_date >= ?`;
+        params.push(start_date);
+    }
+
+    if (end_date) {
+        query += ` AND return_date <= ?`;
+        params.push(end_date);
+    }
+
+    query += ` ORDER BY return_date DESC`;
+
+    db.all(query, params, (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(rows);
+    });
+});
+
+// Get a specific return record by ID, including buyer name and container number
+app.get('/purchase-return/:id', (req, res) => {
+    const { id } = req.params;
+
+    const query = `
+        SELECT pr.id, pr.return_date, pr.buyer_id, pr.container_id, pr.returned_kg, pr.returned_price_per_kg, pr.total_amount, 
+               b.name AS buyer_name, c.container_number  -- Fetch container_number here
+        FROM purchase_returns pr
+        LEFT JOIN buyers b ON pr.buyer_id = b.id
+        LEFT JOIN containers c ON pr.container_id = c.id  -- Join with containers table to get the container name
+        WHERE pr.id = ?
+    `;
+
+    db.get(query, [id], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            return res.status(404).json({ error: 'Return record not found' });
+        }
+        res.json(row);  // Send the return record with buyer_name and container_number
+    });
+});
+
+// Update a purchase return record, including buyer_id, container_id, return_date, returned_kg, returned_price_per_kg, and total_amount
+app.put('/purchase-return/update', (req, res) => {
+    const { id, return_date, returned_kg, returned_price_per_kg, total_amount } = req.body;
+
+    // Log the incoming data to see the structure
+    console.log('Update request data:', req.body);
+
+    // Update query without the container_id (as it's not submitted)
+    const query = `
+        UPDATE purchase_returns 
+        SET return_date = ?, returned_kg = ?, returned_price_per_kg = ?, total_amount = ? 
+        WHERE id = ?
+    `;
+
+    db.run(query, [return_date, returned_kg, returned_price_per_kg, total_amount, id], function (err) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true });
+    });
+});
+
+
+
+// Delete a return record by ID
+app.delete('/purchase-return/delete/:id', (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({ error: 'Return ID is required' });
+    }
+
+    db.run('DELETE FROM purchase_returns WHERE id = ?', [id], function (err) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Record not found' });
+        }
+        res.json({ success: true });
+    });
+});
+
+// Get the container name by ID (Fetch container name based on container_id)
+app.get('/container-name/:id', (req, res) => {
+    const { id } = req.params;
+
+    db.get('SELECT container_number FROM containers WHERE id = ?', [id], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            return res.status(404).json({ error: 'Container not found' });
+        }
+        res.json(row);  // Send the container's name (container_number)
+    });
+});
+
+// Get buyer details by buyer_id
+app.get('/buyers/:id', (req, res) => {
+    const { id } = req.params;
+    db.get('SELECT * FROM buyers WHERE id = ?', [id], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            return res.status(404).json({ error: 'Buyer not found' });
+        }
+        res.json(row);
+    });
+});
+
+
+// Get a specific payment record by ID
+app.get('/payment/:id', (req, res) => {
+    const { id } = req.params;
+    db.get('SELECT * FROM payment_history WHERE id = ?', [id], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(row);
+    });
+});
+
+// Update a payment record
+app.put('/payment/update', (req, res) => {
+    const { id, buyer_name, payment_date, particulars, bank_amount, cash_amount, payment_method } = req.body;
+
+    console.log('Updating payment with data:', { id, buyer_name, payment_date, particulars, bank_amount, cash_amount, payment_method });
+
+    const query = 'UPDATE payment_history SET payment_date = ?, particulars = ?, bank_amount = ?, cash_amount = ?, buyer_name = ?, payment_method = ? WHERE id = ?';
+    
+    db.run(query, [payment_date, particulars, bank_amount, cash_amount, buyer_name, payment_method, id], function (err) {
+        if (err) {
+            console.error('Error updating payment:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true });
+    });
+});
+
+
+// Delete a payment record
+app.delete('/payment/delete/:id', (req, res) => {
+    const { id } = req.params;
+    if (!id) {
+        return res.status(400).json({ error: 'Payment ID is required' });
+    }
+
+    db.run('DELETE FROM payment_history WHERE id = ?', [id], function (err) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true });
+    });
+});
+
+app.get('/sales/total-sold', (req, res) => {
+    const query = `
+        SELECT container_id, SUM(weight_sold) AS total_sold
+        FROM sales
+        GROUP BY container_id
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        const salesData = {};
+        rows.forEach(row => {
+            salesData[row.container_id] = row.total_sold;
+        });
+        res.json(salesData);
+    });
+});
+app.get('/purchase-returns/total-returned', (req, res) => {
+    const query = `
+        SELECT container_id, SUM(returned_kg) AS total_returned
+        FROM purchase_returns
+        GROUP BY container_id
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        const returnsData = {};
+        rows.forEach(row => {
+            returnsData[row.container_id] = row.total_returned;
+        });
+        res.json(returnsData);
+    });
+});
+
 // Start the Server
-app.listen(process.env.PORT || port, () => {
-    console.log(`Listening on port ${port}`);
+app.listen(3000, () => {
+    console.log('Server running on http://localhost:3000');
 });
