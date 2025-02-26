@@ -198,12 +198,13 @@ input:focus:valid {
 }
 
 		.dropdown-content {
-			border-radius: 10px;
+
 			display: none;
 			position: absolute;
 			float: left;
-			top: 105%;
-			left: -135px;
+    top: 110%;
+    left: -130px;
+
 			text-align: left;
 			background-color: white;
 			min-width: 160px;

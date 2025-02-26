@@ -68,7 +68,7 @@ select {
 select option {
     padding: 12px;
     font-weight: bold;
-    font-size: 0.5rem;
+        font-size: 0.7rem;
     background-color: white; /* Option background */
     color: #333; /* Text color */
 }
@@ -123,17 +123,20 @@ form button[type="submit"]:hover {
 }
 
 
-#success-popup {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #28a745;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+        #success-popup {
+        display: none;
+		position: fixed;
+		top: 237px;
+		left: 50%;
+		transform: translateX(-50%);
+		background: linear-gradient(to bottom, #37e57e, #77fbac);
+		color: white;
+		padding: 10px;
+		border-radius: 5px;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+		text-align: center;
+		font-size: 3rem;
+        }
 
 				.navbar {
 			display: flex;
@@ -327,7 +330,8 @@ form button[type="submit"]:hover {
 
 #success-popup {
     position: fixed;
-    top: 20px;
+    top: 150px;
+	font-size: 1.5rem;
     left: 50%;
     transform: translateX(-50%);
     background-color: #28a745;

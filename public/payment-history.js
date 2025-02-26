@@ -50,12 +50,16 @@ function fetchPaymentHistory(buyerName = 'all', startDate = null, endDate = null
             data.payments.forEach(payment => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${payment.buyer_name || 'N/A'}</td> <!-- Name of Party -->
+                    <td>${payment.buyer_name || 'N/A'}</td>
                     <td>${formatDate(payment.payment_date)}</td>
                     <td>${payment.particulars || 'N/A'}</td>
                     <td>${formatNumberWithCommas(payment.bank_amount.toFixed(2))}</td>
                     <td>${formatNumberWithCommas(payment.cash_amount.toFixed(2))}</td>
                     <td>${formatNumberWithCommas(payment.total.toFixed(2))}</td>
+                    <td>
+                        <button class="edit-btn" data-id="${payment.id}">Edit</button>
+                        <button class="delete-btn" data-id="${payment.id}">Delete</button>
+                    </td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -73,6 +77,111 @@ document.getElementById('apply-date-filter').addEventListener('click', function 
     const endDate = document.getElementById('end-date').value;
 
     fetchPaymentHistory(buyerName, startDate, endDate);
+});
+
+// Edit button functionality
+document.addEventListener('click', function (event) {
+    if (event.target.classList.contains('edit-btn')) {
+        const id = event.target.getAttribute('data-id');  // Get the correct ID
+        
+        // Fetch payment record by ID and populate the edit form
+        fetch(`/payment/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                // Populate form fields
+                document.getElementById('payment-id').value = data.id;
+                document.getElementById('payment-date').value = data.payment_date;
+                document.getElementById('particulars').value = data.particulars;
+                document.getElementById('bank-amount').value = data.bank_amount;
+                document.getElementById('cash-amount').value = data.cash_amount;
+                document.getElementById('payment-method').value = data.payment_method;
+
+                // Disable the buyer-name field and populate it (so it can't be edited)
+                const buyerNameField = document.getElementById('buyer-name');
+                buyerNameField.value = data.buyer_name;
+                buyerNameField.disabled = true;
+
+                // Show the modal for editing
+                document.getElementById('edit-payment-form').style.display = 'block';
+            });
+    }
+});
+
+// Close the edit modal
+document.getElementById('close-edit-btn').addEventListener('click', function () {
+    document.getElementById('edit-payment-form').style.display = 'none';
+});
+
+// Update payment record with confirmation dialog
+document.getElementById('update-payment-btn').addEventListener('click', function () {
+    // Show confirmation dialog before proceeding with the update
+    const confirmed = confirm('Are you sure you want to update this payment record?');
+    if (!confirmed) {
+        return;  // If not confirmed, stop the update process
+    }
+
+    const paymentData = {
+        id: document.getElementById('payment-id').value,
+        payment_date: document.getElementById('payment-date').value,
+        particulars: document.getElementById('particulars').value,
+        bank_amount: document.getElementById('bank-amount').value,
+        cash_amount: document.getElementById('cash-amount').value,
+        payment_method: document.getElementById('payment-method').value,
+        buyer_name: document.getElementById('buyer-name').value // Ensure buyer_name is included
+    };
+
+    console.log('Sending update request with data:', paymentData);  // Log the data to verify it's correct
+
+    fetch(`/payment/update`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(paymentData)  // Send paymentData with buyer_name included
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Payment record updated successfully');
+            fetchPaymentHistory();  // Refresh the payment history
+            document.getElementById('edit-payment-form').style.display = 'none'; // Hide the modal
+        } else {
+            alert('Failed to update payment record');
+        }
+    })
+    .catch(error => console.error('Error updating payment record:', error));
+});
+
+// Handle Delete button functionality with confirmation
+document.addEventListener('click', function (event) {
+    if (event.target.classList.contains('delete-btn')) {
+        const id = event.target.getAttribute('data-id');
+        console.log('Deleting payment with ID:', id);
+
+        if (!id) {
+            console.error("ID is missing for the delete button.");
+            return; // Prevent the request from being sent if ID is missing
+        }
+
+        // Show confirmation dialog before proceeding with deletion
+        const confirmed = confirm('Are you sure you want to delete this payment record?');
+        if (!confirmed) {
+            return;  // If not confirmed, stop the delete process
+        }
+
+        // Proceed with the delete request
+        fetch(`/payment/delete/${id}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Payment record deleted successfully');
+                    fetchPaymentHistory();  // Refresh the payment history
+                } else {
+                    alert('Failed to delete payment record');
+                }
+            })
+            .catch(error => console.error('Error deleting payment record:', error));
+    }
 });
 
 // Add event listener for export to Excel
@@ -126,6 +235,11 @@ document.getElementById('export-payment-history-pdf').addEventListener('click', 
         .catch(error => console.error('Error exporting PDF:', error));
 });
 
+
+// Fetch all payment history on page load
+document.addEventListener("DOMContentLoaded", function() {
+    fetchPaymentHistory();
+});
 document.addEventListener("DOMContentLoaded", function() {
     // Get the dropdown button and menu
     const dropdownButton = document.querySelector(".dropbtn");
@@ -145,6 +259,3 @@ document.addEventListener("DOMContentLoaded", function() {
         dropdownContent.style.display = "none";
     });
 });
-
-// Fetch all payment history on page load
-fetchPaymentHistory();

@@ -252,6 +252,97 @@ button:active {
     transform: scale(0.98);  /* Shrink the button when clicked */
 }
 
+/* Modal styles */
+.popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Popup content */
+.popup-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+}
+
+/* Close Button */
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Form styles */
+#edit-return-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#edit-return-form input, #edit-return-form select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#update-return-btn {
+
+    font-size: 1rem;
+    background: linear-gradient(to bottom, #37e57e, #47a16b);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+
+}
+
+#update-return-btn:hover {
+    background-color: #45a049;
+}
+
+button.edit-btn {
+    padding: 4px 13px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin: 5px 0px;
+    background: linear-gradient(to bottom, #37e57e, #47a16b);
+    color: white;
+}
+button.delete-btn {
+    padding: 4px 8px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin: 0 0px;
+    background: linear-gradient(to bottom, #e5363b, #fb7679);
+    color: white;
+}
 
 @media (min-width: 1281px) {
 	/* General Styles */
@@ -302,10 +393,18 @@ h1 {
     margin-top: 20px;
 }
 
-#return-history-table th, #return-history-table td {
+#return-history-table th{
     padding: 10px;
 		font-size:1rem;
-    text-align: left;
+    text-align: center;
+    border: 1px solid #ddd;
+} 
+
+
+return-history-table td {
+    padding: 10px;
+		font-size:1rem;
+    text-align: center;
     border: 1px solid #ddd;
 }
 

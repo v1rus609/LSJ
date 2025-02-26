@@ -192,17 +192,17 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-
     fetchBuyers();
 });
 
-document.addEventListener("DOMContentLoaded", function() {
+// **Dropdown Toggle**
+document.addEventListener("DOMContentLoaded", function () {
     // Get the dropdown button and menu
     const dropdownButton = document.querySelector(".dropbtn");
     const dropdownContent = document.querySelector(".dropdown-content");
 
     // Toggle dropdown visibility when button is clicked
-    dropdownButton.addEventListener("click", function(event) {
+    dropdownButton.addEventListener("click", function (event) {
         // Prevent the event from bubbling up to the document
         event.stopPropagation();
 
@@ -211,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Hide the dropdown if the user clicks anywhere else on the document
-    document.addEventListener("click", function() {
+    document.addEventListener("click", function () {
         dropdownContent.style.display = "none";
     });
 });

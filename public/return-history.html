@@ -8,8 +8,6 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
-
-  
 </head>
 <body>
     <div class="container">
@@ -89,7 +87,8 @@
                     <th>Return Date</th>
                     <th>Returned KG</th>
                     <th>Price per KG</th>
-                    <th>Total Amount</th>
+                    <th>Total Amount</th>            
+					<th>Actions</th>
                 </tr>
             </thead>
             <tbody id="return-history-table-body">
@@ -105,6 +104,46 @@
 		<button id="export-pdf-return-history">Export PDF</button>
 
     </div>
+<!-- Edit Return Modal Form -->
+<div id="edit-return-form" class="popup" style="display: none;">
+    <div class="popup-content">
+        <span id="close-edit-btn" class="close-btn">&times;</span>
+        <h2>Edit Return Record</h2>
+        <form id="return-form">
+            <input type="hidden" id="return-id"> <!-- Hidden field for ID -->
+
+            <!-- Buyer Name (set by backend using buyer_id) -->
+            <label for="buyer-name">Buyer Name:</label><br>
+            <input type="text" id="buyer-name" disabled><br><br> <!-- Display buyer's name, disabled for editing -->
+
+            <!-- Container Name (set by backend using container_id) -->
+            <label for="container-name">Container No:</label><br>
+            <input type="text" id="container-name" disabled><br><br> <!-- Display container name, disabled for editing -->
+
+            <!-- Return Date -->
+            <label for="return-date">Return Date:</label><br>
+            <input type="date" id="return-date" required><br><br>
+
+            <!-- Returned KG -->
+            <label for="returned-kg">Returned KG:</label><br>
+            <input type="number" id="returned-kg" required><br><br>
+
+            <!-- Price per KG -->
+            <label for="returned-price-per-kg">Price per KG:</label><br>
+            <input type="number" id="returned-price-per-kg" required><br><br>
+
+            <!-- Total Amount -->
+            <label for="total-amount">Total Amount:</label><br>
+            <input type="number" id="total-amount" required><br><br>
+
+            <!-- Update Button -->
+            <button type="submit" id="update-return-btn">Update Return</button>
+        </form>
+    </div>
+</div>
+
+
+
 
     <script src="return-history.js"></script> <!-- Link to JavaScript file -->
 </body>

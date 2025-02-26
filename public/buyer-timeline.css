@@ -69,8 +69,8 @@ body {
     display: none;
     position: absolute;
     float: left;
-    top: 100%;
-    left: -315%;
+top: 80%;
+    left: -103%;
     text-align: left;
     background-color: white;
     min-width: 140px;
@@ -328,6 +328,18 @@ background: linear-gradient(to bottom, #2dabe2, #83d9ff);
     display: inline-block;
     text-align: center;
 }
-
+.dropdown-content {
+    border-radius: 5px;
+    display: none;
+    position: absolute;
+    float: left;
+    top: 75%;
+    left: -100%;
+    text-align: left;
+    background-color: white;
+    min-width: 140px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
 
 }

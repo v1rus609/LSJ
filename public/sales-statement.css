@@ -178,19 +178,19 @@ tr:hover {
 			cursor: pointer;
 		}
 
-		.dropdown-content {
-			border-radius: 10px;
-			display: none;
-			position: absolute;
-			float: left;
-			top: 200%;
-			left: -135px;
-			text-align: left;
-			background-color: white;
-			min-width: 160px;
-			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-			z-index: 1;
-		}
+.dropdown-content {
+    /* border-radius: 10px; */
+    display: none;
+    position: absolute;
+    float: left;
+    top: 165%;
+    left: -148px;
+    text-align: left;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
 
 		.dropdown-content a {
 			color: black;
@@ -281,18 +281,18 @@ tr:hover {
 		background: none; /* No background change on hover */
 	}
 		
-	.dropdown-content {
-		border-radius: 10px;
-		display: none;
-		position: absolute;
-		float: left;
-		top: 140%;
-		left: -280px;
-		text-align: left;
-		background-color: white;
-		min-width: 300px;
-		box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-		z-index: 1;
+    .dropdown-content {
+        /* border-radius: 10px; */
+        display: none;
+        position: absolute;
+        float: left;
+        top: 215%;
+        left: -157px;
+        text-align: left;
+        background-color: white;
+        min-width: 180px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
 	}
 
 	.dropdown-content a {

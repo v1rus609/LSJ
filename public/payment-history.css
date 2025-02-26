@@ -30,9 +30,7 @@ body {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-select{
-font-size:1.5rem;	
-}
+
 
 h1 {
 	font-size:2.5rem;
@@ -185,18 +183,18 @@ tfoot th {
 			cursor: pointer;
 		}
 
-		.dropdown-content {
-			border-radius: 10px;
-			display: none;
-			position: absolute;
-			float: left;
-			top: 265%;
-			left: -290px;
-			text-align: left;
-			background-color: white;
-			min-width: 300px;
-			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-			z-index: 1;
+.dropdown-content {
+    /* border-radius: 10px; */
+    display: none;
+    position: absolute;
+    float: left;
+    top: 196%;
+    left: -314px;
+    text-align: left;
+    background-color: white;
+    min-width: 330px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
 		}
 
 		.dropdown-content a {
@@ -219,6 +217,230 @@ tfoot th {
 			border-radius: 0px;
 			padding: 50px;
 		}
+
+
+/* Modal Background */
+.popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.popup-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Close Button Style */
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* Header Text */
+.popup-content h3 {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+/* Confirmation Text */
+.popup-content p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+/* Buttons */
+.popup-content button {
+    padding: 25px 30%;
+	margin: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(to bottom, #37e57e, #47a16b);
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+
+/* Confirm Button */
+#confirm-delete {
+    background-color: #e5363b;
+    color: white;
+}
+
+#confirm-delete:hover {
+    background-color: #e53935; /* Darker Red */
+}
+
+/* Cancel Button */
+#cancel-delete {
+    background-color: #888;
+    color: white;
+    margin-left: 10px;
+}
+
+#cancel-delete:hover {
+    background-color: #555;
+}
+
+/* Button Wrapper */
+.popup-content .button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#edit-purchase-form {
+	
+	
+}
+
+#edit-payment-form label {
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-align: left;
+}
+
+
+#edit-payment-form input {
+    padding: 15px;
+	margin: 10px;
+    width: 80%;
+    font-size: 1.6rem;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+
+
+option {
+    padding: 10px;
+    font-size: 1rem;
+    background-color: white;
+    color: #333;
+    border: none; /* Remove borders */
+    transition: background-color 0.2s;
+}
+
+option:hover {
+    background-color: #f1f1f1; /* Change background color on hover */
+}
+
+/* Style the select dropdown */
+select {
+    padding: 10px;
+    font-size: 1.6rem;
+    margin: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: #333;
+    width: 200px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+select:focus {
+    outline: none;
+    border-color: #47a16b; /* Change border color on focus */
+    background-color: #f1f1f1; /* Change background color on focus */
+}
+
+/* Style for options */
+option {
+    padding: 10px;
+    font-size: 0.8rem;
+    background-color: white;
+    color: #333;
+    border: none; /* Remove borders */
+    transition: background-color 0.2s;
+}
+
+option:hover {
+    background-color: #f1f1f1; /* Change background color on hover */
+}
+
+/* Styling for the dropdown options when hovering */
+select:hover {
+    border-color: #47a16b; /* Highlight the border on hover */
+}
+
+/* Optional: Add a subtle box-shadow for a modern look */
+select {
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for the dropdown arrow */
+select {
+    appearance: none; /* Remove the default arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"%3E%3Cpath d="M5 6L2 3H8L5 6Z" fill="gray"/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px; /* Adjust for the arrow */
+}
+
+/* Edit Button Style */
+button.edit-btn {
+    padding: 8px 24px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin: 5px 0px;
+    background: linear-gradient(to bottom, #37e57e, #47a16b);
+    color: white;
+}
+
+button.edit-btn:hover {
+    background-color: #45a049;  /* Darker Green */
+    transform: scale(1.05);  /* Slight scale effect on hover */
+}
+
+/* Delete Button Style */
+button.delete-btn {
+    padding: 8px 12px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin: 0 0px;
+    background: linear-gradient(to bottom, #e5363b, #fb7679);
+    color: white;
+}
+
+button.delete-btn:hover {
+    background-color: #e53935;  /* Darker Red */
+    transform: scale(1.05);  /* Slight scale effect on hover */
+}
 
 @media (min-width: 1281px) {
 	
@@ -266,10 +488,6 @@ tfoot th {
 	display: block;
 	width: 32px;
 }
-	
-	select {
-		font-size: 1.0rem;
-	}
 	
 	.filter-section button {
 		padding: 5px 10px;
@@ -343,18 +561,18 @@ tfoot th {
 		background: none; /* No background change on hover */
 	}
 		
-	.dropdown-content {
-		border-radius: 10px;
-		display: none;
-		position: absolute;
-		float: left;
-		top: 140%;
-		left: -280px;
-		text-align: left;
-		background-color: white;
-		min-width: 300px;
-		box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-		z-index: 1;
+    .dropdown-content {
+        /* border-radius: 10px; */
+        display: none;
+        position: absolute;
+        float: left;
+        top: 187%;
+        left: -277px;
+        text-align: left;
+        background-color: white;
+        min-width: 300px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
 	}
 
 	.dropdown-content a {
@@ -378,6 +596,122 @@ tfoot th {
 		padding: 10px;
 	}
 
+	/* Style the select dropdown */
+	select {
+		padding: 10px;
+		font-size: 1rem;
+		margin: 10px;
+		border-radius: 5px;
+		border: 1px solid #ccc;
+		background-color: white;
+		color: #333;
+		width: 200px;
+		cursor: pointer;
+		transition: background-color 0.3s, border-color 0.3s;
+	}
+
+	select:focus {
+		outline: none;
+		border-color: #47a16b; /* Change border color on focus */
+		background-color: #f1f1f1; /* Change background color on focus */
+	}
+
+	/* Style for options */
+	option {
+		padding: 10px;
+		font-size: 0.8rem;
+		background-color: white;
+		color: #333;
+		border: none; /* Remove borders */
+		transition: background-color 0.2s;
+	}
+
+	option:hover {
+		background-color: #f1f1f1; /* Change background color on hover */
+	}
+
+	/* Styling for the dropdown options when hovering */
+	select:hover {
+		border-color: #47a16b; /* Highlight the border on hover */
+	}
+
+	/* Optional: Add a subtle box-shadow for a modern look */
+	select {
+		box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+	}
+
+	/* Style for the dropdown arrow */
+	select {
+		appearance: none; /* Remove the default arrow */
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"%3E%3Cpath d="M5 6L2 3H8L5 6Z" fill="gray"/%3E%3C/svg%3E');
+		background-repeat: no-repeat;
+		background-position: right 10px center;
+		padding-right: 30px; /* Adjust for the arrow */
+	}
+
+	button.edit-btn {
+			padding: 4px 20px;
+			font-size: 0.8rem;
+			font-weight: bold;
+			border-radius: 5px;
+			border: none;
+			cursor: pointer;
+			transition: background-color 0.3s, transform 0.2s;
+			margin: 5px 0px;
+			background: linear-gradient(to bottom, #37e57e, #47a16b);
+			color: white;
+		}
+	
+	
+	    button.delete-btn {
+        padding: 4px 13px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+        margin: 0 0px;
+        background: linear-gradient(to bottom, #e5363b, #fb7679);
+        color: white;
+    }
+#edit-payment-form input {
+        padding: 10px;
+        width: 57%;
+        font-size: 0.8rem;
+        margin: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+}
+
+.popup-content {
+    background-color: #fefefe;
+    margin: 7% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.popup-content button {
+    padding: 15px 20%;
+    font-size: 1rem;
+	margin: 10px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(to bottom, #37e57e, #47a16b);
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+#edit-payment-form label {
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: left;
+}
 }
 	
 

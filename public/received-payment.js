@@ -146,6 +146,7 @@ document.getElementById('payment-form').addEventListener('submit', function (eve
             alert('Error: ' + error.message);
         });
 });
+
 document.addEventListener("DOMContentLoaded", function() {
     // Get the dropdown button and menu
     const dropdownButton = document.querySelector(".dropbtn");

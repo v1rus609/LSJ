@@ -12,7 +12,6 @@ function fetchFilters() {
     fetch('/buyers/list')
         .then(response => response.json())
         .then(data => {
-            console.log("Fetched Buyers:", data);  // Log fetched buyers data
             const buyerFilter = document.getElementById('buyer-filter');
             data.forEach(buyer => {
                 const option = document.createElement('option');
@@ -26,7 +25,6 @@ function fetchFilters() {
     fetch('/containers/list')
         .then(response => response.json())
         .then(data => {
-            console.log("Fetched Containers:", data);  // Log fetched containers data
             const containerFilter = document.getElementById('container-filter');
             data.forEach(container => {
                 const option = document.createElement('option');
@@ -46,8 +44,6 @@ function fetchPurchases(filters = {}) {
     fetch(query)
         .then(response => response.json())
         .then(data => {
-            console.log("Fetched Purchases:", data);  // Add logs here to inspect the data
-
             const tableBody = document.getElementById('purchase-table').querySelector('tbody');
             tableBody.innerHTML = '';
 
@@ -143,6 +139,24 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+	
+	// Apply filters immediately when a buyer or container is selected
+document.getElementById('buyer-filter').addEventListener('change', function () {
+    const filters = {
+        buyer: this.value,
+        container: document.getElementById('container-filter').value,
+    };
+    fetchPurchases(filters); // Trigger fetch on change
+});
+
+// Apply filters immediately when a container is selected
+document.getElementById('container-filter').addEventListener('change', function () {
+    const filters = {
+        buyer: document.getElementById('buyer-filter').value,
+        container: this.value,
+    };
+    fetchPurchases(filters); // Trigger fetch on change
+});
 
     // Recalculate the Price and Unpaid Amount when any of the fields change
     document.getElementById('quantity').addEventListener('input', updatePriceAndUnpaidAmount);

@@ -7,14 +7,37 @@ fetch('/containers/list') // ✅ Fetch directly from the updated containers tabl
         containerData = data.map(container => ({
             id: container.id,
             container_number: container.container_number,
-            weight: container.weight,
-            remaining_weight: container.remaining_weight, // ✅ Directly from DB (already updated)
-            total_sold: container.weight - container.remaining_weight, // ✅ No need to adjust for returns
+            weight: container.weight, // Total weight of the container from the DB
             arrival_date: container.arrival_date
         }));
-        renderTable(containerData); // Render table
+
+        // Now fetch the sold and returned data dynamically
+        fetchSoldAndReturnedData().then(() => {
+            renderTable(containerData); // Render table after calculating remaining weight
+        });
     })
     .catch(error => console.error('Error fetching containers:', error));
+
+// Fetch sold and returned data
+async function fetchSoldAndReturnedData() {
+    // Fetch sales data (weight sold for each container)
+    const salesResponse = await fetch('/sales/total-sold');
+    const salesData = await salesResponse.json();
+
+    // Fetch returned data (weight returned for each container)
+    const returnsResponse = await fetch('/purchase-returns/total-returned');
+    const returnsData = await returnsResponse.json();
+
+    // Calculate remaining weight for each container
+    containerData.forEach(container => {
+        const soldWeight = salesData[container.id] || 0; // Total weight sold for the container
+        const returnedWeight = returnsData[container.id] || 0; // Total weight returned for the container
+
+        container.remaining_weight = container.weight - soldWeight + returnedWeight;
+        container.total_sold = soldWeight; // Store total sold weight for reference
+        container.total_returned = returnedWeight; // Store total returned weight for reference
+    });
+}
 
 // Render table rows with formatted values
 function renderTable(data) {
@@ -32,11 +55,10 @@ function renderTable(data) {
         const row = `
             <tr>
                 <td>${container.id}</td>
+				<td>${formattedDate}</td>
                 <td>${container.container_number}</td>
                 <td>${formatNumberWithCommas(container.weight)}</td>
-                <td>${formattedDate}</td>
                 <td>${formatNumberWithCommas(container.remaining_weight)}</td>
-                <td>${formatNumberWithCommas(container.total_sold)}</td>
             </tr>
         `;
         tableBody.innerHTML += row;
