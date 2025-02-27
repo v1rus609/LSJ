@@ -2,7 +2,7 @@
 const { Database } = require('@sqlitecloud/drivers');
 
 // Connect to SQLite Cloud
-const db = new Database('sqlitecloud://cksyvf4pnk.g6.sqlite.cloud:8860/chinook.sqlite?apikey=LYNMd1zowmqh5nTC6c4HP9WN9Ja12zYpmq7a1fwAONM'); // Replace with your connection URL
+const db = new Database('sqlitecloud://cksyvf4pnk.g6.sqlite.cloud:8860/database.db?apikey=LYNMd1zowmqh5nTC6c4HP9WN9Ja12zYpmq7a1fwAONM'); // Replace with your connection URL
 
 // Middleware to parse incoming request bodies
 const bodyParser = require('body-parser');
