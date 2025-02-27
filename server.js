@@ -26,44 +26,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Initialize Database (SQLite Cloud Connection)
-db.serialize(() => {
-    db.run(`
-        CREATE TABLE IF NOT EXISTS containers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            container_number TEXT,
-            weight REAL,
-            arrival_date TEXT,
-            remaining_weight REAL
-        )
-    `);
-    db.run(`
-        CREATE TABLE IF NOT EXISTS sales (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            container_id INTEGER,
-            buyer_id INTEGER,
-            weight_sold REAL,
-            price_per_kg REAL,
-            paid_amount REAL,
-            unpaid_amount REAL,
-            total_price REAL,
-            purchase_date TEXT,
-            FOREIGN KEY (container_id) REFERENCES containers(id),
-            FOREIGN KEY (buyer_id) REFERENCES buyers(id)
-        )
-    `);
-    db.run(`
-        CREATE TABLE IF NOT EXISTS buyers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            location TEXT,
-            contact_number TEXT,
-            paid_amount REAL DEFAULT 0,
-            unpaid_amount REAL DEFAULT 0,
-            total_amount REAL DEFAULT 0
-        )
-    `);
-});
+
 
 // Routes
 app.use('/containers', require('./routes/containers'));
