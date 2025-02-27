@@ -83,6 +83,7 @@ function fetchPurchases(filters = {}) {
         .catch(error => console.error('Error fetching purchases:', error));
 }
 
+
 // Event delegation: Handle Edit and Delete buttons
 document.addEventListener('DOMContentLoaded', function () {
     // Fetch filters and purchases on page load
