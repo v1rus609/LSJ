@@ -90,9 +90,7 @@ tr:hover {
     transition: all 0.3s;
 }
 
-.filter-row select {
-    width: 100px; /* Dropdown width */
-}
+
 
 .filter-row input[type="date"] {
     width: 80px; /* Date input width */

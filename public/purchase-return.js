@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const returnedPriceInput = document.getElementById('returned-price-per-kg');
     const totalAmountInput = document.getElementById('total-amount');
     const submitButton = document.getElementById('submit-return');
+    const buyerSearch = document.getElementById('buyer-search');
+    const containerSearch = document.getElementById('container-search');
 
     let maxReturnableAmount = 0;
 
@@ -38,6 +40,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     option.textContent = buyer.name;
                     buyerSelect.appendChild(option);
                 });
+
+                // Apply search functionality to buyer dropdown
+                buyerSearch.addEventListener('input', function () {
+                    filterDropdownOptions(buyerSelect, buyerSearch.value);
+                });
             })
             .catch(error => console.error("❌ Error fetching buyers:", error));
     }
@@ -58,6 +65,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     containerSelect.appendChild(option);
                 });
                 purchasedProductText.textContent = '';
+
+                // Apply search functionality to container dropdown
+                containerSearch.addEventListener('input', function () {
+                    filterDropdownOptions(containerSelect, containerSearch.value);
+                });
             })
             .catch(error => console.error('❌ Error fetching containers:', error));
     });
@@ -197,21 +209,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // **Dropdown Toggle**
 document.addEventListener("DOMContentLoaded", function () {
-    // Get the dropdown button and menu
     const dropdownButton = document.querySelector(".dropbtn");
     const dropdownContent = document.querySelector(".dropdown-content");
 
     // Toggle dropdown visibility when button is clicked
     dropdownButton.addEventListener("click", function (event) {
-        // Prevent the event from bubbling up to the document
         event.stopPropagation();
-
-        // Toggle the display of the dropdown
         dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
     });
 
-    // Hide the dropdown if the user clicks anywhere else on the document
     document.addEventListener("click", function () {
         dropdownContent.style.display = "none";
     });
 });
+
+// **Function to Filter Dropdown Options Based on Search**
+function filterDropdownOptions(dropdown, searchTerm) {
+    const options = dropdown.querySelectorAll('option');
+    const filterValue = searchTerm.toLowerCase();
+    options.forEach(function (option) {
+        const text = option.textContent || option.innerText;
+        if (text.toLowerCase().includes(filterValue)) {
+            option.style.display = ''; // Show matching option
+        } else {
+            option.style.display = 'none'; // Hide non-matching option
+        }
+    });
+}
+

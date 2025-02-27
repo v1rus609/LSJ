@@ -1,78 +1,108 @@
-let containerData = []; // Store fetched container data for filtering
+document.addEventListener('DOMContentLoaded', function () {
+    const searchBox = document.getElementById('search-box');  // Search input field
+    const containerList = document.getElementById('container-list');  // Table body
+    let containerData = [];  // Store the fetched container data for filtering
 
-// Fetch container data and render the table
-fetch('/containers/list') // ✅ Fetch directly from the updated containers table
-    .then(response => response.json())
-    .then(data => {
-        containerData = data.map(container => ({
-            id: container.id,
-            container_number: container.container_number,
-            weight: container.weight, // Total weight of the container from the DB
-            arrival_date: container.arrival_date
-        }));
+    // Fetch container data and render the table
+    fetch('/containers/list')  // Adjust endpoint if necessary
+        .then(response => response.json())
+        .then(data => {
+            containerData = data.map(container => ({
+                id: container.id,
+                container_number: container.container_number,
+                weight: container.weight,
+                arrival_date: container.arrival_date,
+                remaining_weight: container.remaining_weight
+            }));
 
-        // Now fetch the sold and returned data dynamically
-        fetchSoldAndReturnedData().then(() => {
-            renderTable(containerData); // Render table after calculating remaining weight
+            // Render the table after fetching the container data
+            renderTable(containerData);
+        })
+        .catch(error => {
+            console.error('Error fetching containers:', error);
+            document.getElementById('error-message').style.display = 'block';  // Show error message if data fetch fails
         });
-    })
-    .catch(error => console.error('Error fetching containers:', error));
 
-// Fetch sold and returned data
-async function fetchSoldAndReturnedData() {
-    // Fetch sales data (weight sold for each container)
-    const salesResponse = await fetch('/sales/total-sold');
-    const salesData = await salesResponse.json();
+    // Render the container list in the table
+    function renderTable(data) {
+        containerList.innerHTML = '';  // Clear existing rows
 
-    // Fetch returned data (weight returned for each container)
-    const returnsResponse = await fetch('/purchase-returns/total-returned');
-    const returnsData = await returnsResponse.json();
+        data.forEach(container => {
+            const arrivalDate = new Date(container.arrival_date);
+            const formattedDate = new Intl.DateTimeFormat('en-GB').format(arrivalDate);  // Format the arrival date as dd/mm/yyyy
 
-    // Calculate remaining weight for each container
-    containerData.forEach(container => {
-        const soldWeight = salesData[container.id] || 0; // Total weight sold for the container
-        const returnedWeight = returnsData[container.id] || 0; // Total weight returned for the container
+            const row = `
+                <tr>
+                    <td>${container.id}</td>
+                    <td>${formattedDate}</td>
+                    <td>${container.container_number}</td>
+                    <td>${formatNumberWithCommas(container.weight)}</td>
+                    <td>${formatNumberWithCommas(container.remaining_weight)}</td>
+                    <td><button class="delete-btn" data-id="${container.id}">Delete</button></td>
+                </tr>
+            `;
+            containerList.innerHTML += row;
+        });
 
-        container.remaining_weight = container.weight - soldWeight + returnedWeight;
-        container.total_sold = soldWeight; // Store total sold weight for reference
-        container.total_returned = returnedWeight; // Store total returned weight for reference
+        // Attach event listeners for the delete buttons
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', handleDeleteContainer);
+        });
+    }
+
+    // Helper function to format numbers with commas
+    function formatNumberWithCommas(number) {
+        return parseFloat(number).toLocaleString('en-US');
+    }
+
+    // Filter containers based on search input
+    searchBox.addEventListener('input', function () {
+        const searchValue = this.value.toLowerCase();
+        const filteredData = containerData.filter(container =>
+            container.container_number.toLowerCase().includes(searchValue)  // Match the search value with container number
+        );
+        renderTable(filteredData);  // Re-render the table with the filtered data
     });
-}
 
-// Render table rows with formatted values
-function renderTable(data) {
-    const tableBody = document.getElementById('container-list');
-    tableBody.innerHTML = ''; // Clear existing rows
+    // Handle Delete Button Click
+    function handleDeleteContainer(event) {
+        const containerId = event.target.dataset.id;
 
-    data.forEach(container => {
-        const arrivalDate = new Date(container.arrival_date);
-        const formattedDate = new Intl.DateTimeFormat('en-GB').format(arrivalDate); // dd/mm/yyyy format
-
-        const formatNumberWithCommas = (number) => {
-            return parseFloat(number).toLocaleString('en-US'); // Format number with commas
-        };
-
-        const row = `
-            <tr>
-                <td>${container.id}</td>
-				<td>${formattedDate}</td>
-                <td>${container.container_number}</td>
-                <td>${formatNumberWithCommas(container.weight)}</td>
-                <td>${formatNumberWithCommas(container.remaining_weight)}</td>
-            </tr>
-        `;
-        tableBody.innerHTML += row;
-    });
-}
-
-// Filter containers based on search input
-document.getElementById('search-box').addEventListener('input', function () {
-    const searchValue = this.value.toLowerCase();
-    const filteredData = containerData.filter(container =>
-        container.container_number.toLowerCase().includes(searchValue)
-    );
-    renderTable(filteredData);
+        if (confirm("Are you sure you want to delete this container?")) {
+            // Send a request to the backend to delete the container
+            fetch(`/container/delete/${containerId}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Container deleted successfully");
+                    // Re-fetch the container list after deletion
+                    fetch('/containers/list')
+                        .then(response => response.json())
+                        .then(data => {
+                            containerData = data.map(container => ({
+                                id: container.id,
+                                container_number: container.container_number,
+                                weight: container.weight,
+                                arrival_date: container.arrival_date,
+                                remaining_weight: container.remaining_weight
+                            }));
+                            renderTable(containerData);
+                        });
+                } else {
+                    alert("Failed to delete container.");
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting container:', error);
+                alert('Failed to delete container.');
+            });
+        }
+    }
 });
+
 
 document.addEventListener("DOMContentLoaded", function() {
     // Get the dropdown button and menu

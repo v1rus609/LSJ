@@ -248,9 +248,7 @@ button:focus {
     outline: none; /* Remove the default outline on focus */
 }
 
-button:active {
-    transform: scale(0.98);  /* Shrink the button when clicked */
-}
+
 
 /* Modal styles */
 .popup {
@@ -434,5 +432,35 @@ return-history-table td {
     margin-right: 5px;
 	font-size: 0.8em;
 }
+#return-history-table th, #return-history-table td {
+    padding: 5px;
+    text-align: center;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+}
 
+button.edit-btn {
+    padding: 4px 13px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin: 5px 0px;
+    background: linear-gradient(to bottom, #37e57e, #47a16b);
+    color: white;
+}
+button.delete-btn {
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin: 0 0px;
+    background: linear-gradient(to bottom, #e5363b, #fb7679);
+    color: white;
+}
 }

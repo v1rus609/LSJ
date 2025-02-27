@@ -1,3 +1,6 @@
+// Declare a variable to temporarily store the particulars value
+let storedParticulars = '';
+
 // Fetch and populate buyers in the dropdown
 fetch('/buyers/list')
     .then(response => response.json())
@@ -79,6 +82,40 @@ document.getElementById('apply-date-filter').addEventListener('click', function 
     fetchPaymentHistory(buyerName, startDate, endDate);
 });
 
+// Function to toggle bank/cash fields based on the selected payment method
+function togglePaymentFields() {
+    const paymentMethod = document.getElementById('payment-method').value;
+    const bankAmountField = document.getElementById('bank-amount');
+    const cashAmountField = document.getElementById('cash-amount');
+    const particularsField = document.getElementById('particulars');
+
+    if (paymentMethod === 'cash') {
+        bankAmountField.disabled = true;
+        cashAmountField.disabled = false;
+        // Store the particulars value before resetting it
+        storedParticulars = particularsField.value;
+        particularsField.value = ''; // Reset the particulars field
+
+        // Transfer amount from Bank Amount to Cash Amount if payment method is switched to cash
+        cashAmountField.value = bankAmountField.value;
+        bankAmountField.value = 0;
+    } else if (paymentMethod === 'bank') {
+        cashAmountField.disabled = true;
+        bankAmountField.disabled = false;
+        // Restore the particulars value if switched back to bank
+        particularsField.value = storedParticulars;
+
+        // Transfer amount from Cash Amount to Bank Amount if payment method is switched to bank
+        bankAmountField.value = cashAmountField.value;
+        cashAmountField.value = 0;
+    }
+}
+
+// Listen for changes in payment-method dropdown and toggle input fields accordingly
+document.getElementById('payment-method').addEventListener('change', function () {
+    togglePaymentFields();
+});
+
 // Edit button functionality
 document.addEventListener('click', function (event) {
     if (event.target.classList.contains('edit-btn')) {
@@ -106,11 +143,11 @@ document.addEventListener('click', function (event) {
             });
     }
 });
-
 // Close the edit modal
 document.getElementById('close-edit-btn').addEventListener('click', function () {
     document.getElementById('edit-payment-form').style.display = 'none';
 });
+
 
 // Update payment record with confirmation dialog
 document.getElementById('update-payment-btn').addEventListener('click', function () {

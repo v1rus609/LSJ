@@ -393,6 +393,25 @@ document.getElementById('buyer-filter').addEventListener('change', handleButtonS
 // Call the function once on page load to apply the correct button state
 window.onload = handleButtonState;
 
+function formatQuantity() {
+    const inputField = document.getElementById('quantity');
+    let inputValue = inputField.value;
+
+    // Remove any non-numeric characters (except for the decimal point)
+    inputValue = inputValue.replace(/[^0-9.]/g, '');
+
+    // Split the integer and decimal parts (if any)
+    let [integer, decimal] = inputValue.split('.');
+
+    // Add commas to the integer part
+    if (integer) {
+        integer = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // Reassemble the number with the decimal part if it exists
+    inputField.value = decimal ? `${integer}.${decimal}` : integer;
+}
+
 
 // Format date to dd-mm-yyyy
 function formatDate(dateString) {
