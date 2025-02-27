@@ -357,7 +357,6 @@ app.post('/generate-invoice', async (req, res) => {
     }
 });
 
-
 // New route to handle "Generate Invoice for All Buyers"
 app.post('/generate-all-buyers-invoice', async (req, res) => {
     const { purchases, total_paid, total_unpaid, grand_total } = req.body;
@@ -378,9 +377,8 @@ app.post('/generate-all-buyers-invoice', async (req, res) => {
     }
 });
 
-
 // Handle received payment with unpaid balance validation
-app.post('/payments/distribute', (req, res) => {
+app.post('/payments/distribute', async (req, res) => {
     const { buyer_id, payment_date, payment_method, payment_amount, particulars } = req.body;
 
     if (!buyer_id || !payment_date || !payment_method || !payment_amount || payment_amount <= 0) {
@@ -396,94 +394,91 @@ app.post('/payments/distribute', (req, res) => {
         FROM sales 
         WHERE buyer_id = ?`;
 
-    db.get(queryUnpaidBalance, [buyer_id, buyer_id], (err, result) => {
-        if (err) {
-            console.error('Error fetching total unpaid balance:', err.message);
-            return res.status(500).json({ error: 'Error fetching unpaid balance.' });
-        }
+    try {
+        // Fetch unpaid balance
+        const result = await db.get(queryUnpaidBalance, [buyer_id, buyer_id]);
 
         const totalUnpaid = result?.total_unpaid || 0;
         if (payment_amount > totalUnpaid) {
             return res.status(400).json({ error: `Payment exceeds the total unpaid amount of ${totalUnpaid}.` });
         }
 
+        // Fetch buyer name
         const buyerNameQuery = `SELECT name FROM buyers WHERE id = ?`;
-        db.get(buyerNameQuery, [buyer_id], (err, buyer) => {
-            if (err || !buyer) {
-                console.error('Error fetching buyer name:', err?.message || 'Buyer not found.');
-                return res.status(500).json({ error: 'Error fetching buyer name.' });
+        const buyer = await db.get(buyerNameQuery, [buyer_id]);
+        if (!buyer) {
+            console.error('Buyer not found');
+            return res.status(500).json({ error: 'Error fetching buyer name.' });
+        }
+
+        const buyerName = buyer.name;
+
+        // Fetch unpaid sales for the buyer
+        const salesQuery = `
+            SELECT id, unpaid_amount 
+            FROM sales 
+            WHERE buyer_id = ? AND unpaid_amount > 0 
+            ORDER BY id ASC`;
+
+        const rows = await db.all(salesQuery, [buyer_id]);
+        if (rows.length === 0) {
+            return res.status(400).json({ error: 'No unpaid sales found for this buyer.' });
+        }
+
+        let remainingAmount = payment_amount;
+        const updates = [];
+
+        // Calculate updates for unpaid sales
+        for (const sale of rows) {
+            if (remainingAmount <= 0) break;
+
+            const amountToDeduct = Math.min(remainingAmount, sale.unpaid_amount);
+            remainingAmount -= amountToDeduct;
+
+            updates.push({
+                sale_id: sale.id,
+                amountToDeduct,
+            });
+        }
+
+        // Apply updates to sales and insert payment history
+        const applyUpdates = async () => {
+            if (updates.length === 0) {
+                const bankAmount = payment_method === 'bank' ? payment_amount : 0;
+                const cashAmount = payment_method === 'cash' ? payment_amount : 0;
+
+                await db.run(
+                    `INSERT INTO payment_history (payment_date, particulars, bank_amount, cash_amount, buyer_name, buyer_id)
+                     VALUES (?, ?, ?, ?, ?, ?)`,
+                    [payment_date, particulars, bankAmount, cashAmount, buyerName, buyer_id]
+                );
+
+                return res.json({ success: true });
+            } else {
+                const update = updates.shift();
+
+                await db.run(
+                    `UPDATE sales
+                     SET paid_amount = paid_amount + ?, unpaid_amount = unpaid_amount - ?
+                     WHERE id = ?`,
+                    [update.amountToDeduct, update.amountToDeduct, update.sale_id]
+                );
+
+                applyUpdates();
             }
+        };
 
-            const buyerName = buyer.name;
+        // Start applying the updates
+        applyUpdates();
 
-            db.all(
-                `SELECT id, unpaid_amount FROM sales WHERE buyer_id = ? AND unpaid_amount > 0 ORDER BY id ASC`,
-                [buyer_id],
-                (err, rows) => {
-                    if (err) {
-                        console.error('Error fetching unpaid sales:', err.message);
-                        return res.status(500).json({ error: 'Error fetching unpaid sales.' });
-                    }
-
-                    let remainingAmount = payment_amount;
-                    const updates = [];
-
-                    for (const sale of rows) {
-                        if (remainingAmount <= 0) break;
-
-                        const amountToDeduct = Math.min(remainingAmount, sale.unpaid_amount);
-                        remainingAmount -= amountToDeduct;
-
-                        updates.push({
-                            sale_id: sale.id,
-                            amountToDeduct,
-                        });
-                    }
-
-                    const applyUpdates = () => {
-                        if (updates.length === 0) {
-                            const bankAmount = payment_method === 'bank' ? payment_amount : 0;
-                            const cashAmount = payment_method === 'cash' ? payment_amount : 0;
-
-                            db.run(
-                                `INSERT INTO payment_history (payment_date, particulars, bank_amount, cash_amount, buyer_name, buyer_id)
-                                 VALUES (?, ?, ?, ?, ?, ?)`,
-                                [payment_date, particulars, bankAmount, cashAmount, buyerName, buyer_id],
-                                (insertErr) => {
-                                    if (insertErr) {
-                                        console.error('Error inserting payment history:', insertErr.message);
-                                        return res.status(500).json({ error: 'Error saving payment history.' });
-                                    }
-                                    return res.json({ success: true });
-                                }
-                            );
-                        } else {
-                            const update = updates.shift();
-                            db.run(
-                                `UPDATE sales
-                                 SET paid_amount = paid_amount + ?, unpaid_amount = unpaid_amount - ?
-                                 WHERE id = ?`,
-                                [update.amountToDeduct, update.amountToDeduct, update.sale_id],
-                                (updateErr) => {
-                                    if (updateErr) {
-                                        console.error('Error updating sale:', updateErr.message);
-                                        return res.status(500).json({ error: 'Error processing payment.' });
-                                    }
-                                    applyUpdates();
-                                }
-                            );
-                        }
-                    };
-
-                    applyUpdates();
-                }
-            );
-        });
-    });
+    } catch (err) {
+        console.error('Error processing payment:', err.message);
+        return res.status(500).json({ error: 'Error processing payment.' });
+    }
 });
 
-
-app.get('/buyers/unpaid-amount/:buyer_id', (req, res) => {
+// Fetch Unpaid Amount for a Buyer
+app.get('/buyers/unpaid-amount/:buyer_id', async (req, res) => {
     const buyerId = req.params.buyer_id;
 
     const queryTotalUnpaid = `
@@ -501,52 +496,40 @@ app.get('/buyers/unpaid-amount/:buyer_id', (req, res) => {
         FROM purchase_returns 
         WHERE buyer_id = ?`;
 
-    db.serialize(() => {
-        db.get(queryTotalUnpaid, [buyerId], (err, unpaidRow) => {
-            if (err) {
-                console.error('❌ Error fetching unpaid amount:', err.message);
-                return res.status(500).json({ error: 'Error fetching unpaid amount' });
-            }
-            console.log(`📊 Buyer ${buyerId} | Total Unpaid from Sales:`, unpaidRow.total_unpaid);
+    try {
+        // Fetch total unpaid amount
+        const unpaidRow = await db.get(queryTotalUnpaid, [buyerId]);
+        console.log(`📊 Buyer ${buyerId} | Total Unpaid from Sales:`, unpaidRow.total_unpaid);
 
-            db.get(queryTotalPaid, [buyerId], (err, paidRow) => {
-                if (err) {
-                    console.error('❌ Error fetching total paid:', err.message);
-                    return res.status(500).json({ error: 'Error fetching total paid' });
-                }
-                console.log(`💰 Buyer ${buyerId} | Total Paid from Payment History:`, paidRow.total_paid);
+        // Fetch total paid amount
+        const paidRow = await db.get(queryTotalPaid, [buyerId]);
+        console.log(`💰 Buyer ${buyerId} | Total Paid from Payment History:`, paidRow.total_paid);
 
-                db.get(queryTotalReturns, [buyerId], (err, returnRow) => {
-                    if (err) {
-                        console.error('❌ Error fetching total returns:', err.message);
-                        return res.status(500).json({ error: 'Error fetching total returns' });
-                    }
-                    console.log(`🔄 Buyer ${buyerId} | Total Purchase Returns:`, returnRow.total_returns);
+        // Fetch total returns
+        const returnRow = await db.get(queryTotalReturns, [buyerId]);
+        console.log(`🔄 Buyer ${buyerId} | Total Purchase Returns:`, returnRow.total_returns);
 
-                    // ✅ Final Unpaid Calculation
-                    const totalUnpaid = unpaidRow.total_unpaid || 0;
-                    const totalPaid = paidRow.total_paid || 0;
-                    const totalReturns = returnRow.total_returns || 0;
+        // ✅ Final Unpaid Calculation
+        const totalUnpaid = unpaidRow.total_unpaid || 0;
+        const totalPaid = paidRow.total_paid || 0;
+        const totalReturns = returnRow.total_returns || 0;
 
-                    console.log(`📢 Calculating Final Unpaid Amount: ${totalUnpaid} - ${totalPaid} - ${totalReturns}`);
+        console.log(`📢 Calculating Final Unpaid Amount: ${totalUnpaid} - ${totalPaid} - ${totalReturns}`);
 
-                    const adjustedUnpaid = totalUnpaid - totalPaid - totalReturns;
-                    const finalUnpaid = Math.max(0, adjustedUnpaid); // Prevent negative unpaid amounts
+        const adjustedUnpaid = totalUnpaid - totalPaid - totalReturns;
+        const finalUnpaid = Math.max(0, adjustedUnpaid); // Prevent negative unpaid amounts
 
-                    console.log(`✅ Final Adjusted Unpaid Amount for Buyer ${buyerId}:`, finalUnpaid);
+        console.log(`✅ Final Adjusted Unpaid Amount for Buyer ${buyerId}:`, finalUnpaid);
 
-                    res.json({ unpaid_amount: finalUnpaid });
-                });
-            });
-        });
-    });
+        res.json({ unpaid_amount: finalUnpaid });
+    } catch (err) {
+        console.error('❌ Error fetching data for unpaid amount:', err.message);
+        return res.status(500).json({ error: 'Error fetching unpaid amount' });
+    }
 });
 
-
-
-
 // Add a new payment record
-app.post('/payments/history/add', (req, res) => {
+app.post('/payments/history/add', async (req, res) => {
     const { payment_date, particulars, bank_amount, cash_amount, payment_method, buyer_id, buyer_name } = req.body;
 
     // Validate inputs
@@ -559,20 +542,19 @@ app.post('/payments/history/add', (req, res) => {
         VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.run(query, [payment_date, particulars, bank_amount || 0, cash_amount || 0, payment_method, buyer_id, buyer_name], function (err) {
-        if (err) {
-            console.error('Error adding payment history:', err.message);
-            return res.status(500).json({ error: 'Error saving payment history.' });
-        }
-
+    try {
+        // Insert payment record using @sqlitecloud/drivers
+        await db.run(query, [payment_date, particulars, bank_amount || 0, cash_amount || 0, payment_method, buyer_id, buyer_name]);
+        
         res.json({ success: true });
-    });
+    } catch (err) {
+        console.error('Error adding payment history:', err.message);
+        return res.status(500).json({ error: 'Error saving payment history.' });
+    }
 });
 
-
-
 // Fetch payment history
-app.get('/payments/history', (req, res) => {
+app.get('/payments/history', async (req, res) => {
     const { buyer_name, start_date, end_date } = req.query;
 
     let query = `
@@ -598,21 +580,22 @@ app.get('/payments/history', (req, res) => {
 
     query += ` ORDER BY payment_date DESC`;
 
-    db.all(query, params, (err, rows) => {
-        if (err) {
-            console.error('Error fetching payment history:', err.message);
-            return res.status(500).send('Error fetching payment history.');
-        }
+    try {
+        // Execute the query using @sqlitecloud/drivers
+        const rows = await db.all(query, params);
 
         // Calculate total received
         const totalReceived = rows.reduce((sum, row) => sum + row.total, 0);
 
         res.json({ payments: rows, totalReceived });
-    });
+    } catch (err) {
+        console.error('Error fetching payment history:', err.message);
+        return res.status(500).send('Error fetching payment history.');
+    }
 });
 
-
-app.get('/sales/statement', (req, res) => {
+// Fetch sales statement
+app.get('/sales/statement', async (req, res) => {
     const { buyer_name, start_date, end_date } = req.query;
 
     let querySales = `
@@ -650,40 +633,33 @@ app.get('/sales/statement', (req, res) => {
 
     querySales += ` GROUP BY buyers.id ORDER BY buyers.name ASC`;
 
-    db.all(querySales, params, (err, salesRows) => {
-        if (err) {
-            console.error('Error fetching sales statement:', err.message);
-            return res.status(500).send('Error fetching sales statement.');
-        }
+    try {
+        // Fetch sales data
+        const salesRows = await db.all(querySales, params);
 
-        db.all(queryPayments, [], (err, paymentRows) => {
-            if (err) {
-                console.error('Error fetching payment history:', err.message);
-                return res.status(500).send('Error fetching payment history.');
-            }
+        // Fetch payment data
+        const paymentRows = await db.all(queryPayments, []);
 
-            // ✅ Create a map of payments per buyer
-            const paymentsMap = {};
-            paymentRows.forEach(row => {
-                paymentsMap[row.buyer_id] = row.total_payment || 0;
-            });
-
-            // ✅ Merge payments into sales data
-            const finalData = salesRows.map(sale => ({
-                ...sale,
-                total_paid: (paymentsMap[sale.buyer_id] || 0) + sale.paid_at_sale, // ✅ Sum both sources
-                total_unpaid: sale.total_unpaid - (paymentsMap[sale.buyer_id] || 0) - sale.paid_at_sale // ✅ Adjust balance correctly
-            }));
-
-            res.json(finalData);
+        // Create a map of payments per buyer
+        const paymentsMap = {};
+        paymentRows.forEach(row => {
+            paymentsMap[row.buyer_id] = row.total_payment || 0;
         });
-    });
+
+        // Merge payments into sales data
+        const finalData = salesRows.map(sale => ({
+            ...sale,
+            total_paid: (paymentsMap[sale.buyer_id] || 0) + sale.paid_at_sale, // Sum both sources
+            total_unpaid: sale.total_unpaid - (paymentsMap[sale.buyer_id] || 0) - sale.paid_at_sale // Adjust balance correctly
+        }));
+
+        res.json(finalData);
+
+    } catch (err) {
+        console.error('Error fetching sales statement:', err.message);
+        return res.status(500).send('Error fetching sales statement.');
+    }
 });
-
-
-
-
-
 
 // Export Sales Statement to PDF
 app.post('/sales/export-pdf', async (req, res) => {
@@ -701,8 +677,9 @@ app.post('/sales/export-pdf', async (req, res) => {
     }
 });
 
+
 // Fetch Containers based on Sales
-app.get('/get-containers-by-buyer', (req, res) => {
+app.get('/get-containers-by-buyer', async (req, res) => {
     const buyerId = req.query.id;  // Get buyerId from query string
 
     if (!buyerId || buyerId === "0" || buyerId === "null") {
@@ -715,24 +692,26 @@ app.get('/get-containers-by-buyer', (req, res) => {
         FROM containers
         JOIN sales ON containers.id = sales.container_id
         WHERE sales.buyer_id = ?`;
-    
-    db.all(query, [buyerId], (err, results) => {
-        if (err) {
-            console.error('Error fetching containers from sales:', err.message);
-            return res.status(500).json({ error: 'Failed to fetch containers.' });
-        }
+
+    try {
+        // Execute the query using @sqlitecloud/drivers
+        const results = await db.all(query, [buyerId]);
 
         if (results.length === 0) {
             return res.status(404).json({ error: 'No containers found for this buyer.' });
         }
 
         res.json(results);  // Return the list of containers as a JSON response
-    });
+
+    } catch (err) {
+        console.error('Error fetching containers from sales:', err.message);
+        return res.status(500).json({ error: 'Failed to fetch containers.' });
+    }
 });
 
-// Fetch Purchase Returns (Return History) with filters
+
 // Backend: Purchase Returns with Date Filtering
-app.get('/purchase-returns', (req, res) => {
+app.get('/purchase-returns', async (req, res) => {
     const { buyer, container, start_date, end_date } = req.query;
 
     let query = `
@@ -765,71 +744,66 @@ app.get('/purchase-returns', (req, res) => {
         queryParams.push(end_date);
     }
 
-    db.all(query, queryParams, (err, rows) => {
-        if (err) {
-            console.error('Error fetching purchase returns:', err.message);
-            return res.status(500).json({ error: 'Database query error' });
-        }
+    try {
+        // Execute the query using @sqlitecloud/drivers
+        const rows = await db.all(query, queryParams);
+
         res.json(rows);
-    });
+    } catch (err) {
+        console.error('Error fetching purchase returns:', err.message);
+        return res.status(500).json({ error: 'Database query error' });
+    }
 });
 
 
 // Fetch all containers when no buyer is selected
-app.get('/get-all-containers', (req, res) => {
+app.get('/get-all-containers', async (req, res) => {
     const query = 'SELECT * FROM containers'; // Query to fetch all containers from the database
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            console.error('Error fetching all containers:', err.message);
-            return res.status(500).json({ success: false, message: 'Error fetching containers' });
-        }
+
+    try {
+        // Execute the query asynchronously
+        const rows = await db.all(query, []);
+
         res.json(rows); // Send all containers as the response
-    });
+    } catch (err) {
+        console.error('Error fetching all containers:', err.message);
+        return res.status(500).json({ success: false, message: 'Error fetching containers' });
+    }
 });
 
-
-// ✅ **Handle Purchase Return: Only Update Containers Table**
-app.post('/purchase-return', (req, res) => {
+// Handle Purchase Return: Only Update Containers Table
+app.post('/purchase-return', async (req, res) => {
     const { return_date, buyer_id, container_id, returned_kg, returned_price_per_kg, total_amount } = req.body;
 
     if (!return_date || !buyer_id || !container_id || !returned_kg || !returned_price_per_kg || !total_amount) {
         return res.status(400).json({ success: false, message: 'All fields are required' });
     }
 
-    db.serialize(() => {
+    try {
         // **Step 1: Insert the return record**
-        db.run(
+        await db.run(
             `INSERT INTO purchase_returns (return_date, buyer_id, container_id, returned_kg, returned_price_per_kg, total_amount)
              VALUES (?, ?, ?, ?, ?, ?)`,
-            [return_date, buyer_id, container_id, returned_kg, returned_price_per_kg, total_amount],
-            function (err) {
-                if (err) {
-                    console.error('Error inserting purchase return:', err.message);
-                    return res.status(500).json({ success: false, message: 'Failed to submit purchase return' });
-                }
-
-                // **Step 2: Update the containers table**
-                db.run(
-                    `UPDATE containers
-                     SET remaining_weight = remaining_weight + ?, 
-                         weight = weight
-                     WHERE id = ?`,
-                    [returned_kg, container_id],
-                    function (err) {
-                        if (err) {
-                            console.error('Error updating container weight:', err.message);
-                            return res.status(500).json({ success: false, message: 'Failed to update container weight' });
-                        }
-
-                        return res.json({ success: true, message: 'Purchase return recorded successfully' });
-                    }
-                );
-            }
+            [return_date, buyer_id, container_id, returned_kg, returned_price_per_kg, total_amount]
         );
-    });
+
+        // **Step 2: Update the containers table**
+        await db.run(
+            `UPDATE containers
+             SET remaining_weight = remaining_weight + ? 
+             WHERE id = ?`,
+            [returned_kg, container_id]
+        );
+
+        return res.json({ success: true, message: 'Purchase return recorded successfully' });
+    } catch (err) {
+        console.error('Error processing purchase return:', err.message);
+        return res.status(500).json({ success: false, message: 'Failed to process purchase return' });
+    }
 });
 
-app.post('/sales/statement/update/:buyerId', (req, res) => {
+// Update Sales Statement
+app.post('/sales/statement/update/:buyerId', async (req, res) => {
     const { returnedAmount } = req.body;
     const { buyerId } = req.params;
 
@@ -837,59 +811,65 @@ app.post('/sales/statement/update/:buyerId', (req, res) => {
         return res.status(400).json({ success: false, message: 'Invalid buyer ID or returned amount' });
     }
 
-    db.run(
-        `UPDATE sales
-         SET total_price = total_price - ?, 
-             unpaid_amount = unpaid_amount - ?
-         WHERE id IN (
-             SELECT id FROM sales 
-             WHERE buyer_id = ? 
-             ORDER BY purchase_date DESC 
-             LIMIT 1
-         )`,
-        [returnedAmount, returnedAmount, buyerId],
-        function (err) {
-            if (err) {
-                console.error('Error updating sales statement:', err.message);
-                return res.status(500).json({ success: false, message: 'Failed to update sales statement' });
-            }
-            res.json({ success: true, message: 'Sales statement updated successfully' });
-        }
-    );
+    try {
+        // Update the sales statement
+        await db.run(
+            `UPDATE sales
+             SET total_price = total_price - ?, 
+                 unpaid_amount = unpaid_amount - ?
+             WHERE id IN (
+                 SELECT id FROM sales 
+                 WHERE buyer_id = ? 
+                 ORDER BY purchase_date DESC 
+                 LIMIT 1
+             )`,
+            [returnedAmount, returnedAmount, buyerId]
+        );
+
+        res.json({ success: true, message: 'Sales statement updated successfully' });
+    } catch (err) {
+        console.error('Error updating sales statement:', err.message);
+        return res.status(500).json({ success: false, message: 'Failed to update sales statement' });
+    }
 });
 
-
-// ✅ **API: Fetch Updated Containers List**
-app.get('/containers/list', (req, res) => {
+// Fetch Updated Containers List
+app.get('/containers/list', async (req, res) => {
     const query = `
         SELECT c.id, c.container_number, c.weight, c.arrival_date, c.remaining_weight,
                (c.weight - c.remaining_weight) AS total_sold
         FROM containers c
     `;
     
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            console.error('Error fetching containers:', err.message);
-            return res.status(500).json({ error: 'Failed to fetch containers' });
-        }
-        res.json(rows);
-    });
+    try {
+        // Execute the query asynchronously using @sqlitecloud/drivers
+        const rows = await db.all(query, []);
+
+        res.json(rows);  // Return the containers data as a JSON response
+    } catch (err) {
+        console.error('Error fetching containers:', err.message);
+        return res.status(500).json({ error: 'Failed to fetch containers' });
+    }
 });
 
-// ✅ API to fetch all purchase returns (needed for frontend calculations)
-app.get('/purchase-return/list', (req, res) => {
+// API to fetch all purchase returns (needed for frontend calculations)
+app.get('/purchase-return/list', async (req, res) => {
     const query = `SELECT * FROM purchase_returns`; // Ensure table name is correct
 
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            console.error('Error fetching purchase returns:', err.message);
-            return res.status(500).json({ error: 'Failed to fetch purchase return data.' });
-        }
-        res.json(rows);
-    });
+    try {
+        // Execute the query asynchronously using @sqlitecloud/drivers
+        const rows = await db.all(query, []);
+
+        res.json(rows); // Return the purchase returns data as a JSON response
+    } catch (err) {
+        console.error('Error fetching purchase returns:', err.message);
+        return res.status(500).json({ error: 'Failed to fetch purchase return data.' });
+    }
 });
 
-app.get('/buyer-timeline', (req, res) => {
+
+// Fetch buyer timeline
+app.get('/buyer-timeline', async (req, res) => {
     const buyerId = req.query.buyer_id;
     if (!buyerId) {
         return res.status(400).json({ error: "Buyer ID is required" });
@@ -935,52 +915,45 @@ app.get('/buyer-timeline', (req, res) => {
         JOIN containers ON purchase_returns.container_id = containers.id
         WHERE buyer_id = ?`;
 
-    db.all(queryPurchases, [buyerId], (err, purchases) => {
-        if (err) {
-            console.error("Error fetching purchases:", err.message);
-            return res.status(500).json({ error: "Error fetching purchases" });
-        }
+    try {
+        // Fetch purchases, payments, and returns asynchronously
+        const [purchases, payments, returns] = await Promise.all([
+            db.all(queryPurchases, [buyerId]),
+            db.all(queryPayments, [buyerId]),
+            db.all(queryReturns, [buyerId])
+        ]);
 
-        db.all(queryPayments, [buyerId], (err, payments) => {
-            if (err) {
-                console.error("Error fetching payments:", err.message);
-                return res.status(500).json({ error: "Error fetching payments" });
+        // Combine all entries and sort by date
+        let timeline = [...purchases, ...payments, ...returns].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        // 🔹 Calculate running balance
+        let runningTotal = 0;
+        timeline.forEach(entry => {
+            if (entry.bill_amount) {
+                runningTotal += entry.bill_amount; // Purchases increase total
             }
-
-            db.all(queryReturns, [buyerId], (err, returns) => {
-                if (err) {
-                    console.error("Error fetching returns:", err.message);
-                    return res.status(500).json({ error: "Error fetching returns" });
-                }
-
-                let timeline = [...purchases, ...payments, ...returns].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-                // 🔹 Calculate running balance
-                let runningTotal = 0;
-                timeline.forEach(entry => {
-                    if (entry.bill_amount) {
-                        runningTotal += entry.bill_amount; // Purchases increase total
-                    }
-                    if (entry.cash) {
-                        runningTotal -= entry.cash; // Payments decrease total
-                    }
-                    if (entry.bank) {
-                        runningTotal -= entry.bank; // Payments decrease total
-                    }
-                    if (entry.non_cash) {
-                        runningTotal -= entry.non_cash; // Returns decrease total
-                    }
-                    entry.total_taka = runningTotal; // Store the updated running total
-                });
-
-                res.json({ timeline });
-            });
+            if (entry.cash) {
+                runningTotal -= entry.cash; // Payments decrease total
+            }
+            if (entry.bank) {
+                runningTotal -= entry.bank; // Payments decrease total
+            }
+            if (entry.non_cash) {
+                runningTotal -= entry.non_cash; // Returns decrease total
+            }
+            entry.total_taka = runningTotal; // Store the updated running total
         });
-    });
+
+        res.json({ timeline });
+
+    } catch (err) {
+        console.error('Error fetching buyer timeline:', err.message);
+        return res.status(500).json({ error: 'Error fetching buyer timeline' });
+    }
 });
 
-// ✅ Get Containers a Buyer Purchased From
-app.get('/buyer-containers/:buyerId', (req, res) => {
+// Get Containers a Buyer Purchased From
+app.get('/buyer-containers/:buyerId', async (req, res) => {
     const { buyerId } = req.params;
 
     const query = `
@@ -990,15 +963,16 @@ app.get('/buyer-containers/:buyerId', (req, res) => {
         WHERE s.buyer_id = ?
     `;
 
-    db.all(query, [buyerId], (err, rows) => {
-        if (err) {
-            console.error('❌ Error fetching buyer containers:', err);
-            return res.status(500).json({ error: 'Error fetching containers' });
-        }
-        res.json(rows);
-    });
-});
+    try {
+        // Execute the query asynchronously using @sqlitecloud/drivers
+        const rows = await db.all(query, [buyerId]);
 
+        res.json(rows);  // Return the containers data as a JSON response
+    } catch (err) {
+        console.error('❌ Error fetching buyer containers:', err.message);
+        return res.status(500).json({ error: 'Error fetching containers' });
+    }
+});
 
 // ✅ Get Purchase Details for Selected Container
 app.get('/container-purchase-details/:buyerId/:containerId', (req, res) => {
