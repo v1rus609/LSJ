@@ -974,8 +974,8 @@ app.get('/buyer-containers/:buyerId', async (req, res) => {
     }
 });
 
-// ✅ Get Purchase Details for Selected Container
-app.get('/container-purchase-details/:buyerId/:containerId', (req, res) => {
+// Get Purchase Details for Selected Container
+app.get('/container-purchase-details/:buyerId/:containerId', async (req, res) => {
     const { buyerId, containerId } = req.params;
 
     const queryTotalPurchased = `
@@ -992,46 +992,47 @@ app.get('/container-purchase-details/:buyerId/:containerId', (req, res) => {
 
     let responseData = {};
 
-    db.get(queryTotalPurchased, [buyerId, containerId], (err, row) => {
-        if (err) {
-            console.error('❌ Error fetching total purchased:', err);
-            return res.status(500).json({ error: 'Error fetching purchase data' });
-        }
-        responseData.total_purchased = row.total_purchased;
-        responseData.price_per_kg = row.price_per_kg;
+    try {
+        // Fetch total purchased data
+        const totalPurchasedRow = await db.get(queryTotalPurchased, [buyerId, containerId]);
+        responseData.total_purchased = totalPurchasedRow.total_purchased;
+        responseData.price_per_kg = totalPurchasedRow.price_per_kg;
 
-        db.get(queryTotalReturned, [buyerId, containerId], (err, row) => {
-            if (err) {
-                console.error('❌ Error fetching total returned:', err);
-                return res.status(500).json({ error: 'Error fetching return data' });
-            }
-            responseData.total_returned = row.total_returned;
-            res.json(responseData);
-        });
-    });
+        // Fetch total returned data
+        const totalReturnedRow = await db.get(queryTotalReturned, [buyerId, containerId]);
+        responseData.total_returned = totalReturnedRow.total_returned;
+
+        // Send the response after fetching both data
+        res.json(responseData);
+    } catch (err) {
+        console.error('❌ Error fetching purchase details:', err.message);
+        return res.status(500).json({ error: 'Error fetching purchase data' });
+    }
 });
 
-
 // Route to fetch buyer location by ID
-app.get('/buyers/location/:id', (req, res) => {
+app.get('/buyers/location/:id', async (req, res) => {
     const buyerId = req.params.id;
 
     const query = "SELECT location FROM buyers WHERE id = ?";
-    db.get(query, [buyerId], (err, row) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error fetching buyer location.' });
-        }
+
+    try {
+        // Execute the query asynchronously using @sqlitecloud/drivers
+        const row = await db.get(query, [buyerId]);
 
         if (row) {
             res.json({ location: row.location });
         } else {
             res.status(404).json({ error: 'Buyer not found.' });
         }
-    });
+    } catch (err) {
+        console.error('Error fetching buyer location:', err.message);
+        return res.status(500).json({ error: 'Error fetching buyer location.' });
+    }
 });
 
 // Fetch a purchase record for editing
-app.get('/purchase-record/:id', (req, res) => {
+app.get('/purchase-record/:id', async (req, res) => {
     const id = req.params.id;
 
     const query = `
@@ -1049,23 +1050,23 @@ app.get('/purchase-record/:id', (req, res) => {
         WHERE sales.id = ?
     `;
 
-    db.get('SELECT sales.id AS sale_id, sales.buyer_id, buyers.name AS buyer_name, sales.purchase_date, sales.weight_sold, sales.price_per_kg, sales.paid_amount, sales.unpaid_amount, sales.total_price FROM sales JOIN buyers ON sales.buyer_id = buyers.id WHERE sales.id = ?', [id], (err, result) => {
-        if (err) {
-            console.error('Error fetching purchase record:', err);
-            return res.status(500).send('Error fetching purchase record');
-        }
+    try {
+        // Execute the query asynchronously using @sqlitecloud/drivers
+        const result = await db.get(query, [id]);
+
         if (result) {
-            res.json(result); // Now the result includes buyer_id
+            res.json(result); // Send the result as a JSON response
         } else {
             res.status(404).json({ error: 'Record not found' });
         }
-    });
+    } catch (err) {
+        console.error('Error fetching purchase record:', err.message);
+        return res.status(500).json({ error: 'Error fetching purchase record' });
+    }
 });
 
-
-
 // Update a purchase record
-app.put('/purchase-record/update', (req, res) => {
+app.put('/purchase-record/update', async (req, res) => {
     console.log('Request body:', req.body);  // Log the incoming request body
 
     const { purchase_date, buyer_id, weight_sold, price_per_kg, paid_amount, unpaid_amount, total_price, id } = req.body;
@@ -1080,12 +1081,9 @@ app.put('/purchase-record/update', (req, res) => {
         return res.status(400).json({ success: false, error: 'Missing required fields' });
     }
 
-    // Ensure that buyer exists in the database
-    db.get('SELECT id FROM buyers WHERE id = ?', [buyer_id], (err, buyer) => {
-        if (err) {
-            console.error('Error finding buyer:', err);
-            return res.status(500).json({ success: false, error: 'Error finding buyer' });
-        }
+    try {
+        // Ensure that buyer exists in the database
+        const buyer = await db.get('SELECT id FROM buyers WHERE id = ?', [buyer_id]);
 
         if (!buyer) {
             return res.status(404).json({ success: false, error: 'Buyer not found' });
@@ -1093,10 +1091,10 @@ app.put('/purchase-record/update', (req, res) => {
 
         // Now update the record in the sales table
         const query = `
-			UPDATE sales 
-			SET purchase_date = ?, buyer_id = ?, weight_sold = ?, price_per_kg = ?, paid_amount = ?, unpaid_amount = ?, total_price = ? 
-			WHERE id = ?
-		`;
+            UPDATE sales 
+            SET purchase_date = ?, buyer_id = ?, weight_sold = ?, price_per_kg = ?, paid_amount = ?, unpaid_amount = ?, total_price = ? 
+            WHERE id = ?
+        `;
 
         const params = [purchase_date, buyer_id, weight_sold, price_per_kg, paid_amount, unpaid_amount, total_price, id];
 
@@ -1104,38 +1102,35 @@ app.put('/purchase-record/update', (req, res) => {
         console.log('Running query:', query);
         console.log('With params:', params);
 
-        db.run(query, params, function (err) {
-            if (err) {
-                console.error('Error updating purchase record:', err);
-                return res.status(500).json({ success: false, error: 'Failed to update record' });
-            }
+        await db.run(query, params);
 
-            // Log the result of the update
-            console.log(`Updated purchase record with ID: ${id}`);
-            res.json({ success: true });
-        });
-    });
+        // Log the result of the update
+        console.log(`Updated purchase record with ID: ${id}`);
+        res.json({ success: true });
+
+    } catch (err) {
+        console.error('Error updating purchase record:', err.message);
+        return res.status(500).json({ success: false, error: 'Failed to update record' });
+    }
 });
-
-
-
-
 
 // Delete a purchase record
-app.delete('/purchase-record/delete/:id', (req, res) => {
+app.delete('/purchase-record/delete/:id', async (req, res) => {
     const id = req.params.id;
-    db.run('DELETE FROM sales WHERE id = ?', [id], function(err) {
-        if (err) {
-            console.error('Error deleting purchase record:', err);
-            return res.status(500).json({ success: false, error: 'Failed to delete record' });
-        }
+
+    try {
+        // Execute the delete query asynchronously
+        await db.run('DELETE FROM sales WHERE id = ?', [id]);
+
         res.json({ success: true });
-    });
+    } catch (err) {
+        console.error('Error deleting purchase record:', err.message);
+        return res.status(500).json({ success: false, error: 'Failed to delete record' });
+    }
 });
 
-
 // Get all purchase return records with optional filters for buyer, container, start date, and end date
-app.get('/purchase-returns', (req, res) => {
+app.get('/purchase-returns', async (req, res) => {
     const { buyer, container, start_date, end_date } = req.query;
 
     let query = `
@@ -1167,16 +1162,19 @@ app.get('/purchase-returns', (req, res) => {
 
     query += ` ORDER BY return_date DESC`;
 
-    db.all(query, params, (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.json(rows);
-    });
+    try {
+        // Execute the query asynchronously using @sqlitecloud/drivers
+        const rows = await db.all(query, params);
+        res.json(rows);  // Return the purchase returns data as a JSON response
+    } catch (err) {
+        console.error('Error fetching purchase returns:', err.message);
+        return res.status(500).json({ error: 'Failed to fetch purchase return records.' });
+    }
 });
 
+
 // Get a specific return record by ID, including buyer name and container number
-app.get('/purchase-return/:id', (req, res) => {
+app.get('/purchase-return/:id', async (req, res) => {
     const { id } = req.params;
 
     const query = `
@@ -1188,19 +1186,24 @@ app.get('/purchase-return/:id', (req, res) => {
         WHERE pr.id = ?
     `;
 
-    db.get(query, [id], (err, row) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
+    try {
+        // Execute the query asynchronously using @sqlitecloud/drivers
+        const row = await db.get(query, [id]);
+
         if (!row) {
             return res.status(404).json({ error: 'Return record not found' });
         }
+
         res.json(row);  // Send the return record with buyer_name and container_number
-    });
+    } catch (err) {
+        console.error('Error fetching purchase return record:', err.message);
+        return res.status(500).json({ error: err.message });
+    }
 });
 
+
 // Update a purchase return record, including buyer_id, container_id, return_date, returned_kg, returned_price_per_kg, and total_amount
-app.put('/purchase-return/update', (req, res) => {
+app.put('/purchase-return/update', async (req, res) => {
     const { id, return_date, returned_kg, returned_price_per_kg, total_amount } = req.body;
 
     // Log the incoming data to see the structure
@@ -1213,169 +1216,195 @@ app.put('/purchase-return/update', (req, res) => {
         WHERE id = ?
     `;
 
-    db.run(query, [return_date, returned_kg, returned_price_per_kg, total_amount, id], function (err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
+    try {
+        // Execute the query asynchronously using @sqlitecloud/drivers
+        await db.run(query, [return_date, returned_kg, returned_price_per_kg, total_amount, id]);
+
         res.json({ success: true });
-    });
+    } catch (err) {
+        console.error('Error updating purchase return record:', err.message);
+        return res.status(500).json({ error: 'Failed to update purchase return record' });
+    }
 });
 
-
-
 // Delete a return record by ID
-app.delete('/purchase-return/delete/:id', (req, res) => {
+app.delete('/purchase-return/delete/:id', async (req, res) => {
     const { id } = req.params;
 
     if (!id) {
         return res.status(400).json({ error: 'Return ID is required' });
     }
 
-    db.run('DELETE FROM purchase_returns WHERE id = ?', [id], function (err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (this.changes === 0) {
+    try {
+        // Execute the delete query asynchronously using @sqlitecloud/drivers
+        const result = await db.run('DELETE FROM purchase_returns WHERE id = ?', [id]);
+
+        if (result.changes === 0) {
             return res.status(404).json({ error: 'Record not found' });
         }
+
         res.json({ success: true });
-    });
+    } catch (err) {
+        console.error('Error deleting purchase return record:', err.message);
+        return res.status(500).json({ error: 'Failed to delete record' });
+    }
 });
 
+
 // Get the container name by ID (Fetch container name based on container_id)
-app.get('/container-name/:id', (req, res) => {
+app.get('/container-name/:id', async (req, res) => {
     const { id } = req.params;
 
-    db.get('SELECT container_number FROM containers WHERE id = ?', [id], (err, row) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
+    try {
+        const row = await db.get('SELECT container_number FROM containers WHERE id = ?', [id]);
         if (!row) {
             return res.status(404).json({ error: 'Container not found' });
         }
         res.json(row);  // Send the container's name (container_number)
-    });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
 });
 
+
 // Get buyer details by buyer_id
-app.get('/buyers/:id', (req, res) => {
+app.get('/buyers/:id', async (req, res) => {
     const { id } = req.params;
-    db.get('SELECT * FROM buyers WHERE id = ?', [id], (err, row) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
+
+    try {
+        const row = await db.get('SELECT * FROM buyers WHERE id = ?', [id]);
         if (!row) {
             return res.status(404).json({ error: 'Buyer not found' });
         }
         res.json(row);
-    });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
 });
 
 
 // Get a specific payment record by ID
-app.get('/payment/:id', (req, res) => {
+app.get('/payment/:id', async (req, res) => {
     const { id } = req.params;
-    db.get('SELECT * FROM payment_history WHERE id = ?', [id], (err, row) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
+
+    try {
+        const row = await db.get('SELECT * FROM payment_history WHERE id = ?', [id]);
+        if (!row) {
+            return res.status(404).json({ error: 'Payment record not found' });
         }
         res.json(row);
-    });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
 });
 
+
 // Update a payment record
-app.put('/payment/update', (req, res) => {
+app.put('/payment/update', async (req, res) => {
     const { id, buyer_name, payment_date, particulars, bank_amount, cash_amount, payment_method } = req.body;
 
     console.log('Updating payment with data:', { id, buyer_name, payment_date, particulars, bank_amount, cash_amount, payment_method });
 
     const query = 'UPDATE payment_history SET payment_date = ?, particulars = ?, bank_amount = ?, cash_amount = ?, buyer_name = ?, payment_method = ? WHERE id = ?';
-    
-    db.run(query, [payment_date, particulars, bank_amount, cash_amount, buyer_name, payment_method, id], function (err) {
-        if (err) {
-            console.error('Error updating payment:', err.message);
-            return res.status(500).json({ error: err.message });
-        }
+
+    try {
+        await db.run(query, [payment_date, particulars, bank_amount, cash_amount, buyer_name, payment_method, id]);
         res.json({ success: true });
-    });
-});
-
-
-// Delete a payment record
-app.delete('/payment/delete/:id', (req, res) => {
-    const { id } = req.params;
-    if (!id) {
-        return res.status(400).json({ error: 'Payment ID is required' });
+    } catch (err) {
+        console.error('Error updating payment:', err.message);
+        return res.status(500).json({ error: err.message });
     }
-
-    db.run('DELETE FROM payment_history WHERE id = ?', [id], function (err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.json({ success: true });
-    });
 });
 
-app.get('/sales/total-sold', (req, res) => {
+// Update a payment record
+app.put('/payment/update', async (req, res) => {
+    const { id, buyer_name, payment_date, particulars, bank_amount, cash_amount, payment_method } = req.body;
+
+    console.log('Updating payment with data:', { id, buyer_name, payment_date, particulars, bank_amount, cash_amount, payment_method });
+
+    const query = 'UPDATE payment_history SET payment_date = ?, particulars = ?, bank_amount = ?, cash_amount = ?, buyer_name = ?, payment_method = ? WHERE id = ?';
+
+    try {
+        await db.run(query, [payment_date, particulars, bank_amount, cash_amount, buyer_name, payment_method, id]);
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Error updating payment:', err.message);
+        return res.status(500).json({ error: err.message });
+    }
+});
+
+// Get total sold by container
+app.get('/sales/total-sold', async (req, res) => {
     const query = `
         SELECT container_id, SUM(weight_sold) AS total_sold
         FROM sales
         GROUP BY container_id
     `;
 
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
+    try {
+        // Execute the query asynchronously
+        const rows = await db.all(query, []);
         const salesData = {};
+
         rows.forEach(row => {
             salesData[row.container_id] = row.total_sold;
         });
+
         res.json(salesData);
-    });
+    } catch (err) {
+        console.error('Error fetching sales data:', err.message);
+        return res.status(500).json({ error: err.message });
+    }
 });
-app.get('/purchase-returns/total-returned', (req, res) => {
+
+
+// Get total returned by container
+app.get('/purchase-returns/total-returned', async (req, res) => {
     const query = `
         SELECT container_id, SUM(returned_kg) AS total_returned
         FROM purchase_returns
         GROUP BY container_id
     `;
 
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
+    try {
+        // Execute the query asynchronously
+        const rows = await db.all(query, []);
         const returnsData = {};
+
         rows.forEach(row => {
             returnsData[row.container_id] = row.total_returned;
         });
+
         res.json(returnsData);
-    });
+    } catch (err) {
+        console.error('Error fetching purchase return data:', err.message);
+        return res.status(500).json({ error: err.message });
+    }
 });
 
+
 // DELETE request to delete a container
-app.delete('/container/delete/:id', (req, res) => {
+app.delete('/container/delete/:id', async (req, res) => {
     const containerId = req.params.id;
 
     // Delete the container from the database
     const query = 'DELETE FROM containers WHERE id = ?';
 
-    db.run(query, [containerId], function (err) {
-        if (err) {
-            console.error('Error deleting container:', err.message);
-            return res.status(500).json({ success: false, message: 'Failed to delete container' });
-        }
+    try {
+        const result = await db.run(query, [containerId]);
 
-        if (this.changes === 0) {
+        if (result.changes === 0) {
             return res.status(404).json({ success: false, message: 'Container not found' });
         }
 
         res.json({ success: true, message: 'Container deleted successfully' });
-    });
+    } catch (err) {
+        console.error('Error deleting container:', err.message);
+        return res.status(500).json({ success: false, message: 'Failed to delete container' });
+    }
 });
-
 
 // Start the Server
 app.listen(process.env.PORT || port, () => {
-    console.log(`Listening on port ${port}`);
+    console.log(`Listening on port ${process.env.PORT || port}`);
 });
