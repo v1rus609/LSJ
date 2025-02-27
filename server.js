@@ -1,18 +1,22 @@
-const express = require('express');
+// Import the SQLite Cloud driver
+const { Database } = require('@sqlitecloud/drivers');
+
+// Connect to SQLite Cloud
+const db = new Database('sqlitecloud://cksyvf4pnk.g6.sqlite.cloud:8860/chinook.sqlite?apikey=LYNMd1zowmqh5nTC6c4HP9WN9Ja12zYpmq7a1fwAONM'); // Replace with your connection URL
+
+// Middleware to parse incoming request bodies
 const bodyParser = require('body-parser');
-const sqlite3 = require('sqlite3').verbose();
+const express = require('express');
 const path = require('path');
 const PDFDocument = require('pdfkit');
 const generateInvoice = require('./invoiceGenerator');
 const generatePaymentHistoryPDF = require('./generatePaymentHistoryPDF');
-const generateAllBuyersInvoice = require('./generateAllBuyersInvoice');  // Adjust path as needed
-const generateSalesStatementPDF = require('./generateSalesStatementPDF'); // Import the PDF generation function
+const generateAllBuyersInvoice = require('./generateAllBuyersInvoice');
+const generateSalesStatementPDF = require('./generateSalesStatementPDF');
 const fs = require('fs');
 
 const app = express();
-const db = new sqlite3.Database('./database.db');
 const port = 5000;
-
 
 app.use('/invoices', express.static(path.join(__dirname, 'invoices')));
 app.use('/exports', express.static(path.join(__dirname, 'exports')));
@@ -22,7 +26,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Initialize Database
+// Initialize Database (SQLite Cloud Connection)
 db.serialize(() => {
     db.run(`
         CREATE TABLE IF NOT EXISTS containers (
