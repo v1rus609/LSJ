@@ -121,8 +121,6 @@ app.get('/payments/history', async (req, res) => {
     }
 });
 
-const path = require('path');
-
 // Export Payment History to PDF
 app.post('/payments/export-pdf', async (req, res) => {
     const { payments, totalReceived, selectedBuyer } = req.body;
