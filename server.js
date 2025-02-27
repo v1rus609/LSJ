@@ -11,6 +11,9 @@ const fs = require('fs');
 
 const app = express();
 const db = new sqlite3.Database('./database.db');
+const port = 5000;
+
+
 app.use('/invoices', express.static(path.join(__dirname, 'invoices')));
 app.use('/exports', express.static(path.join(__dirname, 'exports')));
 
@@ -1424,7 +1427,29 @@ app.get('/purchase-returns/total-returned', (req, res) => {
     });
 });
 
+// DELETE request to delete a container
+app.delete('/container/delete/:id', (req, res) => {
+    const containerId = req.params.id;
+
+    // Delete the container from the database
+    const query = 'DELETE FROM containers WHERE id = ?';
+
+    db.run(query, [containerId], function (err) {
+        if (err) {
+            console.error('Error deleting container:', err.message);
+            return res.status(500).json({ success: false, message: 'Failed to delete container' });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({ success: false, message: 'Container not found' });
+        }
+
+        res.json({ success: true, message: 'Container deleted successfully' });
+    });
+});
+
+
 // Start the Server
-app.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
+app.listen(process.env.PORT || port, () => {
+    console.log(`Listening on port ${port}`);
 });
