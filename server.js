@@ -81,9 +81,6 @@ app.get('/buyers/list', async (req, res) => {
     }
 });
 
-const sqlitecloud = require('@sqlitecloud/drivers');
-const db = new sqlitecloud.Database('your-database-name');  // Initialize the SQLite Cloud database
-
 // Fetch Payment History
 app.get('/payments/history', async (req, res) => {
     const { buyer_name, start_date, end_date } = req.query;
