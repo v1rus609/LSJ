@@ -1,3 +1,5 @@
+let containerData = []; // Store fetched container data for filtering
+
 // Helper functions for formatting numbers
 function formatNumberWithCommas(value) {
     return !isNaN(value) && value !== '' ? parseFloat(value).toLocaleString('en-US') : value;
@@ -24,15 +26,15 @@ function fetchBuyers() {
         .catch(error => console.error('Error fetching buyers:', error));
 }
 
-// Fetch sales statement and purchase return data with filtering
-function fetchSalesAndReturns(buyerName = 'all', startDate = '', endDate = '') {
+// Fetch sales statement and purchase return data with filtering (without date filter)
+function fetchSalesAndReturns(buyerName = 'all') {
     fetch('/buyers/list') // ✅ Fetch buyers first
         .then(response => response.json())
         .then(buyersData => {
             console.log('✅ Buyers Data:', buyersData); // Debugging
 
-            // ✅ Append filters to API request
-            let query = `/sales/statement?buyer_name=${buyerName}&start_date=${startDate}&end_date=${endDate}`;
+            // ✅ Append filters to API request (removed date filters)
+            let query = `/sales/statement?buyer_name=${buyerName}`;
 
             fetch(query)
                 .then(response => response.json())
@@ -52,8 +54,6 @@ function fetchSalesAndReturns(buyerName = 'all', startDate = '', endDate = '') {
         })
         .catch(error => console.error('❌ Error fetching buyers:', error));
 }
-
-
 
 // ✅ Update Sales Table Dynamically
 function updateSalesTable(salesData, purchaseReturnsData, buyersData) {
@@ -122,8 +122,6 @@ function updateSalesTable(salesData, purchaseReturnsData, buyersData) {
     console.log('✅ Updated Sales Table Successfully');
 }
 
-
-
 // ✅ Function to Fetch and Update Balance Table
 function fetchSalesAndBalanceUpdates() {
     fetch('/buyers/list')
@@ -144,17 +142,13 @@ function fetchSalesAndBalanceUpdates() {
         .catch(error => console.error('❌ Error fetching buyers:', error));
 }
 
-
-
-// ✅ Add event listener for filters
+// ✅ Add event listener for filters (without date filter)
 document.getElementById('apply-filters').addEventListener('click', function () {
     const buyerName = document.getElementById('buyer-filter').value;
-    const startDate = document.getElementById('start-date').value;
-    const endDate = document.getElementById('end-date').value;
     
-    console.log(`🔍 Applying filters: Buyer=${buyerName}, Start Date=${startDate}, End Date=${endDate}`);
+    console.log(`🔍 Applying filters: Buyer=${buyerName}`);
     
-    fetchSalesAndReturns(buyerName, startDate, endDate); // ✅ Pass selected filters
+    fetchSalesAndReturns(buyerName); // ✅ Pass selected buyer filter
 });
 
 // Add event listener for export to Excel
@@ -225,4 +219,4 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // ✅ Fetch initial data and populate buyers
 fetchBuyers();
-fetchSalesAndReturns();
+fetchSalesAndReturns(); // Start fetching sales data and rendering
