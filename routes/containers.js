@@ -47,7 +47,6 @@ router.get('/list', (req, res) => {
 });
 
 
-// ✅ Sell from multiple containers (with transactions)
 router.post('/sell', (req, res) => {
     const {
         container_id,
@@ -56,6 +55,7 @@ router.post('/sell', (req, res) => {
         price_per_kg,
         paid_amount,
         purchase_date,
+        bill_no, // ✅ Capture Bill No.
     } = req.body;
 
     if (!Array.isArray(container_id)) {
@@ -78,11 +78,12 @@ router.post('/sell', (req, res) => {
                 [weight, id]
             );
 
-            // ✅ Insert the sale record
+            // ✅ Insert the sale record with Bill No.
             db.run(
-                `INSERT INTO sales (container_id, buyer_id, weight_sold, price_per_kg, paid_amount, unpaid_amount, total_price, purchase_date)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                [id, buyer_id, weight, price, paid, unpaid, total_price, purchase_date]
+                `INSERT INTO sales (container_id, buyer_id, weight_sold, price_per_kg, paid_amount, unpaid_amount, total_price, purchase_date, bill_no)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+
+                [id, buyer_id, weight, price, paid, unpaid, total_price, purchase_date, bill_no]
             );
         });
 
@@ -115,16 +116,20 @@ router.post('/sell', (req, res) => {
     });
 });
 
-// ✅ Get purchase history
+
+// ✅ Get purchase history with Bill No.
 router.get('/purchases', (req, res) => {
     const { buyer, container } = req.query;
 
     let query = `
         SELECT
             sales.id AS sale_id,
+            sales.bill_no,  -- ✅ Fetch Bill No.
             buyers.name AS buyer_name,
             containers.container_number AS container_number,
             sales.purchase_date,
+            sales.weight_sold,
+            sales.price_per_kg,
             sales.paid_amount,
             sales.unpaid_amount,
             sales.total_price
