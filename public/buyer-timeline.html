@@ -40,13 +40,13 @@
 
         <label>Select Buyer:</label>
         <select id="buyer-dropdown"></select>
-
 <table id="timeline-table">
     <thead>
         <tr>
             <th>Date</th>
             <th>Particulars</th>
             <th>Details</th>
+            <th>Bill No.</th> <!-- Moved here -->
             <th>Qnty</th>
             <th>Rate</th>
             <th>Cash</th>
@@ -59,7 +59,7 @@
     <tbody></tbody>
     <tfoot>
         <tr>
-<td colspan="5" style="text-align: right; padding-right: 20px;"><strong>Total</strong></td>
+            <td colspan="6" style="text-align: right; padding-right: 20px;"><strong>Total</strong></td>
             <td id="total-cash">0</td>
             <td id="total-bank">0</td>
             <td id="total-non-cash">0</td>
@@ -68,6 +68,7 @@
         </tr>
     </tfoot>
 </table>
+
 		<button id="export-excel">Export to Excel</button>
 		<button id="export-pdf">Export to PDF</button>
         <script src="buyer-timeline.js"></script>

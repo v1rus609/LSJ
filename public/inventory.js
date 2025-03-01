@@ -1,25 +1,34 @@
 let buyerData = [];
 let containerData = [];
 
-// Helper functions for formatting and raw number handling
+// ✅ **Format numbers while allowing decimals**
 function formatNumberWithCommas(value) {
-    const rawValue = value.replace(/,/g, '');
-    return !isNaN(rawValue) && rawValue !== '' ? parseFloat(rawValue).toLocaleString('en-US') : value;
+    // Remove existing commas
+    let rawValue = value.replace(/,/g, '');
+
+    // Allow numbers with up to 2 decimal places
+    if (!isNaN(rawValue) && rawValue !== '') {
+        let [integer, decimal] = rawValue.split('.');
+        integer = parseInt(integer, 10).toLocaleString('en-US'); // Add commas to the integer part
+        return decimal !== undefined ? `${integer}.${decimal}` : integer;
+    }
+    return value;
 }
 
+// ✅ **Ensure valid number format before submitting to backend**
 function getRawNumber(value) {
     return value.replace(/,/g, '');
 }
 
-// Restrict input to numbers, dot, and comma
+// ✅ **Restrict input to numbers & single decimal point**
 function restrictInputToNumbers(event) {
     const key = event.key;
-    if (!/[0-9.,]/.test(key) && key !== 'Backspace' && key !== 'Delete' && key !== 'ArrowLeft' && key !== 'ArrowRight') {
+    if (!/[0-9.]/.test(key) && key !== 'Backspace' && key !== 'Delete' && key !== 'ArrowLeft' && key !== 'ArrowRight') {
         event.preventDefault();
     }
 }
 
-// Fetch buyers to populate the dropdown
+// ✅ **Fetch buyers and populate dropdown**
 fetch('/buyers/list')
     .then(response => response.json())
     .then(data => {
@@ -28,7 +37,7 @@ fetch('/buyers/list')
     })
     .catch(error => console.error('Error fetching buyers:', error));
 
-// Render buyer dropdown
+// ✅ **Render buyer dropdown**
 function renderBuyerDropdown(data) {
     const buyerDropdown = document.getElementById('buyer-dropdown');
     buyerDropdown.innerHTML = '<option value="">Select a Buyer</option>';
@@ -96,12 +105,8 @@ document.getElementById('container-section').addEventListener('input', (event) =
     }
 });
 
-// Format fields dynamically without affecting calculations
-const fieldsToFormat = [
-    '.weight-sold',
-    '.price-per-kg',
-    '.paid-amount'
-];
+// ✅ **Handle decimal input properly without formatting interference**
+const fieldsToFormat = ['.weight-sold', '.price-per-kg', '.paid-amount'];
 
 fieldsToFormat.forEach(selector => {
     document.addEventListener('input', (event) => {
@@ -122,7 +127,6 @@ fieldsToFormat.forEach(selector => {
         }
     });
 
-    // Add restriction for allowed characters
     document.querySelectorAll(selector).forEach(field => {
         field.addEventListener('keydown', restrictInputToNumbers);
     });
@@ -194,7 +198,7 @@ document.getElementById('container-section').addEventListener('click', (event) =
             <label>Price Per KG:</label><br>
             <input type="text" name="price_per_kg[]" class="price-per-kg" required><br><br>
             <label>Paid Amount:</label><br>
-            <input type="text" name="paid_amount[]" class="paid-amount" required><br><br>
+            <input type="text" name="paid_amount[]" class="paid-amount" value="0" required><br><br>
             <label>Unpaid Amount:</label><br>
             <input type="text" name="unpaid_amount[]" class="unpaid-amount" readonly><br><br>
             <button type="button" class="add-container">Add Container</button>
@@ -212,18 +216,25 @@ document.getElementById('container-section').addEventListener('click', (event) =
     }
 });
 
-// Form submission with double-click prevention
-document.getElementById('sell-form').addEventListener('submit', (event) => {
-    event.preventDefault();
 
-    // Get the "Sell" button and disable it to prevent multiple clicks
+document.getElementById('sell-form').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent default form submission
+
     const sellButton = document.querySelector('button[type="submit"]');
-    sellButton.disabled = true;  // 🔒 Disable the button
+
+    if (sellButton.disabled) {
+        console.log("Sell button already disabled - preventing duplicate submission.");
+        return; // Stop further execution if the button is already disabled
+    }
+
+    sellButton.disabled = true; // Disable the button to prevent multiple clicks
+    sellButton.textContent = "Processing..."; // Show loading text
 
     const formData = new FormData(event.target);
     const data = {
         buyer_id: formData.get('buyer_id'),
         purchase_date: formData.get('purchase_date'),
+        bill_no: formData.get('bill_no'), // Ensure Bill No is captured
         container_id: formData.getAll('container_id[]'),
         weight_sold: formData.getAll('weight_sold[]').map(getRawNumber),
         price_per_kg: formData.getAll('price_per_kg[]').map(getRawNumber),
@@ -258,9 +269,11 @@ document.getElementById('sell-form').addEventListener('submit', (event) => {
         // ✅ Re-enable the button after request completes
         setTimeout(() => {
             sellButton.disabled = false;
-        }, 3000);  // Prevents immediate re-clicking
+            sellButton.textContent = "Sell"; // Reset button text
+        }, 3000); // Add a slight delay to prevent instant double-clicking
     });
 });
+
 
 document.addEventListener("DOMContentLoaded", function() {
     // Get the dropdown button and menu

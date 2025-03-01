@@ -58,6 +58,7 @@ function fetchPurchases(filters = {}) {
                     <td>${formatDate(purchase.purchase_date) || "N/A"}</td>
                     <td>${purchase.buyer_name || "N/A"}</td>
                     <td>${purchase.container_number || "N/A"}</td>
+					 <td>${purchase.bill_no || "N/A"}</td>  <!-- ✅ Display Bill No. -->
                     <td>${formatNumberWithCommas(purchase.weight_sold || 0)}</td>
                     <td>${formatNumberWithCommas(purchase.price_per_kg || 0)}</td>
                     <td>${formatNumberWithCommas(purchase.paid_amount || 0)}</td>
@@ -100,9 +101,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(response => response.json())
                 .then(data => {
                     console.log('Fetched record for editing:', data);
-                    console.log('Fetched Buyer Name:', data.buyer_name);
-                    console.log('Fetched Buyer ID:', data.buyer_id);  // Log the buyer_id
 
+                    // Populate the modal fields
                     document.getElementById('purchase-date').value = data.purchase_date;
                     document.getElementById('buyer-name').value = data.buyer_name || "N/A";
                     document.getElementById('buyer-filter').value = data.buyer_id;
@@ -111,15 +111,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('paid-amount').value = data.paid_amount;
                     document.getElementById('unpaid-amount').value = data.unpaid_amount;
                     document.getElementById('total-price').value = data.total_price;
-                    document.getElementById('purchase-id').value = id;
+                    document.getElementById('purchase-id').value = data.sale_id;
+                    document.getElementById('bill-no').value = data.bill_no || ''; // Set the Bill No.
+
                     document.getElementById('buyer-name').disabled = true; // Disable the Buyer Name field
                     document.getElementById('edit-form').style.display = 'block'; // Show the modal
-                                 
-                    // Disable the Buyer Name field for editing
-                    document.getElementById('buyer-name').disabled = true;
-
-                    // Recalculate the Price and Unpaid Amount when Quantity or Rate is changed
-                    updatePriceAndUnpaidAmount();
                 })
                 .catch(err => console.error('Error fetching purchase data:', err));
         }
@@ -139,24 +135,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
-	
-	// Apply filters immediately when a buyer or container is selected
-document.getElementById('buyer-filter').addEventListener('change', function () {
-    const filters = {
-        buyer: this.value,
-        container: document.getElementById('container-filter').value,
-    };
-    fetchPurchases(filters); // Trigger fetch on change
-});
-
-// Apply filters immediately when a container is selected
-document.getElementById('container-filter').addEventListener('change', function () {
-    const filters = {
-        buyer: document.getElementById('buyer-filter').value,
-        container: this.value,
-    };
-    fetchPurchases(filters); // Trigger fetch on change
-});
 
     // Recalculate the Price and Unpaid Amount when any of the fields change
     document.getElementById('quantity').addEventListener('input', updatePriceAndUnpaidAmount);
@@ -181,13 +159,10 @@ document.getElementById('container-filter').addEventListener('change', function 
         document.getElementById('unpaid-amount').value = unpaidAmount.toFixed(2); // Set the Unpaid Amount (Price - Paid Amount)
     }
 
-
-
     // Close the modal when the "close" button is clicked
     document.getElementById('close-btn').addEventListener('click', function () {
         document.getElementById('edit-form').style.display = 'none'; // Hide the modal
     });
-
 
     // Update the purchase record when the Update Purchase button is clicked
     document.getElementById('update-btn').addEventListener('click', function () {
@@ -199,6 +174,7 @@ document.getElementById('container-filter').addEventListener('change', function 
         const paid_amount = document.getElementById('paid-amount').value;
         const unpaid_amount = document.getElementById('unpaid-amount').value;
         const total_price = document.getElementById('total-price').value;
+        const bill_no = document.getElementById('bill-no').value;  // Get Bill No.
 
         const updatedPurchase = {
             id: id,
@@ -208,7 +184,8 @@ document.getElementById('container-filter').addEventListener('change', function 
             price_per_kg: rate,
             paid_amount: paid_amount,
             unpaid_amount: unpaid_amount,
-            total_price: total_price
+            total_price: total_price,
+            bill_no: bill_no,  // Add Bill No. to the update
         };
 
         // Send the PUT request to update the record

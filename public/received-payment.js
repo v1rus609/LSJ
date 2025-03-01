@@ -58,19 +58,6 @@ document.getElementById('payment-amount').addEventListener('keypress', function 
     }
 });
 
-// Add event listeners to format the Payment Amount field
-document.getElementById('payment-amount').addEventListener('input', function () {
-    const rawValue = getRawNumber(this.value);
-    const maxAmount = parseFloat(this.getAttribute('data-max-amount')) || 0;
-    const enteredAmount = parseFloat(rawValue) || 0;
-
-    if (enteredAmount > maxAmount) {
-        alert(`Error: Payment cannot exceed the unpaid balance of ${formatNumberWithCommas(maxAmount)}.`);
-        this.value = formatNumberWithCommas(maxAmount.toString());
-    } else {
-        this.value = formatNumberWithCommas(rawValue);
-    }
-});
 
 document.getElementById('payment-amount').addEventListener('focus', function () {
     this.value = getRawNumber(this.value);
@@ -98,11 +85,6 @@ document.getElementById('payment-form').addEventListener('submit', function (eve
     // Validate inputs
     if (!buyerId || !paymentDate || !paymentMethod || !paymentAmount || paymentAmount <= 0) {
         alert('Please fill out all fields with valid values.');
-        return;
-    }
-
-    if (paymentAmount > maxAmount) {
-        alert(`Error: Payment cannot exceed the unpaid balance of ${formatNumberWithCommas(maxAmount)}.`);
         return;
     }
 

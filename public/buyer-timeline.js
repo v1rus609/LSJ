@@ -28,59 +28,90 @@ document.addEventListener("DOMContentLoaded", function () {
         const buyerId = buyerDropdown.value;
         if (!buyerId) return;
 
-        fetch(`/buyer-timeline?buyer_id=${buyerId}`)
+        // Fetch opening balance for the selected buyer
+        fetch(`/buyers/opening-balance/${buyerId}`)
             .then(response => response.json())
             .then(data => {
-                tableBody.innerHTML = ""; // Clear previous data
+                const openingBalance = data.opening_balance || 0; // Default to 0 if no opening balance
 
-                let totalCash = 0;
-                let totalBank = 0;
-                let totalNonCash = 0;
-                let totalBill = 0;
-                let lastTotalTaka = 0; // Store the last value instead of summing
+                // Fetch buyer timeline data
+                fetch(`/buyer-timeline?buyer_id=${buyerId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        tableBody.innerHTML = ""; // Clear previous data
 
-                data.timeline.forEach((entry, index) => {
-                    // Parse numbers safely
-                    const cash = parseFloat(entry.cash) || 0;
-                    const bank = parseFloat(entry.bank) || 0;
-                    const nonCash = parseFloat(entry.non_cash) || 0;
-                    const billAmount = parseFloat(entry.bill_amount) || 0;
-                    const totalTakaValue = parseFloat(entry.total_taka) || 0;
+                        let totalCash = 0;
+                        let totalBank = 0;
+                        let totalNonCash = 0;
+                        let totalBill = openingBalance; // Start with opening balance
+                        let runningTotalTaka = openingBalance; // Initialize running total with opening balance
 
-                    // Sum up totals (except Total Taka)
-                    totalCash += cash;
-                    totalBank += bank;
-                    totalNonCash += nonCash;
-                    totalBill += billAmount;
+                        // Add Opening Balance as the first row if greater than 0
+                        if (openingBalance > 0) {
+                            const openingBalanceRow = `<tr>
+                                <td>-</td>
+                                <td>Opening Balance</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>${openingBalance.toLocaleString()}</td>
+                                <td>${runningTotalTaka.toLocaleString()}</td> <!-- Use runningTotalTaka -->
+                                <td>-</td>
+                            </tr>`;
+                            tableBody.innerHTML += openingBalanceRow;
+                        }
 
-                    // Set lastTotalTaka as the last row's value
-                    lastTotalTaka = totalTakaValue;
+                        // Loop through timeline data and add rows
+                        data.timeline.forEach((entry) => {
+                            // Parse numbers safely
+                            const cash = parseFloat(entry.cash) || 0;
+                            const bank = parseFloat(entry.bank) || 0;
+                            const nonCash = parseFloat(entry.non_cash) || 0;
+                            const billAmount = parseFloat(entry.bill_amount) || 0;
+                            const totalTakaValue = parseFloat(entry.total_taka) || 0;
 
-                    // Add row to the table
-                    const row = `<tr>
-                        <td>${entry.date}</td>
-                        <td>${entry.type || '-'}</td>
-                        <td>${entry.details || '-'}</td>
-                        <td>${entry.quantity || '-'}</td>
-                        <td>${entry.rate || '-'}</td>
-                        <td>${cash.toLocaleString()}</td>
-                        <td>${bank.toLocaleString()}</td>
-                        <td>${nonCash.toLocaleString()}</td>
-                        <td>${billAmount.toLocaleString()}</td>
-                        <td>${totalTakaValue.toLocaleString()}</td>
-                    </tr>`;
-                    tableBody.innerHTML += row;
-                });
+                            // Sum up totals (except Total Taka)
+                            totalCash += cash;
+                            totalBank += bank;
+                            totalNonCash += nonCash;
+                            totalBill += billAmount;
 
-                // Update total row
-                document.getElementById("total-cash").textContent = totalCash.toLocaleString();
-                document.getElementById("total-bank").textContent = totalBank.toLocaleString();
-                document.getElementById("total-non-cash").textContent = totalNonCash.toLocaleString();
-                document.getElementById("total-bill").textContent = totalBill.toLocaleString();
-                document.getElementById("total-taka").textContent = lastTotalTaka.toLocaleString();
+                            // Update running total of Taka for this entry
+                            runningTotalTaka += totalTakaValue; // Accumulate the total taka
+
+// Add row to the table, including Bill No.
+const row = `<tr>
+    <td>${entry.date}</td>
+    <td>${entry.type || '-'}</td>
+    <td>${entry.details || '-'}</td>
+    <td>${entry.bill_no || '-'}</td> <!-- Bill No. comes after Details -->
+    <td>${entry.quantity || '-'}</td>
+    <td>${entry.rate || '-'}</td>
+    <td>${cash.toLocaleString()}</td>
+    <td>${bank.toLocaleString()}</td>
+    <td>${nonCash.toLocaleString()}</td>
+    <td>${billAmount.toLocaleString()}</td>
+    <td>${runningTotalTaka.toLocaleString()}</td> <!-- Updated Total Taka -->
+</tr>`;
+tableBody.innerHTML += row;
+                            tableBody.innerHTML += row;
+                        });
+
+                        // Update total row
+                        document.getElementById("total-cash").textContent = totalCash.toLocaleString();
+                        document.getElementById("total-bank").textContent = totalBank.toLocaleString();
+                        document.getElementById("total-non-cash").textContent = totalNonCash.toLocaleString();
+                        document.getElementById("total-bill").textContent = totalBill.toLocaleString();
+                        document.getElementById("total-taka").textContent = runningTotalTaka.toLocaleString(); // Updated Total Taka
+                    });
             });
     });
 });
+
+
 
 // Export to Excel
 document.getElementById('export-excel').addEventListener('click', function () {

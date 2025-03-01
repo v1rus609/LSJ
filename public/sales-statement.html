@@ -25,9 +25,9 @@
                     <a href="received-payment.html">Received Payment</a>
                     <a href="payment-history.html">Payment History</a>
                     <a href="sales-statement.html" class="active"> Sales Statement </a>
-					<a href="purchase-return.html"> Purchase Return </a>
-					<a href="return-history.html"> Return History </a>
-					<a href="buyer-timeline.html"> Buyer Timeline </a>
+                    <a href="purchase-return.html"> Purchase Return </a>
+                    <a href="return-history.html"> Return History </a>
+                    <a href="buyer-timeline.html"> Buyer Timeline </a>
                 </div>
             </div>
         </div>
@@ -47,42 +47,43 @@
                         <option value="all">All Buyers</option>
                         <!-- Options populated dynamically -->
                     </select>
-					<div class="filter-row">
                     <button id="apply-filters">Filter</button>
                 </div>
-                </div>
-
-                <!-- Date Filters and Apply Button (Side by Side) -->
-                
             </div>
 
-            <table id="sales-statement-table">
-                <thead>
-                    <tr>
-                        <th>SL No</th>
-                        <th>Name of Party</th>
-                        <th>Amount (BDT)</th>
-                        <th>Receipt (BDT)</th>
-                        <th>Balance (BDT)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Rows will be dynamically added here -->
-                </tbody>
-    <tfoot>
-        <tr>
-            <td colspan="2"><strong>Totals</strong></td>
-            <td id="sum-total-purchase">0</td>
-            <td id="sum-total-paid">0</td> <!-- ✅ Corrected -->
-            <td id="sum-total-unpaid">0</td>
-        </tr>
-    </tfoot>
-</table>
+            <!-- Table Wrapper for Overflow Handling -->
+            <div class="table-wrapper">
+                <table id="sales-statement-table">
+                    <thead>
+                        <tr>
+                            <th>SL No</th>
+                            <th>Name of Party</th>
+                            <th>Amount (BDT)</th>
+                            <th>Receipt (BDT)</th>
+                            <th>Balance (BDT)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be dynamically added here -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2"><strong>Totals</strong></td>
+                            <td id="sum-total-purchase">0</td>
+                            <td id="sum-total-paid">0</td>
+                            <td id="sum-total-unpaid">0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
             <br>
             <button id="export-sales-statement">Export to Excel</button>
-			<button id="export-sales-statement-pdf">Export to PDF</button>
+            <button id="export-sales-statement-pdf">Export to PDF</button>
         </div>
+
         <script src="sales-statement.js"></script> <!-- Link to the JavaScript file -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    </body>
+    </div>
+</body>
 </html>

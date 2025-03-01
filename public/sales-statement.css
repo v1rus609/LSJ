@@ -10,9 +10,47 @@ body {
     min-height: 100vh; /* Ensure full height */
     text-align: center;
 }
+/* Table Wrapper Styling */
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
 
+/* General styling for table */
+#sales-statement-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px auto;
+    background: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#sales-statement-table td,
+#sales-statement-table th {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+#sales-statement-table th {
+    background-color: #333;
+    color: #fff;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+tfoot {
+    font-weight: bold;
+    background: #f8f8f8;
+}
 .container {
-	width: 95%;
+	width: 98%;
     background: #fff;
     padding: 0px;
     border-radius: 5px;
@@ -313,5 +351,7 @@ tr:hover {
 		border-radius: 0px;
 		padding: 10px;
 	}
+	
+	
 	
 }

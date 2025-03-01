@@ -1,79 +1,73 @@
 let buyerData = []; // Store fetched buyer data for filtering
 
-// Format number with commas for display
-function formatNumberWithCommas(number) {
-    return parseFloat(number).toLocaleString('en-US');
+// ✅ **Function for displaying numbers in the table (Fixed decimal places)**
+function formatTableNumber(value) {
+    if (value === null || value === undefined || value === '') {
+        return '0.00'; // Default display value
+    }
+
+    const num = parseFloat(value.toString().replace(/,/g, '')); // Remove commas before parsing
+    if (isNaN(num)) return value; // Return original value if not a number
+
+    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// Function to calculate Total Amount with formatting
-function calculateTotalAmount() {
-    const paidAmountInput = document.getElementById('paid-amount');
-    const unpaidAmountInput = document.getElementById('unpaid-amount');
-    const totalAmountInput = document.getElementById('total-amount');
+// ✅ **Function to format numbers while allowing decimals**
+function formatInputNumber(value) {
+    if (!value) return ''; // Return empty if value is empty
 
-    // Remove commas and parse the input values as numbers
-    const paidAmount = parseFloat(paidAmountInput.value.replace(/,/g, '')) || 0;
-    const unpaidAmount = parseFloat(unpaidAmountInput.value.replace(/,/g, '')) || 0;
+    let rawValue = value.replace(/,/g, ''); // Remove commas
+    if (isNaN(rawValue)) return value; // If not a number, return original value
 
-    // Calculate total amount
-    const totalAmount = paidAmount + unpaidAmount;
+    let [integer, decimal] = rawValue.split('.'); // Split integer and decimal parts
+    integer = parseInt(integer, 10).toLocaleString('en-US'); // Add commas to integer part
 
-    // Format the inputs and the total amount with commas for display
-    paidAmountInput.value = paidAmount.toLocaleString('en-US');
-    unpaidAmountInput.value = unpaidAmount.toLocaleString('en-US');
-    totalAmountInput.value = totalAmount.toLocaleString('en-US');
+    return decimal !== undefined ? `${integer}.${decimal}` : integer; // Keep decimals if they exist
 }
 
+// ✅ **Ensure valid number format before submission (removes commas)**
+function getRawNumber(value) {
+    return value ? value.toString().replace(/,/g, '') : ''; // Ensure valid string before replacing
+}
 
-
-// Fetch buyers and populate the table
+// ✅ **Fetch buyers and populate the table**
 fetch('/buyers/list')
     .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to fetch buyer data.');
-        }
+        if (!response.ok) throw new Error('Failed to fetch buyer data.');
         return response.json();
     })
     .then(data => {
-        buyerData = data; // Store data globally
+        buyerData = data;
         renderTable(buyerData);
     })
     .catch(error => {
-        console.error('Error fetching buyers:', error);
-        const errorMessage = document.getElementById('error-message');
-        errorMessage.style.display = 'block';
-        errorMessage.textContent = 'Error fetching buyer data. Please try again.';
+        console.error('❌ Error fetching buyers:', error);
+        document.getElementById('error-message').style.display = 'block';
     });
 
-// Delete a buyer
+// ✅ **Delete a buyer**
 function deleteBuyer(buyerId) {
     if (confirm('Are you sure you want to delete this buyer?')) {
         fetch(`/buyers/delete/${buyerId}`, { method: 'DELETE' })
             .then(response => {
-                // Check if the response status indicates success
-                if (response.ok) {
-                    return response.text(); // Parse the success message
-                } else {
-                    // Handle non-2xx HTTP status codes
-                    throw new Error(`Failed to delete buyer. Status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`Failed to delete buyer. Status: ${response.status}`);
+                return response.text();
             })
             .then(message => {
-                alert(message); // Show success message
-                location.reload(); // Reload the page to refresh the table
+                alert(message);
+                location.reload();
             })
             .catch(error => {
-                // Log the actual error message for debugging
-                console.error('Error deleting buyer:', error);
+                console.error('❌ Error deleting buyer:', error);
                 alert('Failed to delete buyer. Please try again.');
             });
     }
 }
 
-// Add a delete button to each buyer row
+// ✅ **Render Table with Fixed Decimal Formatting**
 function renderTable(data) {
     const tableBody = document.getElementById('buyer-list');
-    tableBody.innerHTML = ''; // Clear existing rows
+    tableBody.innerHTML = ''; 
 
     data.forEach(buyer => {
         const row = `
@@ -82,6 +76,7 @@ function renderTable(data) {
                 <td>${buyer.name}</td>
                 <td>${buyer.location}</td>
                 <td>${buyer.contact_number}</td>
+                <td>${formatTableNumber(buyer.opening_balance)}</td> <!-- ✅ Prevents null error -->
                 <td>
                     <button class="delete-btn" onclick="deleteBuyer(${buyer.id})">Delete</button>
                 </td>
@@ -91,7 +86,7 @@ function renderTable(data) {
     });
 }
 
-// Filter buyers based on search input
+// ✅ **Filter buyers based on search input**
 document.getElementById('search-box').addEventListener('input', function () {
     const searchValue = this.value.toLowerCase();
     const filteredData = buyerData.filter(buyer =>
@@ -100,22 +95,45 @@ document.getElementById('search-box').addEventListener('input', function () {
     );
     renderTable(filteredData);
 });
-document.addEventListener("DOMContentLoaded", function() {
-    // Get the dropdown button and menu
+
+// ✅ **Opening Balance Input Field: Add Separate Formatting**
+document.addEventListener('DOMContentLoaded', function () {
+    const openingBalanceInput = document.getElementById('opening-balance');
+
+    if (openingBalanceInput) {
+        openingBalanceInput.addEventListener('input', function () {
+            this.value = formatInputNumber(this.value); // Format with commas dynamically
+        });
+
+        openingBalanceInput.addEventListener('focus', function () {
+            this.value = getRawNumber(this.value); // Remove commas while editing
+        });
+
+        openingBalanceInput.addEventListener('blur', function () {
+            this.value = formatInputNumber(this.value); // Re-add commas when leaving the field
+        });
+    }
+
+    // ✅ **Ensure correct format before submitting the form**
+    const buyerForm = document.querySelector('form');
+    if (buyerForm) {
+        buyerForm.addEventListener('submit', function () {
+            openingBalanceInput.value = getRawNumber(openingBalanceInput.value); // Send raw number
+        });
+    }
+});
+
+// ✅ **Handle dropdown visibility**
+document.addEventListener("DOMContentLoaded", function () {
     const dropdownButton = document.querySelector(".dropbtn");
     const dropdownContent = document.querySelector(".dropdown-content");
 
-    // Toggle dropdown visibility when button is clicked
-    dropdownButton.addEventListener("click", function(event) {
-        // Prevent the event from bubbling up to the document
+    dropdownButton.addEventListener("click", function (event) {
         event.stopPropagation();
-
-        // Toggle the display of the dropdown
         dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
     });
 
-    // Hide the dropdown if the user clicks anywhere else on the document
-    document.addEventListener("click", function() {
+    document.addEventListener("click", function () {
         dropdownContent.style.display = "none";
     });
 });

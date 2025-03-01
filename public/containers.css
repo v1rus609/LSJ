@@ -170,7 +170,10 @@
     outline: none; /* Remove outline */
     box-shadow: 0 0 5px rgba(255, 0, 0, 0.7); /* Red shadow effect */
 }
-
+.table-wrapper {
+    overflow-x: auto; /* Enable horizontal scrolling if necessary */
+    width: 100%;
+}
 		
 		@media (min-width: 1281px) {
  body {
@@ -187,7 +190,7 @@
         }
         .container {
             width: 60%;
-            max-width: 600px;
+            max-width: 710px;
             background: white;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);

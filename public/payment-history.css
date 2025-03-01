@@ -10,7 +10,41 @@ body {
     min-height: 100vh; /* Ensure full height */
     text-align: center;
 }
+/* Table Wrapper Styling */
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
 
+/* General styling for table */
+#payment-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px auto;
+    background: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#payment-history-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+    font-size: 1.3rem;
+}
+
+#payment-history-table th {
+    background: #2dabe2;
+    padding: 10px;
+    font-size: 1.3rem;
+    text-align: left;
+    color: white;
+    font-weight: bold;
+}
+
+tfoot {
+    font-weight: bold;
+    background: #f8f8f8;
+}
 /* Logo Styling */
 .logo {
     text-align: center;
@@ -685,7 +719,21 @@ button.delete-btn:hover {
         border: 1px solid #ccc;
         border-radius: 5px;
 }
+#payment-history-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+    font-size: 0.9rem;
+}
 
+#payment-history-table th {
+    background: #2dabe2;
+    padding: 10px;
+    font-size: 1rem;
+    text-align: left;
+    color: white;
+    font-weight: bold;
+}
 .popup-content {
     background-color: #fefefe;
     margin: 7% auto;

@@ -12,18 +12,30 @@ document.addEventListener('DOMContentLoaded', function () {
     let maxReturnableAmount = 0;
 
     // **Helper functions for formatting numbers**
+    // ✅ **Format numbers with commas while allowing decimals**
     function formatNumberWithCommas(value) {
-        const rawValue = value.replace(/,/g, '');
-        return !isNaN(rawValue) && rawValue !== '' ? parseFloat(rawValue).toLocaleString('en-US') : value;
-    }
+        let rawValue = value.replace(/,/g, '');
 
+        if (!isNaN(rawValue) && rawValue !== '') {
+            let [integer, decimal] = rawValue.split('.');
+            integer = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas to integer part
+            return decimal !== undefined ? `${integer}.${decimal}` : integer;
+        }
+        return value;
+    }
+	
     function getRawNumber(value) {
         return value.replace(/,/g, '');
     }
 
     function restrictInputToNumbers(event) {
         const key = event.key;
-        if (!/[0-9.,]/.test(key) && key !== 'Backspace' && key !== 'Delete' && key !== 'ArrowLeft' && key !== 'ArrowRight') {
+        if (!/[0-9.]/.test(key) && key !== 'Backspace' && key !== 'Delete' && key !== 'ArrowLeft' && key !== 'ArrowRight') {
+            event.preventDefault();
+        }
+
+        // Prevent multiple decimal points
+        if (key === '.' && event.target.value.includes('.')) {
             event.preventDefault();
         }
     }
@@ -100,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let value = getRawNumber(returnedKgInput.value);
         let enteredKg = parseFloat(value) || 0;
 
-        if (enteredKg > maxReturnableAmount) {
+        if (enteredKg >= maxReturnableAmount) {
             alert(`Error: You cannot return more than ${formatNumberWithCommas(maxReturnableAmount.toString())} kg.`);
             returnedKgInput.value = formatNumberWithCommas(maxReturnableAmount.toString());
         } else {

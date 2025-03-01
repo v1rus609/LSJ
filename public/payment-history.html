@@ -52,19 +52,21 @@
                 <button id="apply-date-filter">Filter</button>
             </div>
 
+        <!-- Table Wrapper for Overflow Handling -->
+        <div class="table-wrapper">
             <!-- Payment History Table -->
             <table id="payment-history-table">
-    <thead>
-        <tr>
-            <th>Buyer Name</th>
-            <th>Payment Date</th>
-            <th>Particulars</th>
-            <th>Bank Amount</th>
-            <th>Cash Amount</th>
-            <th>Total</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
+                <thead>
+                    <tr>
+                        <th>Buyer Name</th>
+                        <th>Payment Date</th>
+                        <th>Particulars</th>
+                        <th>Bank Amount</th>
+                        <th>Cash Amount</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
                 <tbody>
                     <!-- Data will be dynamically populated -->
                 </tbody>
@@ -75,7 +77,8 @@
                     </tr>
                 </tfoot>
             </table>
-			</div>
+        </div>
+    </div>
             <!-- Export to Excel Button -->
             <button id="export-payment-history">Export to Excel</button>
 			<button id="export-payment-history-pdf">Export to PDF</button>

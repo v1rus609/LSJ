@@ -2,38 +2,38 @@
 <html>
 <head>
     <title>Add Buyer</title>
-	<link rel="stylesheet" href="buyers.css">
-
+    <link rel="stylesheet" href="buyers.css">
 </head>
 <body>
     <div class="container">
-		<div class="navbar">
-		<a href="index.html" class="home-icon">
+        <div class="navbar">
+            <a href="index.html" class="home-icon">
                 <img src="home-icon.png" alt="Home" width="32">
-		</a>
-		<div class="dropdown">
-			<button class="dropbtn">
-				<img src="menu-icon.png" alt="Menu">
-			</button>
-			<div class="dropdown-content">
-			<a href="container.html">Add Container</a>
-			<a href="containers.html">Container List</a>
-			<a href="buyers.html"class="active">Add Buyer</a>
-			<a href="inventory.html">Inventory</a>
-			<a href="purchase.html">Purchase History</a>
-			<a href="received-payment.html">Received Payment</a>
-			<a href="payment-history.html">Payment History</a>
-			<a href="sales-statement.html"> Sales Statement </a>
-			<a href="purchase-return.html"> Purchase Return </a>
-			<a href="return-history.html"> Return History </a>
-			<a href="buyer-timeline.html"> Buyer Timeline </a>
-			</div>
-		</div>
-	</div>
-	
+            </a>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <img src="menu-icon.png" alt="Menu">
+                </button>
+                <div class="dropdown-content">
+                    <a href="container.html">Add Container</a>
+                    <a href="containers.html">Container List</a>
+                    <a href="buyers.html" class="active">Add Buyer</a>
+                    <a href="inventory.html">Inventory</a>
+                    <a href="purchase.html">Purchase History</a>
+                    <a href="received-payment.html">Received Payment</a>
+                    <a href="payment-history.html">Payment History</a>
+                    <a href="sales-statement.html"> Sales Statement </a>
+                    <a href="purchase-return.html"> Purchase Return </a>
+                    <a href="return-history.html"> Return History </a>
+                    <a href="buyer-timeline.html"> Buyer Timeline </a>
+                </div>
+            </div>
+        </div>
+
         <div class="logo">
             <img src="logo.png" alt="Company Logo">
         </div>
+        
         <h1>Add Buyer</h1>
         <div class="form-container">
             <form action="/buyers/add" method="POST">
@@ -46,15 +46,18 @@
                 <label>Contact Number:</label>
                 <input type="text" name="contact_number" placeholder="Enter contact number" required>
 
-
+                <label>Opening Balance:</label>
+                <input type="text" id="opening-balance" name="opening_balance" placeholder="Enter opening balance" required>
 
                 <button type="submit">Add Buyer</button>
             </form>
         </div>
+
         <div class="search-container">
             <input type="text" id="search-box" placeholder="Search by Buyer Name or Location..." />
         </div>
-		<h1>Buyer List</h1>
+
+        <h1>Buyer List</h1>
         <table>
             <thead>
                 <tr>
@@ -62,13 +65,14 @@
                     <th>Name</th>
                     <th>Location</th>
                     <th>Contact Number</th>
-					<th>Actions</th>
+                    <th>Opening Balance</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="buyer-list">
-                <!-- Rows will be dynamically added here -->
             </tbody>
         </table>
+
         <p class="error-message" id="error-message" style="display: none;">Failed to load buyer data. Please try again.</p>
     </div>
 

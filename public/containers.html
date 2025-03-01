@@ -37,23 +37,26 @@
         <div class="search-container">
             <input type="text" id="search-box" placeholder="Search by Container Number..." />
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-		    <th>Arrival Date</th>
-                    <th>Container Number</th>
-                    <th>Weight</th>
-                    <th>Remaining Weight</th>
-		    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="container-list">
-                <!-- Rows will be dynamically added here -->
-            </tbody>
-        </table>
-        <p class="error-message" id="error-message" style="display: none;">Failed to load container data. Please try again.</p>
-    </div>
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Arrival Date</th>
+                <th>Container Number</th>
+                <th>Weight</th>
+                <th>Sold</th>
+                <th>Returned</th>
+                <th>Remaining Weight</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="container-list">
+            <!-- Rows will be dynamically added here -->
+        </tbody>
+    </table>
+</div>
+
 
 	<script src="containers.js"></script>
 	
