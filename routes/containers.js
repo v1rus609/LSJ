@@ -22,10 +22,19 @@ router.post('/add', (req, res) => {
 
 // ✅ **Get All Containers with Updated Total Sold**
 router.get('/list', (req, res) => {
-    const query = `
-        SELECT c.id, c.container_number, c.weight, c.arrival_date, c.remaining_weight,
-               (c.weight - c.remaining_weight) AS total_sold
+ const query = `
+        SELECT 
+			c.id, c.container_number, c.weight, c.arrival_date,
+            IFNULL(s.total_weight_sold, 0) AS total_weight_sold,
+            IFNULL(pr.total_weight_returned, 0) AS total_weight_returned,
+            (c.weight - IFNULL(s.total_weight_sold, 0) + IFNULL(pr.total_weight_returned, 0)) AS remaining_weight
         FROM containers c
+        LEFT JOIN 
+            (SELECT container_id, SUM(weight_sold) AS total_weight_sold FROM sales GROUP BY container_id) s
+            ON c.id = s.container_id
+        LEFT JOIN 
+            (SELECT container_id, SUM(returned_kg) AS total_weight_returned FROM purchase_returns GROUP BY container_id) pr
+            ON c.id = pr.container_id;
     `;
     
     db.all(query, [], (err, rows) => {
