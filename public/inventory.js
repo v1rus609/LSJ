@@ -212,9 +212,14 @@ document.getElementById('container-section').addEventListener('click', (event) =
     }
 });
 
-// Form submission
+// Form submission with double-click prevention
 document.getElementById('sell-form').addEventListener('submit', (event) => {
     event.preventDefault();
+
+    // Get the "Sell" button and disable it to prevent multiple clicks
+    const sellButton = document.querySelector('button[type="submit"]');
+    sellButton.disabled = true;  // 🔒 Disable the button
+
     const formData = new FormData(event.target);
     const data = {
         buyer_id: formData.get('buyer_id'),
@@ -231,25 +236,32 @@ document.getElementById('sell-form').addEventListener('submit', (event) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
     })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to sell product.');
-            }
-            return response.text();
-        })
-        .then(() => {
-            const popup = document.getElementById('success-popup');
-            popup.style.display = 'block';
-            setTimeout(() => {
-                popup.style.display = 'none';
-                window.location.reload();
-            }, 3000);
-        })
-        .catch(error => {
-            console.error('Error during form submission:', error);
-            alert('Error: ' + error.message);
-        });
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to sell product.');
+        }
+        return response.text();
+    })
+    .then(() => {
+        const popup = document.getElementById('success-popup');
+        popup.style.display = 'block';
+        setTimeout(() => {
+            popup.style.display = 'none';
+            window.location.reload();
+        }, 3000);
+    })
+    .catch(error => {
+        console.error('❌ Error during form submission:', error);
+        alert('Error: ' + error.message);
+    })
+    .finally(() => {
+        // ✅ Re-enable the button after request completes
+        setTimeout(() => {
+            sellButton.disabled = false;
+        }, 3000);  // Prevents immediate re-clicking
+    });
 });
+
 document.addEventListener("DOMContentLoaded", function() {
     // Get the dropdown button and menu
     const dropdownButton = document.querySelector(".dropbtn");
