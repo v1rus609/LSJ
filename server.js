@@ -22,44 +22,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Initialize Database
-db.serialize(() => {
-    db.run(`
-        CREATE TABLE IF NOT EXISTS containers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            container_number TEXT,
-            weight REAL,
-            arrival_date TEXT,
-            remaining_weight REAL
-        )
-    `);
-    db.run(`
-        CREATE TABLE IF NOT EXISTS sales (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            container_id INTEGER,
-            buyer_id INTEGER,
-            weight_sold REAL,
-            price_per_kg REAL,
-            paid_amount REAL,
-            unpaid_amount REAL,
-            total_price REAL,
-            purchase_date TEXT,
-            FOREIGN KEY (container_id) REFERENCES containers(id),
-            FOREIGN KEY (buyer_id) REFERENCES buyers(id)
-        )
-    `);
-    db.run(`
-        CREATE TABLE IF NOT EXISTS buyers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            location TEXT,
-            contact_number TEXT,
-            paid_amount REAL DEFAULT 0,
-            unpaid_amount REAL DEFAULT 0,
-            total_amount REAL DEFAULT 0
-        )
-    `);
-});
 
 // Routes
 app.use('/containers', require('./routes/containers'));
@@ -217,6 +179,7 @@ app.get('/purchases', (req, res) => {
     let query = `
         SELECT
             sales.id AS sale_id,
+			sales.bill_no,  -- ✅ Fetch Bill No.
             buyers.name AS buyer_name,  -- Join buyers table to get the buyer name
             containers.container_number AS container_number,
             sales.purchase_date,
@@ -907,20 +870,33 @@ app.post('/sales/statement/update/:buyerId', (req, res) => {
 });
 
 
-// ✅ **API: Fetch Updated Containers List**
+// ✅ **API: Fetch Updated Containers List with Correct Remaining Weight Calculation**
 app.get('/containers/list', (req, res) => {
     const query = `
-        SELECT c.id, c.container_number, c.weight, c.arrival_date, c.remaining_weight,
-               (c.weight - c.remaining_weight) AS total_sold
+        SELECT 
+            c.id AS container_id,
+            c.container_number,
+            c.weight AS initial_weight,
+            c.arrival_date,
+            IFNULL(s.total_weight_sold, 0) AS total_weight_sold,
+            IFNULL(pr.total_weight_returned, 0) AS total_weight_returned,
+            (c.weight - IFNULL(s.total_weight_sold, 0) + IFNULL(pr.total_weight_returned, 0)) AS remaining_weight
         FROM containers c
+        LEFT JOIN 
+            (SELECT container_id, SUM(weight_sold) AS total_weight_sold FROM sales GROUP BY container_id) s
+            ON c.id = s.container_id
+        LEFT JOIN 
+            (SELECT container_id, SUM(returned_kg) AS total_weight_returned FROM purchase_returns GROUP BY container_id) pr
+            ON c.id = pr.container_id;
     `;
-    
+
     db.all(query, [], (err, rows) => {
         if (err) {
-            console.error('Error fetching containers:', err.message);
+            console.error('❌ Error fetching containers:', err.message);
             return res.status(500).json({ error: 'Failed to fetch containers' });
         }
-        res.json(rows);
+
+        res.json(rows);  // ✅ Return correct remaining weight
     });
 });
 
@@ -937,25 +913,48 @@ app.get('/purchase-return/list', (req, res) => {
     });
 });
 
+// Route to fetch opening balance for a specific buyer
+app.get('/buyers/opening-balance/:buyerId', (req, res) => {
+    const buyerId = req.params.buyerId;
+
+    const query = 'SELECT opening_balance FROM buyers WHERE id = ?';
+
+    db.get(query, [buyerId], (err, row) => {
+        if (err) {
+            console.error('Error fetching opening balance:', err.message);
+            return res.status(500).json({ error: 'Error fetching opening balance' });
+        }
+
+        if (!row) {
+            return res.status(404).json({ error: 'Buyer not found' });
+        }
+
+        res.json({ opening_balance: row.opening_balance });
+    });
+});
+
+
 app.get('/buyer-timeline', (req, res) => {
     const buyerId = req.query.buyer_id;
     if (!buyerId) {
         return res.status(400).json({ error: "Buyer ID is required" });
     }
 
-    const queryPurchases = `
-        SELECT purchase_date AS date, 'Purchase' AS type, 
-               'Purchase: ' || containers.container_number AS particulars,
-               containers.container_number AS details,
-               weight_sold AS quantity, 
-               price_per_kg AS rate, 
-               paid_amount AS cash, 
-               NULL AS bank, 
-               NULL AS non_cash, 
-               total_price AS bill_amount
-        FROM sales
-        JOIN containers ON sales.container_id = containers.id
-        WHERE buyer_id = ?`;
+const queryPurchases = `
+    SELECT purchase_date AS date, 'Purchase' AS type, 
+           'Purchase: ' || containers.container_number AS particulars,
+           containers.container_number AS details,
+           weight_sold AS quantity, 
+           price_per_kg AS rate, 
+           paid_amount AS cash, 
+           NULL AS bank, 
+           NULL AS non_cash, 
+           total_price AS bill_amount,
+           sales.bill_no AS bill_no  -- Add bill_no from the sales table
+    FROM sales
+    JOIN containers ON sales.container_id = containers.id
+    WHERE buyer_id = ?`;
+
 
     const queryPayments = `
         SELECT payment_date AS date, 'Payment' AS type, 
@@ -1109,47 +1108,48 @@ app.get('/purchase-record/:id', (req, res) => {
     const id = req.params.id;
 
     const query = `
-        SELECT
+        SELECT 
             sales.id AS sale_id,
-            buyers.name AS buyer_name,  -- Join buyers table to get the buyer name
+            buyers.name AS buyer_name,
             sales.purchase_date,
             sales.weight_sold,
             sales.price_per_kg,
             sales.paid_amount,
             sales.unpaid_amount,
-            sales.total_price
+            sales.total_price,
+            sales.bill_no  -- Include the bill_no field here
         FROM sales
-        JOIN buyers ON sales.buyer_id = buyers.id  -- Join the buyers table on buyer_id
+        JOIN buyers ON sales.buyer_id = buyers.id
         WHERE sales.id = ?
     `;
 
-    db.get('SELECT sales.id AS sale_id, sales.buyer_id, buyers.name AS buyer_name, sales.purchase_date, sales.weight_sold, sales.price_per_kg, sales.paid_amount, sales.unpaid_amount, sales.total_price FROM sales JOIN buyers ON sales.buyer_id = buyers.id WHERE sales.id = ?', [id], (err, result) => {
+    db.get(query, [id], (err, row) => {
         if (err) {
             console.error('Error fetching purchase record:', err);
-            return res.status(500).send('Error fetching purchase record');
+            return res.status(500).json({ error: err.message });
         }
-        if (result) {
-            res.json(result); // Now the result includes buyer_id
-        } else {
-            res.status(404).json({ error: 'Record not found' });
+
+        if (!row) {
+            return res.status(404).json({ error: 'Record not found' });
         }
+
+        res.json(row);  // Return the purchase record, including the bill_no
     });
 });
 
 
 
-// Update a purchase record
 app.put('/purchase-record/update', (req, res) => {
     console.log('Request body:', req.body);  // Log the incoming request body
 
-    const { purchase_date, buyer_id, weight_sold, price_per_kg, paid_amount, unpaid_amount, total_price, id } = req.body;
+    const { purchase_date, buyer_id, weight_sold, price_per_kg, paid_amount, unpaid_amount, total_price, bill_no, id } = req.body;
 
     // Validation
     if (!buyer_id) {
         console.error('Buyer ID is missing');
         return res.status(400).json({ success: false, error: 'Buyer ID is required' });
     }
-    if (!purchase_date || !weight_sold || !price_per_kg || !paid_amount || !unpaid_amount || !total_price || !id) {
+    if (!purchase_date || !weight_sold || !price_per_kg || !paid_amount || !unpaid_amount || !total_price || !bill_no || !id) {
         console.error('Missing required fields');
         return res.status(400).json({ success: false, error: 'Missing required fields' });
     }
@@ -1167,12 +1167,12 @@ app.put('/purchase-record/update', (req, res) => {
 
         // Now update the record in the sales table
         const query = `
-			UPDATE sales 
-			SET purchase_date = ?, buyer_id = ?, weight_sold = ?, price_per_kg = ?, paid_amount = ?, unpaid_amount = ?, total_price = ? 
-			WHERE id = ?
-		`;
+            UPDATE sales 
+            SET purchase_date = ?, buyer_id = ?, weight_sold = ?, price_per_kg = ?, paid_amount = ?, unpaid_amount = ?, total_price = ?, bill_no = ?
+            WHERE id = ?
+        `;
 
-        const params = [purchase_date, buyer_id, weight_sold, price_per_kg, paid_amount, unpaid_amount, total_price, id];
+        const params = [purchase_date, buyer_id, weight_sold, price_per_kg, paid_amount, unpaid_amount, total_price, bill_no, id];
 
         // Log the query and parameters for debugging
         console.log('Running query:', query);
@@ -1190,6 +1190,8 @@ app.put('/purchase-record/update', (req, res) => {
         });
     });
 });
+
+
 
 
 
