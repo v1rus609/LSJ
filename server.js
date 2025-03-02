@@ -1110,6 +1110,7 @@ app.get('/purchase-record/:id', (req, res) => {
     const query = `
         SELECT 
             sales.id AS sale_id,
+	    sales.buyer_id,
             buyers.name AS buyer_name,
             sales.purchase_date,
             sales.weight_sold,
