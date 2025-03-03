@@ -216,21 +216,20 @@ app.get('/purchases', (req, res) => {
 
 
 
-// Dashboard Metrics
-// Dashboard Metrics with Fixed Total Unpaid Calculation
+
+// Dashboard Metrics with Opening Balance in Net Sales Calculation
 app.get('/dashboard-metrics', (req, res) => {
     const queryTotalSell = `SELECT IFNULL(SUM(total_price), 0) AS total_sell FROM sales`;
     const queryTotalPurchaseReturns = `SELECT IFNULL(SUM(total_amount), 0) AS total_purchase_returns FROM purchase_returns`;
-
-    // ✅ Corrected Total Paid = Sales paid_amount + Payment History (Cash + Bank)
     const queryTotalPaid = `
         SELECT 
             IFNULL(SUM(sales.paid_amount), 0) + 
             IFNULL((SELECT SUM(cash_amount + bank_amount) FROM payment_history), 0) AS total_paid
         FROM sales`;
-
     const queryTotalBuyers = `SELECT COUNT(*) AS total_buyers FROM buyers`;
     const queryTotalContainers = `SELECT COUNT(*) AS total_containers FROM containers`;
+    const queryRemainingWeight = `SELECT IFNULL(SUM(remaining_weight), 0) AS total_remaining_weight FROM containers`;  // Query for remaining weight
+    const queryOpeningBalance = `SELECT IFNULL(SUM(opening_balance), 0) AS total_opening_balance FROM buyers`; // Query for opening balance
 
     db.serialize(() => {
         let metrics = {
@@ -239,7 +238,9 @@ app.get('/dashboard-metrics', (req, res) => {
             total_paid: 0,
             total_unpaid: 0,
             total_buyers: 0,
-            total_containers: 0
+            total_containers: 0,
+            total_remaining_weight: 0,
+            total_opening_balance: 0 // New field for opening balance
         };
 
         console.log("🔍 Fetching dashboard metrics...");
@@ -274,13 +275,25 @@ app.get('/dashboard-metrics', (req, res) => {
             console.log(`📦 Total Containers: ${metrics.total_containers}`);
         });
 
+        db.get(queryRemainingWeight, (err, row) => { // Fetch remaining weight
+            if (err) return res.status(500).send('Error fetching total remaining weight.');
+            metrics.total_remaining_weight = row.total_remaining_weight || 0; // Add the remaining weight to the metrics
+            console.log(`📦 Total Remaining Weight: ${metrics.total_remaining_weight}`);
+        });
+
+        db.get(queryOpeningBalance, (err, row) => { // Fetch opening balance for all buyers
+            if (err) return res.status(500).send('Error fetching opening balance.');
+            metrics.total_opening_balance = row.total_opening_balance || 0;
+            console.log(`📊 Total Opening Balance: ${metrics.total_opening_balance}`);
+        });
+
         // ✅ Ensure calculations happen after all queries complete
         setTimeout(() => {
-            // ✅ Calculate Net Sales
-            metrics.net_sale = metrics.total_sell - metrics.total_purchase_returns;
-            console.log(`💰 Net Sales Calculated: ${metrics.net_sale}`);
+            // ✅ Calculate Net Sales (Including Opening Balance)
+            metrics.net_sale = metrics.total_sell + metrics.total_opening_balance - metrics.total_purchase_returns;
+            console.log(`💰 Net Sales Calculated (Including Opening Balance): ${metrics.net_sale}`);
 
-            // ✅ FIX: Calculate Total Unpaid Correctly
+            // ✅ Calculate Total Unpaid Correctly
             metrics.total_unpaid = metrics.net_sale - metrics.total_paid;
             if (isNaN(metrics.total_unpaid)) metrics.total_unpaid = 0; // Prevent NaN
 
@@ -290,6 +303,8 @@ app.get('/dashboard-metrics', (req, res) => {
         }, 500);
     });
 });
+
+
 
 
 
