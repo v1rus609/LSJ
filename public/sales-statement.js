@@ -95,32 +95,44 @@ function updateSalesTable(salesData, purchaseReturnsData, buyersData) {
 
         // ✅ Step 4: Adjust Purchase and Balance Columns
         const adjustedPurchaseAmount = totalPurchaseOriginal - buyerReturns;
-        const adjustedBalance = adjustedPurchaseAmount - totalPaidAmount; // ✅ Correct formula
 
-        totalPurchase += adjustedPurchaseAmount;
-        totalPaid += totalPaidAmount;
-        totalUnpaid += adjustedBalance; // ✅ Corrected Balance Calculation
+        // Fetch the opening balance for this buyer
+        fetch(`/buyers/opening-balance/${buyerId}`)
+            .then(response => response.json())
+            .then(openingBalanceData => {
+                const openingBalance = openingBalanceData.opening_balance || 0;
+                const adjustedPurchaseWithOpeningBalance = adjustedPurchaseAmount + openingBalance;
 
-        // ✅ Append Row to Sales Table
-        const row = `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${buyerName}</td>
-                <td>${formatNumberWithCommas(adjustedPurchaseAmount)}</td> <!-- ✅ Adjusted Amount -->
-                <td>${formatNumberWithCommas(totalPaidAmount)}</td> <!-- ✅ Corrected Receipt (BDT) -->
-                <td>${formatNumberWithCommas(adjustedBalance)}</td> <!-- ✅ Corrected Balance Calculation -->
-            </tr>
-        `;
-        tableBody.innerHTML += row;
+                // Calculate the adjusted balance
+                const adjustedBalance = adjustedPurchaseWithOpeningBalance - totalPaidAmount;
+
+                totalPurchase += adjustedPurchaseWithOpeningBalance;
+                totalPaid += totalPaidAmount;
+                totalUnpaid += adjustedBalance;
+
+                // ✅ Append Row to Sales Table
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${buyerName}</td>
+                        <td>${formatNumberWithCommas(adjustedPurchaseWithOpeningBalance)}</td> <!-- ✅ Adjusted Purchase with Opening Balance -->
+                        <td>${formatNumberWithCommas(totalPaidAmount)}</td> <!-- ✅ Corrected Receipt (BDT) -->
+                        <td>${formatNumberWithCommas(adjustedBalance)}</td> <!-- ✅ Corrected Balance Calculation -->
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+
+                // ✅ Update Footer Totals
+                document.getElementById('sum-total-purchase').textContent = formatNumberWithCommas(totalPurchase);
+                document.getElementById('sum-total-paid').textContent = formatNumberWithCommas(totalPaid);
+                document.getElementById('sum-total-unpaid').textContent = formatNumberWithCommas(totalUnpaid);
+
+                console.log('✅ Updated Sales Table Successfully');
+            })
+            .catch(error => console.error('❌ Error fetching opening balance for buyer:', error));
     });
-
-    // ✅ Update Footer Totals
-    document.getElementById('sum-total-purchase').textContent = formatNumberWithCommas(totalPurchase);
-    document.getElementById('sum-total-paid').textContent = formatNumberWithCommas(totalPaid);
-    document.getElementById('sum-total-unpaid').textContent = formatNumberWithCommas(totalUnpaid);
-
-    console.log('✅ Updated Sales Table Successfully');
 }
+
 
 // ✅ Function to Fetch and Update Balance Table
 function fetchSalesAndBalanceUpdates() {
