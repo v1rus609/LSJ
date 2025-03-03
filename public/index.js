@@ -18,8 +18,10 @@ function fetchMetrics() {
                 { value: data.net_sale || 0, label: 'Net Sales', type: 'sell' }, // ✅ Ensure Net Sales is valid
                 { value: data.total_paid || 0, label: 'Total Paid', type: 'paid' }, // ✅ Ensure Total Paid is valid
                 { value: data.total_unpaid || 0, label: 'Total Unpaid', type: 'unpaid' }, // ✅ FIXED: Corrected Unpaid Value
-                { value: data.total_buyers || 0, label: 'Total Buyers', type: 'buyers' }, 
+				{ value: data.total_remaining_weight || 0, label: 'Remaining Weight', type: 'weight' }, // Add Remaining Weight metric
+                { value: data.total_buyers || 0, label: 'Total Buyers', type: 'buyers' },
                 { value: data.total_containers || 0, label: 'Total Containers', type: 'containers' }
+
             );
             updateMetric();
         })
