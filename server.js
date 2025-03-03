@@ -940,21 +940,20 @@ app.get('/buyer-timeline', (req, res) => {
         return res.status(400).json({ error: "Buyer ID is required" });
     }
 
-const queryPurchases = `
-    SELECT purchase_date AS date, 'Purchase' AS type, 
-           'Purchase: ' || containers.container_number AS particulars,
-           containers.container_number AS details,
-           weight_sold AS quantity, 
-           price_per_kg AS rate, 
-           paid_amount AS cash, 
-           NULL AS bank, 
-           NULL AS non_cash, 
-           total_price AS bill_amount,
-           sales.bill_no AS bill_no  -- Add bill_no from the sales table
-    FROM sales
-    JOIN containers ON sales.container_id = containers.id
-    WHERE buyer_id = ?`;
-
+    const queryPurchases = `
+        SELECT purchase_date AS date, 'Purchase' AS type, 
+               'Purchase: ' || containers.container_number AS particulars,
+               containers.container_number AS details,
+               weight_sold AS quantity, 
+               price_per_kg AS rate, 
+               paid_amount AS cash, 
+               NULL AS bank, 
+               NULL AS non_cash, 
+               total_price AS bill_amount,
+               sales.bill_no AS bill_no  -- Add bill_no from the sales table
+        FROM sales
+        JOIN containers ON sales.container_id = containers.id
+        WHERE buyer_id = ?`;
 
     const queryPayments = `
         SELECT payment_date AS date, 'Payment' AS type, 
@@ -1004,6 +1003,28 @@ const queryPurchases = `
 
                 // 🔹 Calculate running balance
                 let runningTotal = 0;
+				                // First, handle the opening balance
+                const openingBalance = 0; // Get the opening balance from database or assume 0
+                if (openingBalance > 0) {
+                    // Add opening balance row only if it's greater than 0
+                    const openingBalanceRow = {
+                        date: '-',
+                        type: 'Opening Balance',
+                        particulars: '-',
+                        details: '-',
+                        quantity: '-',
+                        rate: '-',
+                        cash: '-',
+                        bank: '-',
+                        non_cash: '-',
+                        bill_amount: openingBalance,
+                        total_taka: openingBalance,
+                        bill_no: '-'
+                    };
+                    timeline.unshift(openingBalanceRow);
+                    runningTotal += openingBalance; // Start the running total with the opening balance
+                }
+
                 timeline.forEach(entry => {
                     if (entry.bill_amount) {
                         runningTotal += entry.bill_amount; // Purchases increase total
@@ -1025,6 +1046,7 @@ const queryPurchases = `
         });
     });
 });
+
 
 // ✅ Get Containers a Buyer Purchased From
 app.get('/buyer-containers/:buyerId', (req, res) => {
@@ -1109,8 +1131,8 @@ app.get('/purchase-record/:id', (req, res) => {
 
     const query = `
         SELECT 
+			sales.buyer_id,
             sales.id AS sale_id,
-	    sales.buyer_id,
             buyers.name AS buyer_name,
             sales.purchase_date,
             sales.weight_sold,
@@ -1191,10 +1213,6 @@ app.put('/purchase-record/update', (req, res) => {
         });
     });
 });
-
-
-
-
 
 
 
