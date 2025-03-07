@@ -2,20 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const PDFDocument = require('pdfkit');
-const generateInvoice = require('./invoiceGenerator');
-const generatePaymentHistoryPDF = require('./generatePaymentHistoryPDF');
-const generateAllBuyersInvoice = require('./generateAllBuyersInvoice');  // Adjust path as needed
-const generateSalesStatementPDF = require('./generateSalesStatementPDF'); // Import the PDF generation function
 const fs = require('fs');
-
 const app = express();
 const db = new sqlite3.Database('./database.db');
 const port = 5000;
-
-
-app.use('/invoices', express.static(path.join(__dirname, 'invoices')));
-app.use('/exports', express.static(path.join(__dirname, 'exports')));
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -117,69 +107,17 @@ db.all(query, params, (err, rows) => {
 
 });
 
-// Export Payment History to PDF
-app.post('/payments/export-pdf', async (req, res) => {
-    const { payments, totalReceived, selectedBuyer } = req.body;
 
-    console.log('Request Body:', req.body);
-
-    let buyerDetails = { name: 'All Buyers', location: '' };
-
-    // Validate selectedBuyer
-    const trimmedBuyer =
-        selectedBuyer && typeof selectedBuyer === 'string' && selectedBuyer.trim() !== ''
-            ? selectedBuyer.trim()
-            : 'all';
-
-    console.log('Trimmed Buyer:', trimmedBuyer);
-
-    if (trimmedBuyer !== 'all') {
-        db.get('SELECT name, location FROM buyers WHERE LOWER(name) = LOWER(?)', [trimmedBuyer], (err, row) => {
-            if (err) {
-                console.error('Error fetching buyer details:', err.message);
-                return res.status(500).send('Error fetching buyer details.');
-            }
-
-            console.log('Database Query Result:', row);
-
-            if (!row) {
-                console.warn(`Buyer not found for the given name: "${trimmedBuyer}"`);
-                buyerDetails = { name: trimmedBuyer, location: 'Unknown Location' };
-            } else {
-                buyerDetails = row;
-            }
-
-            generatePaymentHistoryPDF(payments, totalReceived, trimmedBuyer, buyerDetails)
-                .then((filePath) => {
-                    res.json({ success: true, filePath: `/exports/${path.basename(filePath)}` });
-                })
-                .catch((error) => {
-                    console.error('Error exporting PDF:', error);
-                    res.status(500).json({ success: false, error: 'Failed to generate PDF.' });
-                });
-        });
-    } else {
-        console.log('Generating PDF for All Buyers');
-        generatePaymentHistoryPDF(payments, totalReceived, trimmedBuyer, buyerDetails)
-            .then((filePath) => {
-                res.json({ success: true, filePath: `/exports/${path.basename(filePath)}` });
-            })
-            .catch((error) => {
-                console.error('Error exporting PDF:', error);
-                res.status(500).json({ success: false, error: 'Failed to generate PDF.' });
-            });
-    }
-});
 
 
 // Fetch Purchase History
 app.get('/purchases', (req, res) => {
-    const { buyer, container } = req.query;
+    const { buyer, container, start_date, end_date } = req.query;
 
     let query = `
         SELECT
             sales.id AS sale_id,
-			sales.bill_no,  -- ✅ Fetch Bill No.
+            sales.bill_no,  -- ✅ Fetch Bill No.
             buyers.name AS buyer_name,  -- Join buyers table to get the buyer name
             containers.container_number AS container_number,
             sales.purchase_date,
@@ -195,15 +133,30 @@ app.get('/purchases', (req, res) => {
     `;
 
     const params = [];
+    
+    // Add filter for buyer
     if (buyer) {
         query += ` AND sales.buyer_id = ?`;
         params.push(buyer);
     }
+
+    // Add filter for container
     if (container) {
         query += ` AND sales.container_id = ?`;
         params.push(container);
     }
 
+    // Add filter for start_date
+    if (start_date) {
+        query += ` AND sales.purchase_date >= ?`;
+        params.push(start_date);  // The date should be in 'YYYY-MM-DD' format
+    }
+
+    // Add filter for end_date
+    if (end_date) {
+        query += ` AND sales.purchase_date <= ?`;
+        params.push(end_date);  // The date should be in 'YYYY-MM-DD' format
+    }
 
     db.all(query, params, (err, rows) => {
         if (err) {
@@ -213,8 +166,6 @@ app.get('/purchases', (req, res) => {
         res.json(rows);
     });
 });
-
-
 
 
 // Dashboard Metrics with Opening Balance in Net Sales Calculation
@@ -304,12 +255,6 @@ app.get('/dashboard-metrics', (req, res) => {
     });
 });
 
-
-
-
-
-
-
 // Handle received payment
 app.post('/payments/receive', (req, res) => {
     const { sale_id, payment_amount } = req.body;
@@ -334,74 +279,6 @@ app.post('/payments/receive', (req, res) => {
 
         res.send('Payment processed successfully.');
     });
-});
-
-app.post('/generate-invoice', async (req, res) => {
-    const { buyer_id, total_paid } = req.body;
-
-    if (!buyer_id) {
-        return res.status(400).json({ error: 'Buyer ID is required.' });
-    }
-
-    console.log('Generating invoice for buyer:', buyer_id);
-
-    // Fetch buyer details
-    db.get(`SELECT name, location FROM buyers WHERE id = ?`, [buyer_id], (err, buyer) => {
-        if (err || !buyer) {
-            return res.status(500).json({ error: 'Error fetching buyer details.' });
-        }
-
-        // Fetch all purchase details for the buyer
-        db.all(
-            `SELECT
-                containers.container_number,
-                sales.weight_sold,
-                sales.price_per_kg,
-                sales.purchase_date,
-                sales.paid_amount,
-                sales.unpaid_amount,
-                sales.total_price
-            FROM sales
-            JOIN containers ON sales.container_id = containers.id
-            WHERE sales.buyer_id = ?
-            ORDER BY sales.purchase_date DESC`,
-            [buyer_id],
-            async (err, purchases) => {
-                if (err || purchases.length === 0) {
-                    return res.status(500).json({ error: 'No purchases found for this buyer.' });
-                }
-
-                try {
-                    const invoiceNo = `INV-${Date.now()}`;
-                    const filePath = await generateInvoice({ buyer, purchases, total_paid }, invoiceNo);
-                    res.json({ success: true, invoicePath: `/invoices/${path.basename(filePath)}` });
-                } catch (error) {
-                    console.error('Error generating invoice:', error);
-                    res.status(500).json({ success: false, error: 'Failed to generate invoice.' });
-                }
-            }
-        );
-    });
-});
-
-// New route to handle "Generate Invoice for All Buyers"
-app.post('/generate-all-buyers-invoice', async (req, res) => {
-    const { purchases, total_paid, total_unpaid, grand_total } = req.body;
-
-    // Check if the purchases array is empty
-    if (!purchases || purchases.length === 0) {
-        return res.status(400).json({ success: false, error: 'No purchase data available for invoice generation.' });
-    }
-
-    // Ensure that even if totals are 0, the invoice still proceeds
-    try {
-        const invoiceNo = `INV-${Date.now()}`;
-        const filePath = await generateAllBuyersInvoice(purchases, total_paid, total_unpaid, grand_total, invoiceNo);
-        res.json({ success: true, invoicePath: `/invoices/${path.basename(filePath)}` });
-    } catch (error) {
-        console.error('Error generating invoice for all buyers:', error);
-        res.status(500).json({ success: false, error: `Failed to generate invoice: ${error.message}` });
-    }
 });
 
 
@@ -602,7 +479,7 @@ app.get('/payments/history', (req, res) => {
     const { buyer_name, start_date, end_date } = req.query;
 
     let query = `
-        SELECT id, payment_date, particulars, bank_amount, cash_amount, buyer_name,
+        SELECT id, payment_date, particulars, bank_amount, cash_amount, buyer_name, payment_method ,
                (IFNULL(bank_amount, 0) + IFNULL(cash_amount, 0)) AS total
         FROM payment_history
         WHERE 1=1
@@ -706,26 +583,6 @@ app.get('/sales/statement', (req, res) => {
     });
 });
 
-
-
-
-
-
-// Export Sales Statement to PDF
-app.post('/sales/export-pdf', async (req, res) => {
-    const { sales, totals } = req.body;
-
-    try {
-        // Generate PDF file
-        const filePath = await generateSalesStatementPDF(sales, totals);
-
-        // Respond with the file path
-        res.json({ success: true, filePath: `/exports/${path.basename(filePath)}` });
-    } catch (error) {
-        console.error('Error exporting sales statement PDF:', error);
-        res.status(500).json({ success: false, error: 'Failed to generate PDF.' });
-    }
-});
 
 // Fetch Containers based on Sales
 app.get('/get-containers-by-buyer', (req, res) => {
@@ -973,7 +830,7 @@ app.get('/buyer-timeline', (req, res) => {
     const queryPayments = `
         SELECT payment_date AS date, 'Payment' AS type, 
                'Payment: ' || payment_method AS particulars,
-               payment_history.particulars AS details,
+               payment_method AS details,
                NULL AS quantity, NULL AS rate, 
                cash_amount AS cash, 
                bank_amount AS bank, 
