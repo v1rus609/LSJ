@@ -55,7 +55,7 @@ router.post('/sell', (req, res) => {
         price_per_kg,
         paid_amount,
         purchase_date,
-        bill_no, // ✅ Capture Bill No.
+        bill_no, // This should now be a simple string or number
     } = req.body;
 
     if (!Array.isArray(container_id)) {
@@ -63,7 +63,7 @@ router.post('/sell', (req, res) => {
     }
 
     db.serialize(() => {
-        db.run('BEGIN TRANSACTION'); // ✅ Start transaction
+        db.run('BEGIN TRANSACTION'); // Start transaction
 
         container_id.forEach((id, index) => {
             const weight = parseFloat(weight_sold[index]) || 0;
@@ -72,22 +72,22 @@ router.post('/sell', (req, res) => {
             const total_price = weight * price;
             const unpaid = total_price - paid;
 
-            // ✅ Update container's remaining weight
+            // Update container's remaining weight
             db.run(
                 `UPDATE containers SET remaining_weight = remaining_weight - ? WHERE id = ?`,
                 [weight, id]
             );
 
-            // ✅ Insert the sale record with Bill No.
+            // Insert the sale record with Bill No.
+            // Ensure bill_no is passed as a simple string/number
             db.run(
                 `INSERT INTO sales (container_id, buyer_id, weight_sold, price_per_kg, paid_amount, unpaid_amount, total_price, purchase_date, bill_no)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-
-                [id, buyer_id, weight, price, paid, unpaid, total_price, purchase_date, bill_no]
+                [id, buyer_id, weight, price, paid, unpaid, total_price, purchase_date, bill_no[index]] // Make sure to use the correct bill_no for each container
             );
         });
 
-        // ✅ Update buyer's financial data
+        // Update buyer's financial data
         const totalPaid = paid_amount.reduce((sum, paid) => sum + parseFloat(paid || 0), 0);
         const totalUnpaid = container_id.reduce((sum, _, index) => {
             const weight = parseFloat(weight_sold[index]) || 0;
@@ -106,15 +106,16 @@ router.post('/sell', (req, res) => {
             [totalPaid, totalUnpaid, totalPaid + totalUnpaid, buyer_id],
             (err) => {
                 if (err) {
-                    db.run('ROLLBACK'); // ✅ Rollback on error
+                    db.run('ROLLBACK'); // Rollback on error
                     return res.status(500).send(err.message);
                 }
-                db.run('COMMIT'); // ✅ Commit transaction
+                db.run('COMMIT'); // Commit transaction
                 res.redirect('/inventory.html?message=Success!%20Product%20Sold');
             }
         );
     });
 });
+
 
 
 // ✅ Get purchase history with Bill No.

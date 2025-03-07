@@ -4,19 +4,21 @@ const sqlite3 = require('sqlite3').verbose();
 
 const db = new sqlite3.Database('./database.db');
 
-// Add a new buyer
+// ✅ **Route to Add a New Buyer with Opening Balance**
 router.post('/add', (req, res) => {
-    const { name, location, contact_number } = req.body;
-    if (!name || !location || !contact_number) {
-        return res.status(400).send('All fields are required.');
-    }
+    const { name, location, contact_number, opening_balance } = req.body;
+    const openingBalanceValue = parseFloat(opening_balance) || 0; // Convert to number, default 0
 
-    const query = `INSERT INTO buyers (name, location, contact_number) VALUES (?, ?, ?)`;
-    db.run(query, [name, location, contact_number], function (err) {
+    const query = `
+        INSERT INTO buyers (name, location, contact_number, opening_balance) 
+        VALUES (?, ?, ?, ?)
+    `;
+
+    db.run(query, [name, location, contact_number, openingBalanceValue], function (err) {
         if (err) {
-            return res.status(500).send(err.message);
+            return res.status(500).json({ error: err.message });
         }
-        res.redirect('/buyers.html');
+        res.redirect('/buyers.html?message=Buyer%20added%20successfully');
     });
 });
 
@@ -41,15 +43,18 @@ router.delete('/delete/:id', (req, res) => {
 
 module.exports = router;
 
-// Get all buyers
+// ✅ **Fetch All Buyers including Opening Balance**
 router.get('/list', (req, res) => {
-    const query = `SELECT * FROM buyers`;
+    const query = `SELECT id, name, location, contact_number, opening_balance FROM buyers`;
+
     db.all(query, [], (err, rows) => {
         if (err) {
-            return res.status(500).send(err.message);
+            console.error('❌ Error fetching buyers:', err.message);
+            return res.status(500).json({ error: 'Database error' });
         }
         res.json(rows);
     });
 });
+
 
 module.exports = router;
