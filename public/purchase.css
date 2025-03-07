@@ -58,7 +58,7 @@
 		}
 
 		.filters select {
-			padding: 25px;
+			padding: 15px;
 			border-radius: 5px;
 			font-size: 1.3rem;
 		}
@@ -87,7 +87,35 @@
 		/* Table Styling */
 		.table-container {
 			overflow-x: auto;
+			margin-bottom:20px;
 		}
+
+.datefilters {
+        margin-bottom: 20px;
+        display: flex;
+		font-weight:bold;
+        justify-content: center;
+        gap: 15px;
+		font-size: 1.3rem;
+        align-items: center;
+    }
+	
+	    #apply-date-filter {
+        padding: 15px 10px;
+        font-size:1.3rem;
+        color: #fff;
+        background-color: #007BFF;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+	
+	    .datefilters input {
+        padding:15px;
+        border-radius: 5px;
+        font-size: 1.0rem;
+    }
 
 		#purchase-table {
 			width: 100%;
@@ -138,7 +166,7 @@
 		}
 
 		/* Export Button */
-		#generate-invoice {
+		#export-pdf-btn {
 			background: linear-gradient(to bottom, #2dabe2, #83d9ff);
 			color: white;
 			font-weight: bold;
@@ -149,39 +177,12 @@
 			cursor: pointer;
 		}
 
-		#generate-invoice:hover {
-			background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
-		}
-
-		/* Style for disabled button */
-		#generate-invoice:disabled {
-			background: linear-gradient(to bottom, #797979, #cbcbcb);
-			cursor: not-allowed;
-		}
-
-
-		/* Export Button 2 */
-		#generate-all-buyers-invoice {
-			background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-			color: white;
-			margin-top:15px;
-			font-weight: bold;
-			font-size: 1.5rem;
-			padding: 15px 15px;
-			border: none;
-			border-radius: 5px;
-			cursor: pointer;
-		}
-
-		#generate-all-buyers-invoice:hover {
+		#export-pdf-btn:hover {
 			background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
 		}
 
 
-		#generate-all-buyers-invoice:disabled {
-			background: linear-gradient(to bottom, #797979, #cbcbcb);
-			cursor: not-allowed;
-		}
+
 
 		option {
 		font-weight: bold;
@@ -450,6 +451,29 @@ h1 {
 	font-size: 0.8em;
 }
 
+
+
+.datefilters {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+	align-items: center;
+}
+
+.datefilters input {
+    padding: 5px;
+	border-color:none;
+    border-radius: 5px;
+    font-size: 0.8rem;
+}
+
+label{
+    font-weight: bold;
+    margin-right: 5px;
+	font-size: 0.8rem;
+}
+
 .filters select {
     padding: 5px;
     border-radius: 5px;
@@ -531,7 +555,7 @@ tfoot {
 }
 
 /* Export Button */
-#generate-invoice {
+#export-pdf-btn {
     background: linear-gradient(to bottom, #2dabe2, #83d9ff);
     color: white;
 	margin-top: -5px;
@@ -543,39 +567,12 @@ tfoot {
     cursor: pointer;
 }
 
-#generate-invoice:hover {
-    background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
-}
-
-/* Style for disabled button */
-#generate-invoice:disabled {
-    background: linear-gradient(to bottom, #797979, #cbcbcb);
-    cursor: not-allowed;
-}
-
-
-/* Export Button 2 */
-#generate-all-buyers-invoice {
-    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-    font-size: 0.8rem;
-	color: white;
-		margin-top: -5px;
-    font-weight: bold;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#generate-all-buyers-invoice:hover {
+#export-pdf-btn:hover {
     background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
 }
 
 
-#generate-all-buyers-invoice:disabled {
-    background: linear-gradient(to bottom, #797979, #cbcbcb);
-    cursor: not-allowed;
-}
+
 
 
 		
@@ -726,6 +723,10 @@ tfoot {
     background-color: #45a049;
 }
 
+
+
+
+
 button.edit-btn {
     padding: 4px 20px;
     font-size: 0.8rem;
@@ -750,6 +751,17 @@ button.delete-btn {
     margin: 0 0px;
     background: linear-gradient(to bottom, #e5363b, #fb7679);
     color: white;
+}
+
+#apply-date-filter {
+    padding: 10px 10px;
+    font-size: 0.8rem;
+    color: #fff;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
 }
 
 }

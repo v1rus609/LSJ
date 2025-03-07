@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales Statement</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="sales-statement.css"> <!-- Optional CSS -->
 </head>
 <body>
@@ -79,7 +81,7 @@
 
             <br>
             <button id="export-sales-statement">Export to Excel</button>
-            <button id="export-sales-statement-pdf">Export to PDF</button>
+           <button id="export-pdf-btn" onclick="exportToPDF()">Export to PDF</button>
         </div>
 
         <script src="sales-statement.js"></script> <!-- Link to the JavaScript file -->

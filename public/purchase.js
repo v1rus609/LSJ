@@ -6,7 +6,6 @@ function formatNumberWithCommas(number) {
     });
 }
 
-// Function to fetch and populate the buyer and container filters
 function fetchFilters() {
     // Fetch buyers
     fetch('/buyers/list')
@@ -40,6 +39,8 @@ function fetchPurchases(filters = {}) {
     let query = '/purchases?';
     if (filters.buyer) query += `buyer=${filters.buyer}&`;
     if (filters.container) query += `container=${filters.container}&`;
+    if (filters.startDate) query += `start_date=${filters.startDate}&`;
+    if (filters.endDate) query += `end_date=${filters.endDate}&`;
 
     fetch(query)
         .then(response => response.json())
@@ -58,7 +59,7 @@ function fetchPurchases(filters = {}) {
                     <td>${formatDate(purchase.purchase_date) || "N/A"}</td>
                     <td>${purchase.buyer_name || "N/A"}</td>
                     <td>${purchase.container_number || "N/A"}</td>
-					 <td>${purchase.bill_no || "N/A"}</td>  <!-- ✅ Display Bill No. -->
+                    <td>${purchase.bill_no || "N/A"}</td> 
                     <td>${formatNumberWithCommas(purchase.weight_sold || 0)}</td>
                     <td>${formatNumberWithCommas(purchase.price_per_kg || 0)}</td>
                     <td>${formatNumberWithCommas(purchase.paid_amount || 0)}</td>
@@ -83,6 +84,40 @@ function fetchPurchases(filters = {}) {
         })
         .catch(error => console.error('Error fetching purchases:', error));
 }
+
+
+// Apply filters immediately when a buyer or container is selected
+document.getElementById('buyer-filter').addEventListener('change', function () {
+    const filters = {
+        buyer: this.value,
+        container: document.getElementById('container-filter').value,
+    };
+    fetchPurchases(filters); // Trigger fetch on change
+});
+
+// Apply filters immediately when a container is selected
+document.getElementById('container-filter').addEventListener('change', function () {
+    const filters = {
+        buyer: document.getElementById('buyer-filter').value,
+        container: this.value,
+    };
+    fetchPurchases(filters); // Trigger fetch on change
+});
+
+document.getElementById('apply-date-filter').addEventListener('click', function () {
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+
+    const filters = {
+        buyer: document.getElementById('buyer-filter').value,
+        container: document.getElementById('container-filter').value,
+        startDate: startDate,
+        endDate: endDate
+    };
+
+    fetchPurchases(filters);
+});
+
 
 // Event delegation: Handle Edit and Delete buttons
 document.addEventListener('DOMContentLoaded', function () {
@@ -209,166 +244,184 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// Export table to Excel
-function exportToExcel() {
-    const table = document.getElementById('purchase-table');
-    const workbook = XLSX.utils.table_to_book(table, { sheet: "Purchase History" });
-    XLSX.writeFile(workbook, 'Purchase_History.xlsx');
-}
-
-// Enable Generate Invoice button based on buyer selection
-document.getElementById('buyer-filter').addEventListener('change', function () {
-    const buyerId = this.value;
-    const generateInvoiceButton = document.getElementById('generate-invoice');
-    generateInvoiceButton.disabled = !buyerId; // Enable button if a buyer is selected
-});
-
-// Add event listener for Generate Invoice button
-document.getElementById('generate-invoice').addEventListener('click', generateInvoice);
-
-function generateInvoice() {
-    const buyerId = document.getElementById('buyer-filter').value;
-    if (!buyerId) {
-        alert('Please select a buyer to generate an invoice.');
-        return;
-    }
-
-    const rows = document.querySelectorAll('#purchase-table tbody tr');
-    const purchases = [];
-
-    rows.forEach((row) => {
-        const purchase = {
-            purchase_date: row.children[2]?.textContent || "N/A",
-            paid_amount: parseFloat(row.children[3]?.textContent.replace(/,/g, '') || 0),
-            unpaid_amount: parseFloat(row.children[4]?.textContent.replace(/,/g, '') || 0),
-            total_price: parseFloat(row.children[5]?.textContent.replace(/,/g, '') || 0),
-        };
-        purchases.push(purchase);
-    });
-
-    const totalPaid = parseFloat(document.getElementById('total-paid').textContent.replace(/,/g, ''));
-
-    fetch('/generate-invoice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            buyer_id: buyerId,
-            purchases,
-            total_paid: totalPaid,
-        }),
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.open(data.invoicePath, '_blank'); // Open the generated invoice
-            } else {
-                alert('Failed to generate invoice.');
-            }
-        })
-        .catch(error => console.error('Error generating invoice:', error));
-}
-
-// Add event listener for Generate Invoice for All Buyers button
-document.getElementById('generate-all-buyers-invoice').addEventListener('click', generateAllBuyersInvoice);
-
-function generateAllBuyersInvoice() {
-    const rows = document.querySelectorAll('#purchase-table tbody tr');
-    
-    // Check if the table is empty
-    if (rows.length === 0) {
-        alert('No purchase data available to generate invoices.');
-        return; // Stop further processing if the table is empty
-    }
-
-    const purchases = [];
-
-    let totalPaid = 0;
-    let totalUnpaid = 0;
-    let grandTotal = 0;
-
-    rows.forEach((row) => {
-        const paidAmount = parseFloat(row.children[6]?.textContent.replace(/,/g, '') || 0);
-        const purchase = {
-            buyer_name: row.children[1]?.textContent || "N/A",
-            container_number: row.children[2]?.textContent || "N/A",
-            weight_sold: parseFloat(row.children[3]?.textContent.replace(/,/g, '') || 0),
-            price_per_kg: parseFloat(row.children[4]?.textContent.replace(/,/g, '') || 0),
-            purchase_date: row.children[5]?.textContent || "N/A",
-            paid_amount: paidAmount,
-            unpaid_amount: parseFloat(row.children[7]?.textContent.replace(/,/g, '') || 0),
-            total_price: parseFloat(row.children[8]?.textContent.replace(/,/g, '') || 0),
-        };
-
-        // Update the totals
-        totalPaid += paidAmount;
-        totalUnpaid += purchase.unpaid_amount || 0;
-        grandTotal += purchase.total_price || 0;
-
-        purchases.push(purchase);
-    });
-
-    // If total paid or total unpaid are zero, allow invoice generation
-    if (isNaN(totalPaid) || isNaN(totalUnpaid) || isNaN(grandTotal)) {
-        alert('Please ensure all required data is available before generating the invoice.');
-        return;
-    }
-
-    // Proceed with the fetch even if totals are zero
-    fetch('/generate-all-buyers-invoice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            purchases,
-            total_paid: totalPaid,
-            total_unpaid: totalUnpaid,
-            grand_total: grandTotal
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.open(data.invoicePath, '_blank');
-        } else {
-            alert('Failed to generate invoice for all buyers.');
+        // Helper function to format numbers with commas
+        function formatNumberWithCommas(number) {
+            return parseFloat(number).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
         }
-    })
-    .catch(error => console.error('Error generating invoice for all buyers:', error));
-}
 
+function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-// Function to update button text and disable/enable buttons based on the buyer selection
-function handleButtonState() {
-    const buyerId = document.getElementById('buyer-filter').value; // Get the selected value
-    const generateInvoiceButton = document.getElementById('generate-invoice');
-    const generateAllBuyersButton = document.getElementById('generate-all-buyers-invoice');
-    const buyerFilter = document.getElementById('buyer-filter');
-    const selectedBuyerName = buyerFilter.options[buyerFilter.selectedIndex].text; // Get selected buyer name
-    
-    // If "All Buyers" is selected (id is "0" or "null"), disable "Generate Invoice" button
-    if (buyerId === "0" || buyerId === "null" || buyerId === "") {
-        generateInvoiceButton.disabled = true;
-        generateInvoiceButton.style.backgroundColor = 'gray';  // Make it gray
-        generateInvoiceButton.textContent = 'Generate Invoice'; // Keep default button text
-        
-        generateAllBuyersButton.disabled = false;  // Enable the "Generate Invoice for All Buyers" button
-        generateAllBuyersButton.style.backgroundColor = '';  // Reset the background color
+    // Ensure buyer dropdown exists
+    const buyerDropdown = document.getElementById('buyer-filter'); 
+    const selectedBuyerId = buyerDropdown.value; // Get selected buyer's ID
+    const buyerName = buyerDropdown.selectedOptions[0] ? buyerDropdown.selectedOptions[0].text : "All Buyers"; // Get selected buyer's name or 'All Buyers'
+
+    // Replace spaces with underscores in the buyer's name to avoid filename issues
+    const sanitizedBuyerName = buyerName.replace(/\s+/g, "_");
+
+    // Get current date and time
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    }).replace(/\//g, "-"); // Convert to "DD-MM-YYYY"
+
+    let formattedTime = currentDate.toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    });
+
+    formattedTime = formattedTime.replace(/[:\s]/g, "-").toUpperCase(); // Convert time to uppercase "HH-MM-AM/PM"
+
+    // **Generate filename without location**
+    const fileName = `Purchase_History_${sanitizedBuyerName}_${formattedDate}_${formattedTime}.pdf`;
+
+    // Fetch Buyer Location if a specific buyer is selected
+    let buyerLocation = '';
+    if (selectedBuyerId !== "0") { 
+        fetch(`/buyers/location/${selectedBuyerId}`)
+            .then(response => response.json())
+            .then(data => {
+                buyerLocation = data.location || ''; // Assign buyer's location if available
+                generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName);
+            })
+            .catch(error => {
+                console.error('Error fetching buyer location:', error);
+                generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName);
+            });
     } else {
-        // If a specific buyer is selected, disable "Generate Invoice for All Buyers" button and enable "Generate Invoice"
-        generateAllBuyersButton.disabled = true;
-        generateAllBuyersButton.style.backgroundColor = 'gray';  // Make it gray
-        generateInvoiceButton.disabled = false;  // Enable the "Generate Invoice" button
-        generateInvoiceButton.style.backgroundColor = '';  // Reset the background color
-
-        // Update the "Generate Invoice" button text to show the selected buyer's name
-        generateInvoiceButton.textContent = `Invoice For ${selectedBuyerName}`;
+        generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName);
     }
 }
 
-// Listen to the change event of the dropdown to update button states when selection changes
-document.getElementById('buyer-filter').addEventListener('change', handleButtonState);
+// Function to generate and save PDF with watermark
+function generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName) {
 
-// Call the function once on page load to apply the correct button state
-window.onload = handleButtonState;
+
+        // --- Header with Logo ---
+        const headerBarHeight = 20;
+        doc.setFillColor(49, 178, 230);
+        doc.rect(0, 0, doc.internal.pageSize.width, headerBarHeight, 'F');
+        doc.addImage('/public/lsg.png', 'PNG', 14, 5, 30, 10);
+        doc.setFontSize(14); 
+        doc.setFont("helvetica", "bold"); 
+        doc.setTextColor(255, 255, 255); 
+        doc.text("Purchase History", doc.internal.pageSize.width - 50, 12);
+
+        // --- INVOICE TO Section ---
+        const invoiceYPosition = 30;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont("helvetica", "bold");
+        doc.text("INVOICE TO:", 14, invoiceYPosition);
+        doc.setFont("helvetica", "normal");
+        doc.text(buyerName, 14, invoiceYPosition + 5);
+
+        // **Only show buyer location inside the PDF, not in filename**
+        if (buyerLocation) {
+            doc.text(buyerLocation, 14, invoiceYPosition + 10);
+        }
+
+        // --- Date Section ---
+        const dateLabel = "DATE:";
+        const dateText = `${formattedDate}`;
+        const dateLabelWidth = doc.getTextWidth(dateLabel);
+        const xPosition = doc.internal.pageSize.width - dateLabelWidth - 40; // Right align
+
+        doc.setFont("helvetica", "bold");
+        doc.text(dateLabel, xPosition, invoiceYPosition);
+        doc.setFont("helvetica", "normal");
+        doc.text(dateText, xPosition, invoiceYPosition + 5);
+
+        // --- Table Section ---
+        const table = document.getElementById('purchase-table');
+        doc.autoTable({
+            html: table,
+            theme: 'grid',
+            startY: headerBarHeight + 30,
+            margin: { horizontal: 10 },
+            headStyles: {
+                fillColor: [0, 0, 0],
+                textColor: [255, 255, 255],
+                fontSize: 8,
+                fontStyle: 'bold',
+            },
+            bodyStyles: {
+                fontSize: 9,
+                textColor: [0, 0, 0],
+            },
+            footStyles: {
+                fillColor: [220, 220, 220],
+                textColor: [0, 0, 0],
+                fontSize: 10,
+                fontStyle: 'bold',
+            },
+        });
+
+    const watermarkPath = "/public/watermark.png"; // Change to your actual watermark path
+    const watermarkImg = new Image();
+    watermarkImg.src = watermarkPath;
+
+    watermarkImg.onload = function () {
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
+
+        // Set watermark transparency and add it in the background
+        doc.setGState(new doc.GState({ opacity: 0.2 })); // ✅ Set faint opacity
+        doc.addImage(watermarkImg, 'PNG', pageWidth / 4, pageHeight / 3, pageWidth / 2, pageHeight / 4);
+        doc.setGState(new doc.GState({ opacity: 1 })); // ✅ Restore normal opacity
+
+        // --- Footer Section ---
+        const line1 = "Thank You For Your Business";
+        const line2 = "Generated by bYTE Ltd.";
+        const line3 = "For inquiries, contact support@lsgroup.com.bd";
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(0, 0, 0);
+
+
+        const line1Width = doc.getTextWidth(line1);
+        const line2Width = doc.getTextWidth(line2);
+        const line3Width = doc.getTextWidth(line3);
+
+        const xPosition1 = (doc.internal.pageSize.width - line1Width) / 2.3;
+        const xPosition2 = (doc.internal.pageSize.width - line2Width) / 2;
+        const xPosition3 = (doc.internal.pageSize.width - line3Width) / 2;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.text(line1, xPosition1, pageHeight - 40);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.text(line2, xPosition2, pageHeight - 25);
+        doc.text(line3, xPosition3, pageHeight - 20);
+
+        // Save PDF with dynamic filename
+        doc.save(fileName);
+    };
+}
+
+
+
+
+
+
+        // Example export to Excel function (already implemented)
+        function exportToExcel() {
+            const table = document.getElementById('purchase-table');
+            const workbook = XLSX.utils.table_to_book(table, { sheet: "Purchase History" });
+            XLSX.writeFile(workbook, 'Purchase_History.xlsx');
+        }
+
 
 function formatQuantity() {
     const inputField = document.getElementById('quantity');

@@ -3,6 +3,8 @@
 <head>
     <title>Purchase History</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="purchase.css">
 </head>
 <body>
@@ -44,17 +46,28 @@
 
         <!-- Filters -->
         <div class="filters">
-            <label for="buyer-filter">Filter by Buyer:</label>
+            <label for="buyer-filter">Filter Buyer:</label>
             <select id="buyer-filter">
-                <option value="">All Buyers</option>
+            <option value="">All Buyers</option>
             </select>
 
-            <label for="container-filter">Filter by Container:</label>
+            <label for="container-filter">Filter Container:</label>
             <select id="container-filter">
-                <option value="">All Containers</option>
+            <option value="">All Containers</option>
             </select>
         </div>
+		
+		<div class="datefilters">
+			<label for="start-date">Start Date</label>
+			<input type="date" id="start-date">
 
+
+			<label for="end-date">End Date</label>
+			<input type="date" id="end-date">
+				<button id="apply-date-filter">Apply Date Filter</button>
+		</div>
+
+		
         <!-- Purchase Table -->
         <div class="table-container">
             <table id="purchase-table">
@@ -69,8 +82,7 @@
                         <th>Rate</th>
                         <th>Paid</th>
                         <th>Unpaid</th>
-                        <th>Total Price</th>
-                        <th>Actions</th>
+                        <th>Total Price</th>                   
                     </tr>
                 </thead>
                 <tbody>
@@ -88,9 +100,10 @@
         </div>
 
         <!-- Action Buttons -->
-        <button id="export-btn" onclick="exportToExcel()">Export to Excel</button>
-        <button id="generate-invoice">Invoice</button>
-        <button id="generate-all-buyers-invoice">Invoice For All Buyers</button>
+		        <button id="export-btn" onclick="exportToExcel()">Export to Excel</button>
+		<button id="export-pdf-btn" onclick="exportToPDF()">Export to PDF</button>
+
+
 
         <!-- Edit Form (Popup) -->
         <div class="popup" id="edit-form">
@@ -105,10 +118,8 @@
                     <label for="buyer-name">Buyer:</label>
                     <input type="text" id="buyer-name" required disabled><br>
 					
-
-<label for="bill-no">Bill No.</label>
-<input type="text" id="bill-no" name="bill-no">
-
+					<label for="bill-no">Bill No.</label>
+					<input type="text" id="bill-no" name="bill-no">
 
                     <label for="quantity">Quantity:</label>
                     <input type="number" id="quantity" required><br>
@@ -133,5 +144,6 @@
         <!-- Include JS -->
         <script src="purchase.js"></script>
     </div>
+
 </body>
 </html>

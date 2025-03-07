@@ -69,8 +69,20 @@ document.getElementById('payment-amount').addEventListener('blur', function () {
 });
 
 // Handle form submission
+
 document.getElementById('payment-form').addEventListener('submit', function (event) {
     event.preventDefault();
+
+    // Get the submit button and disable it to prevent multiple submissions
+    const submitButton = event.target.querySelector('button[type="submit"]');
+    if (submitButton.disabled) {
+        console.log("Submit button already disabled - preventing duplicate submission.");
+        return; // Stop further execution if the button is already disabled
+    }
+
+    // Disable the submit button and show processing text
+    submitButton.disabled = true;
+    submitButton.textContent = "Processing...";
 
     // Get form values
     const buyerDropdown = document.getElementById('buyer-dropdown');
@@ -85,11 +97,15 @@ document.getElementById('payment-form').addEventListener('submit', function (eve
     // Validate inputs
     if (!buyerId || !paymentDate || !paymentMethod || !paymentAmount || paymentAmount <= 0) {
         alert('Please fill out all fields with valid values.');
+        submitButton.disabled = false; // Re-enable the button if validation fails
+        submitButton.textContent = "Submit Payment"; // Reset button text
         return;
     }
 
     if (paymentMethod === 'bank' && !particulars) {
         alert('Please provide particulars for bank payments.');
+        submitButton.disabled = false; // Re-enable the button if validation fails
+        submitButton.textContent = "Submit Payment"; // Reset button text
         return;
     }
 
@@ -126,8 +142,16 @@ document.getElementById('payment-form').addEventListener('submit', function (eve
         })
         .catch(error => {
             alert('Error: ' + error.message);
+        })
+        .finally(() => {
+            // Re-enable the submit button and reset text after request completes
+            setTimeout(() => {
+                submitButton.disabled = false;
+                submitButton.textContent = "Submit Payment"; // Reset button text
+            }, 3000); // Add a slight delay to prevent instant double-clicking
         });
 });
+
 
 document.addEventListener("DOMContentLoaded", function() {
     // Get the dropdown button and menu

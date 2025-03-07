@@ -185,6 +185,10 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('purchase-return-form').addEventListener('submit', function (event) {
         event.preventDefault();
 
+    // Disable the submit button and change text to prevent double-clicking
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting...";
+
         const returnData = {
             return_date: document.getElementById('return-date').value,
             buyer_id: buyerSelect.value,
@@ -213,6 +217,13 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(error => {
             console.error('❌ Error:', error);
             alert('❌ An error occurred while submitting the return.');
+			   })
+			 .finally(() => {
+        // Re-enable the submit button and reset text after request completes
+        setTimeout(() => {
+            submitButton.disabled = false;
+            submitButton.textContent = "Submit Return"; // Reset button text
+        }, 3000); // Add a slight delay to prevent instant double-clicking
         });
     });
 

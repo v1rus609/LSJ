@@ -97,10 +97,13 @@ body {
 }
 
 
-@media (min-width: 1024px) {
+
+
+
+@media (min-width: 1281px) {
     .logo img {
-        max-width: 25%;
-		margin-bottom: -15px;
+        max-width: 20%;
+		margin-bottom:-5px;
 		margin-top: 10px;
     }
 	
@@ -121,72 +124,9 @@ body {
     color: white;
     background: linear-gradient(to bottom, #2dabe2, #83d9ff);
     padding: 10px 15px;
-    margin: 5px 0;
-    border-radius: 5px;
-    font-size: 0.8rem;
-    transition: background 0.3s;
-	}
-	
-	.container {
-    width: 85%;
-    max-width: 600px;
-    text-align: center;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-	}
-	
-	.counter {
-    background: linear-gradient(to bottom, #37e57e, #77fbac);
-    color: white;
-    padding: 8px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: -15px;
-	}
-	
-	.counter .value {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 5px;
-	}
-	
-	.counter .label {
-    font-size: 1.0rem;
-	}
-}
-
-
-@media (min-width: 1281px) {
-    .logo img {
-        max-width: 25%;
-		margin-bottom: 5px;
-		margin-top: 10px;
-    }
-	
-	body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f9f9f9;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-	}
-	
-	.menu a {
-    display: block;
-    text-decoration: none;
-    color: white;
-    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-    padding: 15px 15px;
     margin: 10px 0;
     border-radius: 5px;
-    font-size: 1.0rem;
+    font-size: 0.9rem;
     transition: background 0.3s;
 	}
 	
@@ -201,14 +141,14 @@ body {
 	}
 	
 	.counter {
-    background: linear-gradient(to bottom, #37e57e, #77fbac);
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
+		background: linear-gradient(to bottom, #37e57e, #77fbac);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: -10px;
 	}
 	
 	.counter .value {

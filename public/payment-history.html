@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>Payment History</title>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="payment-history.css">
 </head>
 <body>
@@ -64,7 +66,6 @@
                         <th>Bank Amount</th>
                         <th>Cash Amount</th>
                         <th>Total</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -81,7 +82,7 @@
     </div>
             <!-- Export to Excel Button -->
             <button id="export-payment-history">Export to Excel</button>
-			<button id="export-payment-history-pdf">Export to PDF</button>
+		<button id="export-pdf-btn" onclick="exportToPDF()">Export to PDF</button>
         
 <!-- Edit Payment Modal -->
         <div class="popup" id="edit-payment-form">

@@ -10,7 +10,7 @@ function formatNumberWithCommas(value) {
     if (!isNaN(rawValue) && rawValue !== '') {
         let [integer, decimal] = rawValue.split('.');
         integer = parseInt(integer, 10).toLocaleString('en-US'); // Add commas to the integer part
-        return decimal !== undefined ? `${integer}.${decimal}` : integer;
+        return decimal !== undefined ? `${integer}.${decimal}` : integer; // Correct template literal syntax
     }
     return value;
 }
@@ -44,7 +44,7 @@ function renderBuyerDropdown(data) {
     data.forEach(buyer => {
         const option = document.createElement('option');
         option.value = buyer.id;
-        option.text = `${buyer.name} (${buyer.location})`;
+        option.text = `${buyer.name} (${buyer.location})`; // Corrected string interpolation
         buyerDropdown.appendChild(option);
     });
 }
@@ -77,7 +77,7 @@ function renderContainerDropdown(dropdown, data) {
         const option = document.createElement('option');
         option.value = container.id;
         option.setAttribute('data-remaining-weight', container.remaining_weight);
-        option.textContent = `${container.container_number} (Remaining: ${container.remaining_weight} kg)`;
+        option.textContent = `${container.container_number} (Remaining: ${container.remaining_weight} kg)`; // Corrected string interpolation
         dropdown.appendChild(option);
     });
 }
@@ -144,7 +144,7 @@ document.getElementById('container-section').addEventListener('input', (event) =
             const enteredWeight = parseFloat(getRawNumber(weightInput.value)) || 0;
 
             if (enteredWeight > remainingWeight) {
-                alert(`Error: You cannot sell more than the remaining weight (${remainingWeight} kg).`);
+                alert(`Error: You cannot sell more than the remaining weight (${remainingWeight} kg).`); // Corrected string interpolation
                 weightInput.value = formatNumberWithCommas(remainingWeight.toString());
             }
         }
@@ -188,21 +188,30 @@ document.getElementById('container-section').addEventListener('click', (event) =
         const newGroup = document.createElement('div');
         newGroup.className = 'container-group';
         newGroup.innerHTML = `
+            <label>Bill No.:</label><br>
+            <input type="text" name="bill_no[]" id="bill-no" value="Bill No:" required><br><br>
+
             <label>Select Container:</label><br>
             <input type="text" class="container-search" placeholder="Search Container..."><br><br>
             <select name="container_id[]" class="container-dropdown" required>
                 <option value="">Select a Container</option>
             </select><br><br>
+
             <label>Weight Sold (KG):</label><br>
-            <input type="text" name="weight_sold[]" class="weight-sold" required><br><br>
+            <input type="text" name="weight_sold[]" class="weight-sold" step="0.01" required><br><br>
+
             <label>Price Per KG:</label><br>
-            <input type="text" name="price_per_kg[]" class="price-per-kg" required><br><br>
-            <label>Paid Amount:</label><br>
-            <input type="text" name="paid_amount[]" class="paid-amount" value="0" required><br><br>
-            <label>Unpaid Amount:</label><br>
+            <input type="text" name="price_per_kg[]" class="price-per-kg" step="0.01" required><br><br>
+
+            <label>Paid Amount (For This Container):</label><br>
+            <input type="text" name="paid_amount[]" class="paid-amount" step="0.01" value="0" required><br><br>
+
+            <label>Unpaid Amount (For This Container):</label><br>
             <input type="text" name="unpaid_amount[]" class="unpaid-amount" readonly><br><br>
+
             <button type="button" class="add-container">Add Container</button>
-            <button type="button" class="remove-container">Remove</button><br><br>`;
+            <button type="button" class="remove-container">Remove</button><br><br>
+        `;
         containerSection.appendChild(newGroup);
 
         // Populate dropdown with full container list
@@ -217,6 +226,7 @@ document.getElementById('container-section').addEventListener('click', (event) =
 });
 
 
+// Form Submission
 document.getElementById('sell-form').addEventListener('submit', function (event) {
     event.preventDefault(); // Prevent default form submission
 
@@ -234,7 +244,7 @@ document.getElementById('sell-form').addEventListener('submit', function (event)
     const data = {
         buyer_id: formData.get('buyer_id'),
         purchase_date: formData.get('purchase_date'),
-        bill_no: formData.get('bill_no'), // Ensure Bill No is captured
+        bill_no: formData.getAll('bill_no[]'), // Capture all Bill Nos.
         container_id: formData.getAll('container_id[]'),
         weight_sold: formData.getAll('weight_sold[]').map(getRawNumber),
         price_per_kg: formData.getAll('price_per_kg[]').map(getRawNumber),
@@ -273,7 +283,6 @@ document.getElementById('sell-form').addEventListener('submit', function (event)
         }, 3000); // Add a slight delay to prevent instant double-clicking
     });
 });
-
 
 document.addEventListener("DOMContentLoaded", function() {
     // Get the dropdown button and menu

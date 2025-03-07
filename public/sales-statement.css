@@ -161,20 +161,20 @@ tr:hover {
     background: linear-gradient(to bottom, #2ac363, #63e29b);
 }
 
-/* Export Button */
-#export-sales-statement-pdf {
-    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+		/* Export Button */
+		#export-pdf-btn {
+			background: linear-gradient(to bottom, #2dabe2, #83d9ff);
     color: white;
     font-weight: bold;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-}
+		}
 
-#export-sales-statement-pdf:hover {
-    background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
-}
+		#export-pdf-btn:hover {
+			background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
+		}
 
 .home-icon img {
 	display: block;

@@ -1,20 +1,17 @@
 // Declare a variable to temporarily store the particulars value
 let storedParticulars = '';
 
-// Fetch and populate buyers in the dropdown
 fetch('/buyers/list')
     .then(response => response.json())
     .then(data => {
         const buyerFilter = document.getElementById('buyer-filter');
-        const allOption = document.createElement('option');
-        allOption.value = 'all';
-        allOption.textContent = 'All Buyers';
-        buyerFilter.appendChild(allOption);
+        buyerFilter.innerHTML = '<option value="all" data-id="0">All Buyers</option>'; // Default option
 
         data.forEach(buyer => {
             const option = document.createElement('option');
-            option.value = buyer.name; // Use buyer's name as the filter value
+            option.value = buyer.name;
             option.textContent = buyer.name;
+            option.setAttribute('data-id', buyer.id); // Store buyer ID in option
             buyerFilter.appendChild(option);
         });
     })
@@ -221,6 +218,165 @@ document.addEventListener('click', function (event) {
     }
 });
 
+// Function to export table to PDF with a watermark
+function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Ensure buyer dropdown exists
+    const buyerDropdown = document.getElementById('buyer-filter'); 
+    const selectedBuyerId = buyerDropdown.options[buyerDropdown.selectedIndex]?.getAttribute('data-id') || "0"; // Get selected buyer's ID
+    const buyerName = buyerDropdown.value === "all" ? "All Buyers" : buyerDropdown.value; // Ensure "All Buyers" is displayed
+
+    // Replace spaces with underscores in the buyer's name, but keep "All_Buyers" for consistency
+    const sanitizedBuyerName = buyerDropdown.value === "all" ? "All_Buyers" : buyerName.replace(/\s+/g, "_");
+
+    // Get current date and time
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    }).replace(/\//g, "-"); // Convert to "DD-MM-YYYY"
+
+    let formattedTime = currentDate.toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    });
+
+    formattedTime = formattedTime.replace(/[:\s]/g, "-").toUpperCase(); // Convert time to uppercase "HH-MM-AM/PM"
+
+    // **Generate filename without location**
+    const fileName = `Payment_History_${sanitizedBuyerName}_${formattedDate}_${formattedTime}.pdf`;
+
+    // Fetch Buyer Location if a specific buyer is selected and has an ID
+    let buyerLocation = '';
+    if (selectedBuyerId !== "0") { 
+        fetch(`/buyers/location/${selectedBuyerId}`)
+            .then(response => response.json())
+            .then(data => {
+                buyerLocation = data.location || ''; // Assign buyer's location if available
+                generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName);
+            })
+            .catch(error => {
+                console.error('Error fetching buyer location:', error);
+                generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName);
+            });
+    } else {
+        generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName);
+    }
+}
+
+// Function to generate and save PDF with watermark
+function generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName) {
+    // --- Header with Logo ---
+    const headerBarHeight = 20;
+    doc.setFillColor(49, 178, 230);
+    doc.rect(0, 0, doc.internal.pageSize.width, headerBarHeight, 'F');
+    doc.addImage('/public/lsg.png', 'PNG', 14, 5, 30, 10);
+    doc.setFontSize(14); 
+    doc.setFont("helvetica", "bold"); 
+    doc.setTextColor(255, 255, 255); 
+    doc.text("Payment History", doc.internal.pageSize.width - 50, 12);
+
+    // --- INVOICE TO Section ---
+    const invoiceYPosition = 30;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "bold");
+    doc.text("INVOICE TO:", 14, invoiceYPosition);
+    doc.setFont("helvetica", "normal");
+    doc.text(buyerName, 14, invoiceYPosition + 5);
+    
+    // **Only show buyer location inside the PDF, not in filename**
+    if (buyerLocation) {
+        doc.text(buyerLocation, 14, invoiceYPosition + 10);
+    }
+
+    // --- Date Section ---
+    const dateLabel = "DATE:";
+    const dateText = `${formattedDate}`;
+    const dateLabelWidth = doc.getTextWidth(dateLabel);
+    const xPosition = doc.internal.pageSize.width - dateLabelWidth - 40; // Right align
+
+    doc.setFont("helvetica", "bold");
+    doc.text(dateLabel, xPosition, invoiceYPosition);
+    doc.setFont("helvetica", "normal");
+    doc.text(dateText, xPosition, invoiceYPosition + 5);
+
+    // --- Table Section ---
+    const table = document.getElementById('payment-history-table');
+    doc.autoTable({
+        html: table,
+        theme: 'grid',
+        startY: headerBarHeight + 30,
+        margin: { horizontal: 10 },
+        headStyles: {
+            fillColor: [0, 0, 0],
+            textColor: [255, 255, 255],
+            fontSize: 8,
+            fontStyle: 'bold',
+        },
+        bodyStyles: {
+            fontSize: 9,
+            textColor: [0, 0, 0],
+        },
+        footStyles: {
+            fillColor: [220, 220, 220],
+            textColor: [0, 0, 0],
+            fontSize: 10,
+            fontStyle: 'bold',
+        },
+    });
+
+    // --- Footer Section ---
+    const line1 = "Thank You For Your Business";
+    const line2 = "Generated by bYTE Ltd.";
+    const line3 = "For inquiries, contact support@lsgroup.com.bd";
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(0, 0, 0);
+    const pageHeight = doc.internal.pageSize.height;
+
+    const line1Width = doc.getTextWidth(line1);
+    const line2Width = doc.getTextWidth(line2);
+    const line3Width = doc.getTextWidth(line3);
+
+    const xPosition1 = (doc.internal.pageSize.width - line1Width) / 2.3;
+    const xPosition2 = (doc.internal.pageSize.width - line2Width) / 2;
+    const xPosition3 = (doc.internal.pageSize.width - line3Width) / 2;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text(line1, xPosition1, pageHeight - 40);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text(line2, xPosition2, pageHeight - 25);
+    doc.text(line3, xPosition3, pageHeight - 20);
+
+    // Load watermark and add it **after** the table
+    const watermarkImg = new Image();
+    watermarkImg.src = "/public/watermark.png"; // Change to your actual watermark path
+
+    watermarkImg.onload = function () {
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
+
+        // Set watermark transparency and position
+        doc.setGState(new doc.GState({ opacity: 0.2 })); 
+        doc.addImage(watermarkImg, 'PNG', pageWidth / 4, pageHeight / 3, pageWidth / 2, pageHeight / 4);
+        doc.setGState(new doc.GState({ opacity: 1 })); 
+
+        // ✅ Now save the PDF **after** watermark is added
+        doc.save(fileName);
+    };
+}
+
+
+
 // Add event listener for export to Excel
 document.getElementById('export-payment-history').addEventListener('click', function () {
     const table = document.getElementById('payment-history-table');
@@ -229,48 +385,6 @@ document.getElementById('export-payment-history').addEventListener('click', func
     XLSX.writeFile(workbook, fileName);
 });
 
-// Add event listener for export to PDF
-document.getElementById('export-payment-history-pdf').addEventListener('click', () => {
-    const fetchedPayments = []; // Gather the data displayed in the table
-    const rows = document.querySelectorAll('#payment-history-table tbody tr');
-
-    rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        fetchedPayments.push({
-            buyer_name: cells[0].textContent, // Correct field mapping
-            payment_date: cells[1].textContent,
-            particulars: cells[2].textContent,
-            bank_amount: parseFloat(cells[3].textContent.replace(/,/g, '')),
-            cash_amount: parseFloat(cells[4].textContent.replace(/,/g, '')),
-            total: parseFloat(cells[5].textContent.replace(/,/g, '')),
-        });
-    });
-
-    const totalReceived = parseFloat(document.getElementById('total-received').textContent.replace(/,/g, ''));
-
-    // Get the selected buyer
-    const buyerName = document.getElementById('buyer-filter').value;
-
-    // Send data to the backend for PDF generation
-    fetch('/payments/export-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            payments: fetchedPayments,
-            totalReceived: totalReceived,
-            selectedBuyer: buyerName, // Send the selected buyer's name
-        }),
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.open(data.filePath, '_blank');
-            } else {
-                alert('Failed to generate PDF.');
-            }
-        })
-        .catch(error => console.error('Error exporting PDF:', error));
-});
 
 
 // Fetch all payment history on page load

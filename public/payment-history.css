@@ -28,7 +28,7 @@ body {
 #payment-history-table td {
     border: 1px solid #ccc;
     padding: 10px;
-    text-align: left;
+    text-align: center;
     font-size: 1.3rem;
 }
 
@@ -163,21 +163,22 @@ tfoot th {
     background: linear-gradient(to bottom, #2ac363, #63e29b);
 }
 
-/* Export Button */
-#export-payment-history-pdf {
-    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-    color: white;
-    font-weight: bold;
-	font-size: 1.5rem;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+		/* Export Button */
+		#export-pdf-btn {
+			background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+			color: white;
+			font-weight: bold;
+			font-size: 1.5rem;
+			padding: 10px 20px;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+		}
 
-#export-payment-history-pdf:hover {
-    background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
-}
+		#export-pdf-btn:hover {
+			background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
+		}
+
 
 .home-icon img {
 	display: block;
@@ -524,7 +525,7 @@ button.delete-btn:hover {
 }
 	
 	.filter-section button {
-		padding: 5px 10px;
+		padding: 8px 20px;
 		font-size: 0.8rem;
 		color: #fff;
 		background-color: #007BFF;
@@ -548,24 +549,29 @@ button.delete-btn:hover {
 	#export-payment-history {
 		background: linear-gradient(to bottom, #37e57e, #77fbac);
 		color: white;
-		font-size: 1.0rem;
+		font-size: 0.8rem;
 		font-weight: bold;
 		padding: 10px 20px;
 		border: none;
 		border-radius: 5px;
 		cursor: pointer;
 	}
-		
-	#export-payment-history-pdf {
-		background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-		color: white;
-		font-weight: bold;
-		font-size: 1.0rem;
-		padding: 10px 20px;
-		border: none;
-		border-radius: 5px;
-		cursor: pointer;
-	}
+/* Export Button */
+#export-pdf-btn {
+    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+    color: white;
+	margin-top: -5px;
+	font-size: 0.8rem;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#export-pdf-btn:hover {
+    background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
+}
 
 	.navbar {
 		display: flex;
@@ -722,14 +728,14 @@ button.delete-btn:hover {
 #payment-history-table td {
     border: 1px solid #ccc;
     padding: 10px;
-    text-align: left;
+    text-align: center;
     font-size: 0.9rem;
 }
 
 #payment-history-table th {
     background: #2dabe2;
     padding: 10px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     text-align: left;
     color: white;
     font-weight: bold;

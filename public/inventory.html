@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -46,35 +47,36 @@
         <label>Purchase Date:</label><br>
         <input type="date" name="purchase_date" id="purchase-date" required><br><br>
 
-<label>Bill No.:</label><br>
-<input type="text" name="bill_no" id="bill-no" value="Bill No:" required><br><br>
-
-        <!-- Container Section -->
-        <div id="container-section">
-            <div class="container-group">
-				<label>Select Container:</label><br>
-				<input type="text" class="container-search" placeholder="Search Container..."><br><br>
-				<select name="container_id[]" class="container-dropdown" required>
-					<option value="">Select a Container</option>
-				</select><br><br>
-
-                <label>Weight Sold (KG):</label><br>
-                <input type="text" name="weight_sold[]" class="weight-sold" step="0.01" required><br><br>
-
-                <label>Price Per KG:</label><br>
-                <input type="text" name="price_per_kg[]" class="price-per-kg" step="0.01" required><br><br>
-
-				<label>Paid Amount (For This Container):</label><br>
-				<input type="text" name="paid_amount[]" class="paid-amount" step="0.01" value="0" required><br><br>
+<!-- Container Section -->
+<div id="container-section">
+    <div class="container-group">
+        <label>Bill No.:</label><br>
+        <input type="text" name="bill_no[]" id="bill-no" value="Bill No:" required><br><br>
 
 
-                <label>Unpaid Amount (For This Container):</label><br>
-                <input type="text" name="unpaid_amount[]" class="unpaid-amount" readonly><br><br>
+        <label>Select Container:</label><br>
+        <input type="text" class="container-search" placeholder="Search Container..."><br><br>
+        <select name="container_id[]" class="container-dropdown" required>
+            <option value="">Select a Container</option>
+        </select><br><br>
 
-                <button type="button" class="add-container">Add Container</button>
-                <button type="button" class="remove-container">Remove</button><br><br>
-            </div>
-        </div>
+        <label>Weight Sold (KG):</label><br>
+        <input type="text" name="weight_sold[]" class="weight-sold" step="0.01" required><br><br>
+
+        <label>Price Per KG:</label><br>
+        <input type="text" name="price_per_kg[]" class="price-per-kg" step="0.01" required><br><br>
+
+        <label>Paid Amount (For This Container):</label><br>
+        <input type="text" name="paid_amount[]" class="paid-amount" step="0.01" value="0" required><br><br>
+
+        <label>Unpaid Amount (For This Container):</label><br>
+        <input type="text" name="unpaid_amount[]" class="unpaid-amount" readonly><br><br>
+
+        <button type="button" class="add-container">Add Container</button>
+        <button type="button" class="remove-container">Remove</button><br><br>
+    </div>
+</div>
+
 
         <!-- Total Price -->
         <label>Total Price:</label><br>
