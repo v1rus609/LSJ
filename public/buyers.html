@@ -3,6 +3,8 @@
 <head>
     <title>Add Buyer</title>
     <link rel="stylesheet" href="buyers.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Link to Font Awesome for the trash icon -->	
 </head>
 <body>
     <div class="container">
@@ -53,12 +55,15 @@
             </form>
         </div>
 
+
+        <h1>Buyer List</h1>
+
         <div class="search-container">
             <input type="text" id="search-box" placeholder="Search by Buyer Name or Location..." />
         </div>
 
-        <h1>Buyer List</h1>
-        <table>
+        <div class="table-wrapper">
+		<table>
             <thead>
                 <tr>
                     <th>ID</th>
@@ -72,7 +77,7 @@
             <tbody id="buyer-list">
             </tbody>
         </table>
-
+</div>
         <p class="error-message" id="error-message" style="display: none;">Failed to load buyer data. Please try again.</p>
     </div>
 

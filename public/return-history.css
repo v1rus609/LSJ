@@ -1,59 +1,82 @@
-/* General Styles */
+ /* 🌟 General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}	
+
 body {
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
+    background: linear-gradient(to right, #f9f9f9, #e0f7fa);
+	font-size: 0.8em;
+    margin: 0;
     padding: 0;
     display: flex;
-    text-align: center;
-    justify-content: space-around;
-    align-items: stretch;
+    align-items: stretch; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    min-height: 100vh; /* Ensure full height */
 }
+
 
 
 /* Logo Styling */
 .logo {
     text-align: center;
-    margin-bottom: 20px;
 }
 
+/* 🏆 Logo */
 .logo img {
-    max-width: 100px;
-    margin: 0 auto 10px;
-    display: block;
+	text-align: center;
+    max-width: 220px;
+    margin-bottom: 20px;
 }
 
 .container {
     width: 100%;
-    background: #fff;
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+    padding: 25px;
+    transition: all 0.3s ease-in-out;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
-h1 {
-    font-size: 1.5rem;
+ h1 {
+	text-align:center;
+    font-size: 3rem;
+    margin-bottom: 40px;
     color: #333;
-    text-align: center;
 }
 
+
+/* Table Wrapper Styling */
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
 /* Table Styles */
 #return-history-table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
+    margin: 20px auto;
+    background: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 #return-history-table th, #return-history-table td {
-    padding: 5px;
+    border: 1px solid #ccc;
+    padding: 10px;
     text-align: left;
-    font-size: 0.6rem;
-    border: 1px solid #ddd;
+    font-size: 1.3rem;
 }
 
 #return-history-table th {
-    background-color: #4CAF50;
+    background: #2dabe2;
+    padding: 10px;
+    font-size: 1.3rem;
+    text-align: left;
     color: white;
-    font-size: 0.6rem;
+    font-weight: bold;
 }
 
 #return-history-table tr:nth-child(even) {
@@ -65,7 +88,6 @@ h1 {
 }
 /* General filter container */
 .filters {
-    margin-bottom: -5%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -83,31 +105,36 @@ h1 {
 
 /* Label styles */
 .filters label {
+    font-size: 1.5rem;
     font-weight: bold;
-    font-size: 0.7rem;
     color: #333;
+    margin-bottom: 5px;
 }
 
 /* Select dropdown styles for Buyer and Container */
 #buyer-filter, #container-filter {
-    padding: 5px;
-    margin-top: 0%;
-    font-size: 0.7rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    text-align: left;
-    box-sizing: border-box;
+    padding: 15px;
+    font-size: 1.5rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 /* Date input field styles */
 #start-date, #end-date {
-    padding: 5px;
-    margin-top: 0%;
-    font-size: 0.7rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 100%;
-    box-sizing: border-box;
+	padding: 15px;
+    font-size: 1.5rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 /* Styling for the "Select Buyer" and "Select Container" dropdown options */
@@ -127,97 +154,97 @@ h1 {
     text-align: left;
 }
 
-.home-icon img {
-			max-width: 100%;
-			display: block;
-		}
-		
-.dropbtn img {
-			position: absolute;
-			display: block;
-			width: 200%;
-			float: left;
-			top: 0%;
-			left: -50%;
-		}
-		
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 50px 20px;
+    background: none;
+    border-radius: 10px;
 }
 
 .navbar a {
     text-decoration: none;
     color: white;
-    font-size: 0.8rem;
+    font-size: 1.2rem;
 }
+
+.home-icon img {
+    display: block;
+    width: 75px;
+}
+
 .dropdown {
-    position: relative;
-    display: inline-block;
+	position: relative;
+	display: inline-block;
 }
 
 .dropbtn {
     background: none;
     border: none;
     cursor: pointer;
+	padding: 0px;
+}
+		
+.dropbtn:hover {
+    background: none;
+    transform: scale(1.02);
 }
 
-
+.dropbtn img {
+    width: 75px;
+}
 
 .dropdown-content {
-
-			display: none;
-			position: absolute;
-			float: left;
-			top: 140%;
-			left: -140px;
-			text-align: left;
-			background-color: white;
-			min-width: 160px;
-			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-			z-index: 1;
-		}
-		
-
+    display: none;
+    position: absolute;
+    top: 110%;
+    right: 0;
+	text-align: left;
+    background-color: white;
+    min-width: 350px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1;
+    animation: slideDown 0.3s ease-in-out;
+}
 
 .dropdown-content a {
-    color: black;
-    padding: 15px 16px;
-    text-decoration: none;
     display: block;
-}
+    padding: 40px;
+	text-align:left;
+    text-decoration: none;
+    color: #333;
+    font-size: 2rem;
+    transition: background 0.3s ease-in-out;
+}	
 
 .dropdown-content a:hover {
-    background-color: #ddd;
-}
+    background: #f0f0f0;
+}	
 
-.dropdown:hover .dropdown-content {
-    display: none;
-}
-
+/* 🎯 Active Page Highlight */
 .navbar a.active {
+	color:white;
+	text-align:left;
     font-weight: bold;
-    background-color: #2dabe2;
-    color: white;
-    border-radius: 0px;
-    padding: 15px;
-}
+    background: #2dabe2;
+    padding: 40px;
+    border-radius: 5px;
+}	
+
 
 
 /* Style for the "Export to Excel" button */
 #export-excel-return-history {
-	padding: 10px 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 5px;
-    border: none;
-    transition: background-color 0.3s, transform 0.3s ease;
-    background: linear-gradient(to bottom, #37e57e, #77fbac);  /* Green background */
+    background: linear-gradient(to bottom, #37e57e, #77fbac);
     color: white;
-    margin-right: 10px;  /* Add some space between the buttons */
+	font-size: 1.5rem;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #export-excel-return-history:hover {
@@ -227,15 +254,14 @@ h1 {
 
 /* Style for the "Export Return History to PDF" button */
 #export-pdf-return-history {
+	background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+	color: white;
+	font-weight: bold;
+	font-size: 1.5rem;
 	padding: 10px 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 5px;
-    border: none;
-    transition: background-color 0.3s, transform 0.3s ease;
-    background: linear-gradient(to bottom, #2dabe2, #83d9ff);  /* Blue background */
-    color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
 }
 
 #export-pdf-return-history:hover {
@@ -249,8 +275,7 @@ button:focus {
 }
 
 
-
-/* Modal styles */
+/* Style for the modal */
 .popup {
     display: none; /* Hidden by default */
     position: fixed;
@@ -259,24 +284,37 @@ button:focus {
     top: 0;
     width: 100%;
     height: 100%;
+    overflow: auto;
     background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    backdrop-filter: blur(5px); /* Apply a blur effect to the background */
+    -webkit-backdrop-filter: blur(5px); /* For Safari support */
 }
 
 /* Popup content */
 .popup-content {
     background-color: #fefefe;
-    margin: 15% auto;
+	box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+    margin: 20% auto;
     padding: 20px;
+	border-radius:10px;
     border: 1px solid #888;
     width: 80%;
     max-width: 600px;
 }
 
-/* Close Button */
+h2 {
+	text-align:center;
+    font-size: 2rem;
+	margin-top: 30px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+/* Close button */
 .close-btn {
     color: #aaa;
     float: right;
-    font-size: 28px;
+    font-size: 40px;
     font-weight: bold;
 }
 
@@ -289,28 +327,35 @@ button:focus {
 
 /* Form styles */
 #edit-return-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+
+}
+
+#edit-return-form label {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: left;
 }
 
 #edit-return-form input, #edit-return-form select {
     padding: 10px;
-    font-size: 1rem;
+	width: 100%;
+	display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 1.5rem;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
 #update-return-btn {
-
-    font-size: 1rem;
+	width: 100%;
+    font-size: 1.5rem;
     background: linear-gradient(to bottom, #37e57e, #47a16b);
     color: white;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-
 }
 
 #update-return-btn:hover {
@@ -318,8 +363,8 @@ button:focus {
 }
 
 button.edit-btn {
-    padding: 4px 13px;
-    font-size: 0.6rem;
+    padding: 8px 24px;
+    font-size: 1.3rem;
     font-weight: bold;
     border-radius: 5px;
     border: none;
@@ -327,11 +372,12 @@ button.edit-btn {
     transition: background-color 0.3s, transform 0.2s;
     margin: 5px 0px;
     background: linear-gradient(to bottom, #37e57e, #47a16b);
-    color: white;
+	color: white;
 }
+/* Delete Button Style */
 button.delete-btn {
-    padding: 4px 8px;
-    font-size: 0.6rem;
+    padding: 8px 12px;
+    font-size: 1.3rem;
     font-weight: bold;
     border-radius: 5px;
     border: none;
@@ -342,25 +388,37 @@ button.delete-btn {
     color: white;
 }
 
-@media (min-width: 1281px) {
-	/* General Styles */
-			body {
-			font-family: Arial, sans-serif;
-			background-color: #f9f9f9;
-			font-size: 1.0rem;
-			margin: 0;
-			padding: 0;
-			display: flex;
-			align-items: center; /* Center vertically */
-			justify-content: center; /* Center horizontally */
-			min-height: 100vh; /* Ensure full height */
-			text-align: center;
-		}
+#return-history-table td:last-child {
+    text-align: center;  /* Center-align the content of the last column */
+}
 
-/* Logo Styling */
-.logo {
-    text-align: center;
-    margin-bottom: 20px;
+@media (min-width: 1024px) {
+	
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f9f9f9;
+	font-size: 1.0rem;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	align-items: center; /* Center vertically */
+	justify-content: center; /* Center horizontally */
+	min-height: 100vh; /* Ensure full height */
+	text-align: center;
+}
+
+.container {
+	width: 55%;
+	background: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+	
+h1 {
+	font-size:1.5rem;
+	text-align: center;
+	margin-bottom: 20px;
 }
 
 .logo img {
@@ -369,98 +427,205 @@ button.delete-btn {
     display: block;
 }
 
-.container {
-    width: 50%;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-h1 {
-    text-align: center;
+.filters label {
+    font-size: 0.8rem;
+    font-weight: bold;
     color: #333;
+    margin-bottom: 5px;
 }
 
-/* Table Styles */
+#buyer-filter, #container-filter {
+    padding: 10px;
+    font-size: 0.8rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+#start-date, #end-date {
+    padding: 10px;
+    font-size: 0.8rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
 #return-history-table {
     width: 100%;
-
     border-collapse: collapse;
-    margin-top: 20px;
-}
-
-#return-history-table th{
-    padding: 10px;
-		font-size:1rem;
-    text-align: center;
-    border: 1px solid #ddd;
-} 
-
-
-return-history-table td {
-    padding: 10px;
-		font-size:1rem;
-    text-align: center;
-    border: 1px solid #ddd;
+    margin: 20px auto;
+    background: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 #return-history-table th {
-    background-color: #4CAF50;
+    background: #2dabe2;
+    padding: 10px;
+    font-size: 0.9rem;
+    text-align: left;
     color: white;
-}
-
-#return-history-table tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-#return-history-table tr:hover {
-    background-color: #ddd;
-}
-/* Filters Section */
-.filters {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-	align-items: center;
-}
-
-.filters label {
     font-weight: bold;
-    margin-right: 5px;
-	font-size: 0.8em;
 }
+
 #return-history-table th, #return-history-table td {
-    padding: 5px;
-    text-align: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+    font-size: 0.9rem;
+}
+	
+/* 🏠 Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: none;
+    border-radius: 10px;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+}
+.home-icon img {
+    display: block;
+    width: 30px;
+}
+
+.dropbtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+	padding: 0px;
+}
+
+.dropbtn:hover {
+    background: none;
+    transform: scale(1.02);
+}	
+	
+.dropbtn img {
+    width: 30px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1;
+    animation: slideDown 0.3s ease-in-out;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #333;
     font-size: 1rem;
-    border: 1px solid #ddd;
+    transition: background 0.3s ease-in-out;
+}	
+
+.dropdown-content a:hover {
+    background: #f0f0f0;
+}	
+
+/* 🎯 Active Page Highlight */
+.navbar a.active {
+    font-weight: bold;
+    background: #2dabe2;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.dropdown {
+	position: relative;
+	display: inline-block;
 }
 
 button.edit-btn {
-    padding: 4px 13px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    margin: 5px 0px;
-    background: linear-gradient(to bottom, #37e57e, #47a16b);
-    color: white;
-}
+        padding: 4px 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+        margin: 5px 0px;
+        background: linear-gradient(to bottom, #37e57e, #47a16b);
+        color: white;
+    }
+
+
 button.delete-btn {
-    padding: 4px 8px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    margin: 0 0px;
-    background: linear-gradient(to bottom, #e5363b, #fb7679);
-    color: white;
+        padding: 4px 13px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+        margin: 0 0px;
+        background: linear-gradient(to bottom, #e5363b, #fb7679);
+        color: white;
+	}
+	
+	#return-history-table td:last-child {
+    text-align: center;  /* Center-align the content of the last column */
 }
+
+/* Style for the "Export to Excel" button */
+#export-excel-return-history {
+        background: linear-gradient(to bottom, #37e57e, #77fbac);
+        color: white;
+        font-size: 0.8rem;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+}
+
+#export-excel-return-history:hover {
+    background-color: #45a049;  /* Darker green on hover */
+    transform: scale(1.05);  /* Slightly grow the button */
+}
+
+/* Style for the "Export Return History to PDF" button */
+#export-pdf-return-history {
+		background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+        color: white;
+        margin-top: -5px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+}
+
+#export-pdf-return-history:hover {
+    background-color: #0056b3;  /* Darker blue on hover */
+    transform: scale(1.05);  /* Slightly grow the button */
+}
+
+/* Optionally, add some styles for the buttons' container */
+button:focus {
+    outline: none; /* Remove the default outline on focus */
+}
+
 }

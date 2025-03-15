@@ -1,48 +1,53 @@
-/* General Styles */
-body {
-
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-	font-size: 0.8em;
+ /* 🌟 General Styles */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}	
+
+body {
+    background: linear-gradient(to right, #f9f9f9, #e0f7fa);
     display: flex;
-    align-items: stretch; /* Center vertically */
-    justify-content: center; /* Center horizontally */
-    min-height: 100vh; /* Ensure full height */
-    text-align: center;
+    justify-content: center;
+    align-items: stretch;
+    min-height: 100vh;
+    -webkit-text-size-adjust: 100%;
+    transition: backdrop-filter 0.3s ease-in-out; /* Smooth transition for blur */
 }
 
 
+
 .container {
-	
-	width: 95%;
-    background: #fff;
-    padding: 0px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    background: #ffffff;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+    padding: 25px;
+    transition: all 0.3s ease-in-out;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 /* Logo Styling */
 .logo {
-	
-    margin-bottom: 20px;
-}
-
-.logo img {
-    max-width: 25%;
-    margin: 0 auto 10px;
-    display: block;
-}
-
-h1 {
-	font-size:1.5rem;
     text-align: center;
     margin-bottom: 20px;
 }
+
+/* 🏆 Logo */
+.logo img {
+	text-align: center;
+    max-width: 220px;
+}
+
+ h1 {
+	text-align: center;
+    font-size: 3rem;
+    margin-bottom: 40px;
+    color: #333;
+}
+
 /* Form Styles */
 form {
-
     display: grid;
     gap: 10px;
 }
@@ -53,43 +58,29 @@ form {
     justify-content: space-between; /* Space between label and input */
     align-items: normal;
 	align-content: stretch;
-    width: 90%;
+    width: 100%;
     margin: auto;
 }
 
 label {
-	text-align: left; /* Align text to the left */
     font-weight: bold;
+    font-size: 2rem;
+	margin-top: 10px;
     margin-bottom: 5px;
+    display: block;
+    text-align: left;
 }
-
 
 
 input, select {
-
-    padding: 5px;
-    font-size: 14px;
+	width: 100%;
+    font-size: 2em;
+    padding: 20px;
+    border-radius: 5px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
 }
-
-input[type="number"]{
-	
-    width: 100%;
-}
-
-input[type="text"]{
-    width: 100%;
-}
-
-input[type="date"]{
-    width: 100%;
-}
-
-select {
-    width: 100%;
-}
-
 
 input:focus, select:focus {
     outline: none;
@@ -103,19 +94,19 @@ input[readonly] {
 
 /* Submit Button Styles */
 button[type="submit"] {
-    background-color: #4CAF50;
+    background: linear-gradient(to bottom, #37e57e, #77fbac);
+	width: 100%;
+	font-weight: bold;
     color: white;
+	font-size: 2.5rem;
     border: none;
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 30px 15px;
+    border-radius: 4px;
     cursor: pointer;
-	    width: 100%;
-    border-radius: 5px;
-    transition: background-color 0.3s;
 }
 
 button[type="submit"]:hover {
-    background-color: #45a049;
+        background: linear-gradient(to bottom, #2ac363, #63e29b);
 }
 
 button[type="submit"]:disabled {
@@ -126,29 +117,15 @@ button[type="submit"]:disabled {
     display: flex;
     justify-content: center; /* Centers the button horizontally */
 }
-/* Input Field Validation Styles */
-input:invalid {
-    border-color: #46c8ff;
-}
-
-input:valid {
-    border-color: green;
-}
-
-input:focus:invalid {
-    outline: 2px solid #46c8ff;
-}
-
-input:focus:valid {
-    outline: 2px solid green;
-}
 
 /* Search Inputs Styles */
 #buyer-search, #container-search {
-    width: 100%;
-    padding: 5px;
-    border-radius: 4px;
+	width: 100%;
+    font-size: 2em;
+    padding: 20px;
+    border-radius: 5px;
     border: 1px solid #ccc;
+    box-sizing: border-box;
 }
 
 #buyer-search:focus, #container-search:focus {
@@ -156,7 +133,14 @@ input:focus:valid {
     border-color: #4CAF50;
 }
 
-
+option {
+	font-size: 1rem;
+}
+#purchased-product-text{
+	color:#0ab4ff;
+	font-weight:bold;
+	font-size: 3rem;
+}
 
 /* Flexbox for Layout */
 .row {
@@ -169,110 +153,232 @@ input:focus:valid {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 50px 20px;
+    background: none;
+    border-radius: 10px;
 }
 
 .navbar a {
     text-decoration: none;
     color: white;
-    font-size: 0.8rem;
+    font-size: 1.2rem;
 }
 
 .home-icon img {
     display: block;
+    width: 75px;
 }
 
 .dropdown {
-    position: relative;
-    display: inline-block;
+	position: relative;
+	display: inline-block;
 }
 
 .dropbtn {
     background: none;
     border: none;
     cursor: pointer;
+	padding: 0px;
+}
+		
+.dropbtn:hover {
+    background: none;
+    transform: scale(1.02);
 }
 
 .dropbtn img {
-    display: block;
+    width: 75px;
 }
 
-		.dropdown-content {
-
-			display: none;
-			position: absolute;
-			float: left;
+.dropdown-content {
+    display: none;
+    position: absolute;
     top: 110%;
-    left: -130px;
-
-			text-align: left;
-			background-color: white;
-			min-width: 160px;
-			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-			z-index: 1;
-		}
+    right: 0;
+	text-align: left;
+    background-color: white;
+    min-width: 365px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1;
+    animation: slideDown 0.3s ease-in-out;
+}
 
 .dropdown-content a {
-    color: black;
-    padding: 15px 16px;
-    text-decoration: none;
     display: block;
-}
+    padding: 40px;
+	text-align:left;
+    text-decoration: none;
+    color: #333;
+    font-size: 2rem;
+    transition: background 0.3s ease-in-out;
+}	
 
 .dropdown-content a:hover {
-    background-color: #ddd;
-}
+    background: #f0f0f0;
+}	
 
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
+/* 🎯 Active Page Highlight */
 .navbar a.active {
+	color:white;
+	text-align:left;
     font-weight: bold;
-    background-color: #2dabe2;
-    color: white;
-    border-radius: 0px;
-    padding: 15px;
+    background: #2dabe2;
+    padding: 40px;
+    border-radius: 5px;
+}	
+
+input:focus {
+    border-color: #008cff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
 }
-@media (min-width: 1281px) {
-	/* General Styles */
+
+select:focus {
+    border-color: #008cff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
+}
+
+@media (min-width: 1024px) {
 body {
     font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    min-height: 100vh; /* Ensure full height */
 }
 
-.container {
-    width: 35%;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 50px;
-    border-radius: 8px;
-}
-
-h1 {
-    text-align: center;
-    color: #333;
-}
-
-
+/* Logo Styling */
 .logo {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
+/* 🏆 Logo */
 .logo img {
     max-width: 100px;
+    margin-bottom: 20px;
+}
+.logo img {
     margin: 0 auto 10px;
     display: block;
 }
+
+.container {
+	width: 35%;
+	background: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 📝 Form Styling */
+h1 {
+	text-align:center;
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+    color: #333;
+}
+
 /* Form Styles */
 form {
     display: grid;
-    gap: 20px;
+    gap: 5px;
+}
+
+
+/* 🏠 Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: none;
+    border-radius: 10px;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+}
+.home-icon img {
+    display: block;
+    width: 30px;
+}
+
+.dropbtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+	padding: 0px;
+}
+
+.dropbtn:hover {
+    background: none;
+    transform: scale(1.02);
+}	
+	
+.dropbtn img {
+    width: 30px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1;
+    animation: slideDown 0.3s ease-in-out;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+    transition: background 0.3s ease-in-out;
+}	
+
+.dropdown-content a:hover {
+    background: #f0f0f0;
+}	
+
+/* 🎯 Active Page Highlight */
+.navbar a.active {
+    font-weight: bold;
+    background: #2dabe2;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+button[type="submit"] {
+	font-size: 1rem;
+    background: linear-gradient(to bottom, #37e57e, #77fbac);
+	width: 100%;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.submit-payment[type="submit"]:hover {
+    background: linear-gradient(to bottom, #2ac363, #63e29b);
 }
 
 .form-group {
@@ -281,47 +387,32 @@ form {
     justify-content: space-between; /* Space between label and input */
     align-items: normal;
 	align-content: stretch;
-    width: 90%;
+    width: 100%;
     margin: auto;
 }
 
 label {
-	text-align: left; /* Align text to the left */
     font-weight: bold;
+    font-size: 0.9rem;
     margin-bottom: 5px;
+    display: block;
+    text-align: left;
 }
-
 
 
 input, select {
-
-    padding: 5px;
-    font-size: 14px;
+    font-size: 0.9rem;
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 0px;
 }
-
-input[type="number"]{
-	
-    width: 100%;
-}
-
-input[type="text"]{
-    width: 100%;
-}
-
-input[type="date"]{
-    width: 100%;
-}
-
-select {
-    width: 100%;
-}
-
-
 
 input:focus, select:focus {
     outline: none;
+	
     border-color: #4CAF50;
 }
 
@@ -329,81 +420,20 @@ input[readonly] {
     background-color: #f0f0f0;
 }
 
-/* Submit Button Styles */
-button[type="submit"] {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+#purchased-product-text {
+    color: #0ab4ff;
+    font-weight: bold;
+	margin-top:10px;
+    font-size: 1.5rem;
 }
 
-button[type="submit"]:hover {
-    background-color: #45a049;
-}
-
-button[type="submit"]:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-.form-group:last-child {
-    display: flex;
-    justify-content: center; /* Centers the button horizontally */
-}
-/* Input Field Validation Styles */
-input:invalid {
-    border-color: #46c8ff;
-}
-
-input:valid {
-    border-color: green;
-}
-
-input:focus:invalid {
-    outline: 2px solid #46c8ff;
-}
-
-input:focus:valid {
-    outline: 2px solid green;
-}
-
-/* Search Inputs Styles */
 #buyer-search, #container-search {
     width: 100%;
-    padding: 10px;
-    border-radius: 4px;
+    font-size: 0.9rem;
+    padding: 8px;
+    border-radius: 5px;
     border: 1px solid #ccc;
-    margin-top: 8px;
-}
-
-#buyer-search:focus, #container-search:focus {
-    outline: none;
-    border-color: #4CAF50;
-}
-
-/* Flexbox for Layout */
-.row {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-/* Mobile Responsive Styles */
-@media (max-width: 768px) {
-    .container {
-        width: 90%;
-    }
-
-    .row {
-        flex-direction: column;
-    }
-
-    form {
-        grid-template-columns: 1fr;
-    }
+    box-sizing: border-box;
 }
 
 }

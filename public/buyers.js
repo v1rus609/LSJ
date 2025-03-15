@@ -78,7 +78,7 @@ function renderTable(data) {
                 <td>${buyer.contact_number}</td>
                 <td>${formatTableNumber(buyer.opening_balance)}</td> <!-- ✅ Prevents null error -->
                 <td>
-                    <button class="delete-btn" onclick="deleteBuyer(${buyer.id})">Delete</button>
+				<button class="delete-btn" onclick="deleteBuyer(${buyer.id})"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>
                 </td>
             </tr>
         `;

@@ -46,13 +46,23 @@ function updateMetric() {
 
     const current = metrics[currentMetric];
 
-    // ✅ Ensure proper formatting
-    metricValue.textContent = formatNumberWithCommas(current.value);
-    metricLabel.textContent = `${current.label}`;
+    // 🚀 Add a transition effect
+    metricDisplay.setAttribute('data-changing', 'true');
 
-    // ✅ Change background color based on metric type
-    metricDisplay.setAttribute('data-type', current.type);
+    // Force height to prevent layout shifts
+    metricValue.style.minHeight = metricValue.offsetHeight + "px";
+    metricLabel.style.minHeight = metricLabel.offsetHeight + "px";
+
+    setTimeout(() => {
+        metricValue.textContent = formatNumberWithCommas(current.value);
+        metricLabel.textContent = current.label;
+        metricDisplay.setAttribute('data-type', current.type);
+
+        metricDisplay.removeAttribute('data-changing');
+    }, 200);
 }
+
+
 
 // ✅ Navigate to the next metric
 function nextMetric() {

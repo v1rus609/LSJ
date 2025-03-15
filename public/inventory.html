@@ -4,6 +4,7 @@
 <head>
     <title>Sell Inventory</title>
     <link rel="stylesheet" href="inventory.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Link to Font Awesome for the trash icon -->
 </head>
 <body>
     <form id="sell-form">
@@ -72,8 +73,8 @@
         <label>Unpaid Amount (For This Container):</label><br>
         <input type="text" name="unpaid_amount[]" class="unpaid-amount" readonly><br><br>
 
-        <button type="button" class="add-container">Add Container</button>
-        <button type="button" class="remove-container">Remove</button><br><br>
+        <button class="add-container"><span class="truck-text">Add Container</span><i class="fas fa-truck"></i></button>
+        <button class="remove-container"><span class="delete-text">Remove</span><i class="fas fa-trash-alt"></i></button><br><br>
     </div>
 </div>
 

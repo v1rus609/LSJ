@@ -66,8 +66,8 @@ function fetchPurchases(filters = {}) {
                     <td>${formatNumberWithCommas(purchase.unpaid_amount || 0)}</td>
                     <td>${formatNumberWithCommas(purchase.total_price || 0)}</td>
                     <td>
-                        <button class="edit-btn" data-id="${purchase.sale_id}">Edit</button>
-                        <button class="delete-btn" data-id="${purchase.sale_id}">Delete</button>
+                        <button class="edit-btn" data-id="${purchase.sale_id}"><span class="edit-text">Edit</span><i class="fas fa-edit"></i></button>
+						<button class="delete-btn" data-id="${purchase.sale_id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>		
                     </td>
                 `;
 
@@ -127,49 +127,55 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const table = document.getElementById('purchase-table');
 
-    // Event delegation: Attach listeners to Edit and Delete buttons
-    table.addEventListener('click', function (event) {
-        if (event.target.classList.contains('edit-btn')) {
-            const id = event.target.getAttribute('data-id');
-            // Fetch the record data for editing
-            fetch(`/purchase-record/${id}`)
+table.addEventListener('click', function (event) {
+    let target = event.target;
+
+    // Ensure we always target the button (even if clicking on the icon inside it)
+    if (target.tagName === 'I') {
+        target = target.closest('button'); 
+    }
+
+    if (target && target.classList.contains('edit-btn')) {
+        const id = target.getAttribute('data-id');
+
+        fetch(`/purchase-record/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched record for editing:', data);
+
+                document.getElementById('purchase-date').value = data.purchase_date;
+                document.getElementById('buyer-name').value = data.buyer_name || "N/A";
+                document.getElementById('buyer-filter').value = data.buyer_id;
+                document.getElementById('quantity').value = data.weight_sold;
+                document.getElementById('rate').value = data.price_per_kg;
+                document.getElementById('paid-amount').value = data.paid_amount;
+                document.getElementById('unpaid-amount').value = data.unpaid_amount;
+                document.getElementById('total-price').value = data.total_price;
+                document.getElementById('purchase-id').value = data.sale_id;
+                document.getElementById('bill-no').value = data.bill_no || '';
+
+                document.getElementById('buyer-name').disabled = true;
+                document.getElementById('edit-form').style.display = 'block';
+            })
+            .catch(err => console.error('Error fetching purchase data:', err));
+    }
+
+    if (target && target.classList.contains('delete-btn')) {
+        const id = target.getAttribute('data-id');
+        if (confirm('Are you sure you want to delete this record?')) {
+            fetch(`/purchase-record/delete/${id}`, {
+                method: 'DELETE',
+            })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Fetched record for editing:', data);
-
-                    // Populate the modal fields
-                    document.getElementById('purchase-date').value = data.purchase_date;
-                    document.getElementById('buyer-name').value = data.buyer_name || "N/A";
-                    document.getElementById('buyer-filter').value = data.buyer_id;
-                    document.getElementById('quantity').value = data.weight_sold;
-                    document.getElementById('rate').value = data.price_per_kg;
-                    document.getElementById('paid-amount').value = data.paid_amount;
-                    document.getElementById('unpaid-amount').value = data.unpaid_amount;
-                    document.getElementById('total-price').value = data.total_price;
-                    document.getElementById('purchase-id').value = data.sale_id;
-                    document.getElementById('bill-no').value = data.bill_no || ''; // Set the Bill No.
-
-                    document.getElementById('buyer-name').disabled = true; // Disable the Buyer Name field
-                    document.getElementById('edit-form').style.display = 'block'; // Show the modal
+                    alert('Purchase record deleted successfully');
+                    location.reload(); // Refresh the table
                 })
-                .catch(err => console.error('Error fetching purchase data:', err));
+                .catch(error => console.error('Error deleting purchase record:', error));
         }
+    }
+});
 
-        if (event.target.classList.contains('delete-btn')) {
-            const id = event.target.getAttribute('data-id');
-            if (confirm('Are you sure you want to delete this record?')) {
-                fetch(`/purchase-record/delete/${id}`, {
-                    method: 'DELETE',
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert('Purchase record deleted successfully');
-                        location.reload(); // Refresh the table
-                    })
-                    .catch(error => console.error('Error deleting purchase record:', error));
-            }
-        }
-    });
 
     // Recalculate the Price and Unpaid Amount when any of the fields change
     document.getElementById('quantity').addEventListener('input', updatePriceAndUnpaidAmount);

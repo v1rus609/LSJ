@@ -38,32 +38,32 @@
         <h1>Received Payment</h1>
 
         <!-- Select Buyer -->
-        <label>Select Buyer:</label><br>
+        <label>Select Buyer:</label>
         <select id="buyer-dropdown" required>
             <option value="">Select a Buyer</option>
         </select><br><br>
 
         <!-- Display Unpaid Balance -->
-        <label>Unpaid Balance (BDT):</label><br>
+        <label>Unpaid Balance (BDT):</label>
         <span id="unpaid-amount">0</span><br><br> <!-- 🔹 Shows unpaid amount -->
 
         <!-- Payment Date -->
-        <label>Payment Date:</label><br>
+        <label>Payment Date:</label>
         <input type="date" id="payment-date" required><br><br>
 
         <!-- Payment Method -->
-        <label>Payment Method:</label><br>
+        <label>Payment Method:</label>
         <select id="payment-method" required>
             <option value="cash">Cash</option>
             <option value="bank">Bank</option>
         </select><br><br>
 
         <!-- Particulars (for Bank Payment only) -->
-        <label>Particulars:</label><br>
+        <label>Particulars:</label>
         <input type="text" id="particulars" placeholder="Enter bank particulars" disabled><br><br>
 
         <!-- Payment Amount -->
-        <label>Payment Amount:</label><br>
+        <label>Payment Amount:</label>
         <input type="text" id="payment-amount" step="0.01" data-max-amount="0" required><br><br>
 
         <!-- Submit Button -->

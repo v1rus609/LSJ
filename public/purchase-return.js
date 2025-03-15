@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 maxReturnableAmount = total_purchased - total_returned;
 
                 // **Show Purchased Product Info**
-                purchasedProductText.textContent = `Purchased Product: ${maxReturnableAmount.toFixed(2)} kg`;
+                purchasedProductText.textContent = `${maxReturnableAmount.toFixed(2)} KG`;
 
                 console.log(`✅ Buyer ${buyerId} - Container ${containerId}`);
                 console.log(`🔹 Purchased: ${total_purchased}, 🔻 Returned: ${total_returned}, 🟢 Net Available: ${maxReturnableAmount}`);

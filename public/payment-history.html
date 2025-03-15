@@ -2,8 +2,8 @@
 <html>
 <head>
     <title>Payment History</title>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="payment-history.css">
 </head>
 <body>
@@ -37,12 +37,13 @@
         </div>
         
         <h1>Payment History</h1>
-        
-        <label for="buyer-filter">Filter by Buyer:</label>
+       
+	   <div class="buyer-filter">
         <select id="buyer-filter">
             <!-- Buyer options populated dynamically -->
-        </select> <br><br>
-
+        </select> 
+		</div>
+		
         <div class="filter-and-table-container">
             <div class="filter-section">
                 <label for="start-date">From:</label>
@@ -80,34 +81,35 @@
             </table>
         </div>
     </div>
-            <!-- Export to Excel Button -->
+            <div class="export-button" style="text-align:center">
             <button id="export-payment-history">Export to Excel</button>
 		<button id="export-pdf-btn" onclick="exportToPDF()">Export to PDF</button>
-        
+        </div>
+		
 <!-- Edit Payment Modal -->
-        <div class="popup" id="edit-payment-form">
+        <div class="popup" id="edit-payment-form"style="display: none;">
             <div class="popup-content">
-                <span class="close-btn" id="close-edit-btn">&times;</span>
+                <span class="close-btn" id="close-edit-btn">&times;</span><br>
                 <h2>Edit Payment</h2>
 <form id="edit-payment-form">
     <input type="hidden" id="payment-id">
-    <label for="payment-date">Payment Date:</label><br>
+    <label for="payment-date">Payment Date:</label>
     <input type="date" id="payment-date"><br>
 
-<label for="buyer-name">Buyer Name:</label><br>
+<label for="buyer-name">Buyer Name:</label>
 <input type="text" id="buyer-name" disabled><br>
 
 
-    <label for="particulars">Particulars:</label><br>
+    <label for="particulars">Particulars:</label>
     <input type="text" id="particulars"><br>
 
-    <label for="bank-amount">Bank Amount:</label><br>
+    <label for="bank-amount">Bank Amount:</label>
     <input type="number" id="bank-amount"><br>
 
-    <label for="cash-amount">Cash Amount:</label><br>
+    <label for="cash-amount">Cash Amount:</label>
     <input type="number" id="cash-amount"><br>
 
-<label for="payment-method">Payment Method:</label><br>
+<label for="payment-method">Payment Method:</label>
 <select id="payment-method">
     <option value="bank">Bank</option>
     <option value="cash">Cash</option>

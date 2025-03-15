@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <td>${formatNumberWithCommas(container.total_weight_sold)}</td>
                     <td>${formatNumberWithCommas(container.total_weight_returned)}</td>
                     <td>${formatNumberWithCommas(container.remaining_weight)}</td>
-                    <td><button class="delete-btn" data-id="${container.id}">Delete</button></td>
+                    <td><button class="delete-btn" data-id="${container.id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button></td>					
                 </tr>
             `;
             containerList.innerHTML += row;

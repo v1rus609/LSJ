@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Return History</title>
     <link rel="stylesheet" href="return-history.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -78,6 +77,7 @@
         </div>
 
         <!-- Return History Table -->
+		<div class="table-wrapper">
         <table id="return-history-table">
             <thead>
                 <tr>
@@ -100,15 +100,18 @@
             </tr>
 			 </tfoot>
         </table>
+		</div>
+	    <div class="export-button" style="text-align:center">
 		<button id="export-excel-return-history">Export Excel</button>
 		<button id="export-pdf-return-history">Export PDF</button>
+        </div>
 
     </div>
 <!-- Edit Return Modal Form -->
 <div id="edit-return-form" class="popup" style="display: none;">
     <div class="popup-content">
         <span id="close-edit-btn" class="close-btn">&times;</span>
-        <h2>Edit Return Record</h2>
+        <h2>Return Record</h2>
         <form id="return-form">
             <input type="hidden" id="return-id"> <!-- Hidden field for ID -->
 

@@ -1,15 +1,158 @@
+ /* 🌟 General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}	
+
 body {
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-	font-size: 1.5rem;
+    background: linear-gradient(to right, #f9f9f9, #e0f7fa);
+	font-size: 0.8em;
     margin: 0;
     padding: 0;
     display: flex;
-    align-items: flex-start; /* Center vertically */
+    align-items: stretch; /* Center vertically */
     justify-content: center; /* Center horizontally */
     min-height: 100vh; /* Ensure full height */
     text-align: center;
 }
+
+.container {
+    width: 100%;
+    background: #ffffff;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+    padding: 25px;
+    transition: all 0.3s ease-in-out;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Logo Styling */
+.logo {
+    text-align: center;
+}
+
+/* 🏆 Logo */
+.logo img {
+	text-align: center;
+    max-width: 220px;
+    margin-bottom: 20px;
+}
+
+ h1 {
+	text-align:center;
+    font-size: 3rem;
+    margin-bottom: 40px;
+    color: #333;
+}
+
+option {
+    padding: 10px;
+    font-size: 1rem;
+    background-color: white;
+    color: #333;
+    border: none; /* Remove borders */
+    transition: background-color 0.2s;
+}
+
+option:hover {
+    background-color: #f1f1f1; /* Change background color on hover */
+}
+
+.buyer-filter{
+	text-align:center;
+}
+
+/* Style the select dropdown */
+select {
+    padding: 15px;
+    font-size: 1.5rem;
+    margin: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+select:focus {
+    border-color: #008cff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
+}
+
+/* Styling for the dropdown options when hovering */
+select:hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
+/* Style for options */
+option {
+    padding: 10px;
+    font-size: 1rem;
+    background-color: white;
+    color: #333;
+    border: none; /* Remove borders */
+    transition: background-color 0.2s;
+}
+
+option:hover {
+    background-color: #f1f1f1; /* Change background color on hover */
+}
+
+/* Aligning Filter Section with the Table */
+.filter-and-table-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.filter-section label {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.filter-section button {
+    padding: 15px 10px;
+    font-size: 1.5rem;
+    color: #fff;
+    background: linear-gradient(to bottom, #37b0e5, #76d2fb);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filter-section button:hover {
+    background-color: #0056b3;
+}
+
+.filter-section input[type="date"] {
+    border: 1px solid #ccc;
+    transition: all 0.3s;
+	padding: 15px;
+    border-radius: 5px;
+    font-size: 1.5rem;
+}
+
+.filter-section input[type="date"]:focus {
+    border-color: #008cff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
+}
+
+/* Styling for the dropdown options when hovering */
+.filter-section input[type="date"]:hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
+
 /* Table Wrapper Styling */
 .table-wrapper {
     overflow-x: auto;
@@ -28,7 +171,7 @@ body {
 #payment-history-table td {
     border: 1px solid #ccc;
     padding: 10px;
-    text-align: center;
+    text-align: left;
     font-size: 1.3rem;
 }
 
@@ -44,32 +187,6 @@ body {
 tfoot {
     font-weight: bold;
     background: #f8f8f8;
-}
-/* Logo Styling */
-.logo {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.logo img {
-    max-width: 25%;
-    margin: 0 auto 10px;
-    display: block;
-}
-
-.container {
-    width: 90%;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-
-h1 {
-	font-size:2.5rem;
-    text-align: center;
-    margin-bottom: 20px;
 }
 
 table {
@@ -96,56 +213,10 @@ tfoot th {
     font-weight: bold;
 }
 
-/* Aligning Filter Section with the Table */
-.filter-and-table-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
+#payment-history-table td:last-child {
+    text-align: center;  /* Center-align the content of the last column */
 }
 
-.filter-section button {
-    padding: 10px 10px;
-    font-size: 1.5rem;
-    color: #fff;
-    background-color: #007BFF;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.filter-section button:hover {
-    background-color: #0056b3;
-}
-
-.filter-section {
-    display: flex;
-    flex-direction: row.filter-section {
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* Space between elements */
-    margin: 20px 0; /* Spacing around the section */
-    align-items: center;
-};
-    gap: 5px; /* Space between elements */
-    margin: 10px 0; /* Spacing around the section */
-    align-items: center;
-}
-
-.filter-section label {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
-}
-.filter-section input[type="date"] {
-    padding: 4px 4px;
-    font-size: 1em;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: all 0.3s;
-}
 
 /* Export Button */
 #export-payment-history {
@@ -163,281 +234,102 @@ tfoot th {
     background: linear-gradient(to bottom, #2ac363, #63e29b);
 }
 
-		/* Export Button */
-		#export-pdf-btn {
-			background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-			color: white;
-			font-weight: bold;
-			font-size: 1.5rem;
-			padding: 10px 20px;
-			border: none;
-			border-radius: 5px;
-			cursor: pointer;
-		}
+/* Export Button */
+#export-pdf-btn {
+	background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+	color: white;
+	font-weight: bold;
+	font-size: 1.5rem;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
 
-		#export-pdf-btn:hover {
-			background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
-		}
+#export-pdf-btn:hover {
+	background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
+}
 
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 50px 20px;
+    background: none;
+    border-radius: 10px;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+}
 
 .home-icon img {
-	display: block;
-	width: 60px;
+    display: block;
+    width: 75px;
+}
+
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.dropbtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+	padding: 0px;
 }
 		
-		.dropbtn img {
-			position: absolute;
-			display: block;
-			width: 560%;
-			float: left;
-			top: -60%;
-			left: -400%;
-		}
-		
-				.navbar {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 20px 20px;
-		}
+.dropbtn:hover {
+    background: none;
+    transform: scale(1.02);
+}
 
-		.navbar a {
-			text-decoration: none;
-			color: white;
-			font-size: 1rem;
-		}
-
-		.dropdown {
-			position: relative;
-			display: inline-block;
-		}
-
-		.dropbtn {
-			background: none;
-			border: none;
-			cursor: pointer;
-		}
+.dropbtn img {
+    width: 75px;
+}
 
 .dropdown-content {
-    /* border-radius: 10px; */
     display: none;
     position: absolute;
-    float: left;
-    top: 196%;
-    left: -314px;
-    text-align: left;
+    top: 110%;
+    right: 0;
+	text-align: left;
     background-color: white;
-    min-width: 330px;
+    min-width: 350px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-		}
-
-		.dropdown-content a {
-			color: black;
-			font-size: 1.8rem;
-			padding: 50px 16px;
-			text-decoration: none;
-			display: block;
-		}
-
-		.dropdown-content a:hover {
-			background-color: #ddd;
-		}
-
-		.navbar a.active {
-			font-size: 1.8rem;
-			font-weight: bold;
-			background-color: #2dabe2;
-			color: white;
-			border-radius: 0px;
-			padding: 50px;
-		}
-
-
-/* Modal Background */
-.popup {
-    display: none; /* Hidden by default */
-    position: fixed;
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-}
-
-/* Modal Content */
-.popup-content {
-    background-color: #fefefe;
-    margin: 10% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 600px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    animation: slideDown 0.3s ease-in-out;
 }
 
-/* Close Button Style */
-.close-btn {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.close-btn:hover,
-.close-btn:focus {
-    color: black;
+.dropdown-content a {
+    display: block;
+    padding: 40px;
+	text-align:left;
     text-decoration: none;
-}
+    color: #333;
+    font-size: 2rem;
+    transition: background 0.3s ease-in-out;
+}	
 
-/* Header Text */
-.popup-content h3 {
-    font-size: 1.6rem;
-    margin-bottom: 10px;
-}
+.dropdown-content a:hover {
+    background: #f0f0f0;
+}	
 
-/* Confirmation Text */
-.popup-content p {
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-}
-
-/* Buttons */
-.popup-content button {
-    padding: 25px 30%;
-	margin: 10px;
-    font-size: 1.5rem;
+/* 🎯 Active Page Highlight */
+.navbar a.active {
+	color:white;
+	text-align:left;
     font-weight: bold;
-    color: white;
-    background: linear-gradient(to bottom, #37e57e, #47a16b);
+    background: #2dabe2;
+    padding: 40px;
     border-radius: 5px;
-    cursor: pointer;
-    border: none;
-}
-
-/* Confirm Button */
-#confirm-delete {
-    background-color: #e5363b;
-    color: white;
-}
-
-#confirm-delete:hover {
-    background-color: #e53935; /* Darker Red */
-}
-
-/* Cancel Button */
-#cancel-delete {
-    background-color: #888;
-    color: white;
-    margin-left: 10px;
-}
-
-#cancel-delete:hover {
-    background-color: #555;
-}
-
-/* Button Wrapper */
-.popup-content .button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-#edit-purchase-form {
-	
-	
-}
-
-#edit-payment-form label {
-    font-size: 1.3rem;
-    font-weight: bold;
-    text-align: left;
-}
+}	
 
 
-#edit-payment-form input {
-    padding: 15px;
-	margin: 10px;
-    width: 80%;
-    font-size: 1.6rem;
-    margin-top: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-
-
-option {
-    padding: 10px;
-    font-size: 1rem;
-    background-color: white;
-    color: #333;
-    border: none; /* Remove borders */
-    transition: background-color 0.2s;
-}
-
-option:hover {
-    background-color: #f1f1f1; /* Change background color on hover */
-}
-
-/* Style the select dropdown */
-select {
-    padding: 10px;
-    font-size: 1.6rem;
-    margin: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    background-color: white;
-    color: #333;
-    width: 200px;
-    cursor: pointer;
-    transition: background-color 0.3s, border-color 0.3s;
-}
-
-select:focus {
-    outline: none;
-    border-color: #47a16b; /* Change border color on focus */
-    background-color: #f1f1f1; /* Change background color on focus */
-}
-
-/* Style for options */
-option {
-    padding: 10px;
-    font-size: 0.8rem;
-    background-color: white;
-    color: #333;
-    border: none; /* Remove borders */
-    transition: background-color 0.2s;
-}
-
-option:hover {
-    background-color: #f1f1f1; /* Change background color on hover */
-}
-
-/* Styling for the dropdown options when hovering */
-select:hover {
-    border-color: #47a16b; /* Highlight the border on hover */
-}
-
-/* Optional: Add a subtle box-shadow for a modern look */
-select {
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Style for the dropdown arrow */
-select {
-    appearance: none; /* Remove the default arrow */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"%3E%3Cpath d="M5 6L2 3H8L5 6Z" fill="gray"/%3E%3C/svg%3E');
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    padding-right: 30px; /* Adjust for the arrow */
-}
 
 /* Edit Button Style */
 button.edit-btn {
@@ -477,7 +369,94 @@ button.delete-btn:hover {
     transform: scale(1.05);  /* Slight scale effect on hover */
 }
 
-@media (min-width: 1281px) {
+/* Style for the modal */
+.popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    backdrop-filter: blur(5px); /* Apply a blur effect to the background */
+    -webkit-backdrop-filter: blur(5px); /* For Safari support */
+}
+
+/* Popup content */
+.popup-content {
+    background-color: #fefefe;
+	box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+    margin: 20% auto;
+    padding: 20px;
+	border-radius:10px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+}
+
+h2 {
+	text-align:center;
+    font-size: 2rem;
+	margin-top: 30px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+/* Close button */
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Form fields */
+#edit-payment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#edit-payment-form label {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: left;
+}
+
+#edit-payment-form input {
+    padding: 10px;
+    font-size: 1.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Style for buttons */
+#update-payment-btn {
+    font-size: 1.5rem;
+    background: linear-gradient(to bottom, #37e57e, #47a16b);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#update-payment-btn:hover {
+    background-color: #45a049;
+}
+
+
+
+@media (min-width: 1024px) {
 	
 			body {
 			font-family: Arial, sans-serif;
@@ -514,37 +493,29 @@ button.delete-btn:hover {
 	
 		.filter-section label {
 		font-size: 0.8rem;
+		padding: 0px 10px;
 		font-weight: bold;
 		color: #333;
 		margin-bottom: 5px;
 	}
 	
-	.home-icon img {
-	display: block;
-	width: 32px;
-}
-	
 	.filter-section button {
-		padding: 8px 20px;
-		font-size: 0.8rem;
-		color: #fff;
-		background-color: #007BFF;
-		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-		transition: all 0.3s;
+		padding: 7px 10px;
+        font-size: 0.8rem;
+        color: #fff;
+        background: linear-gradient(to bottom, #37b0e5, #76d2fb);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
 	}
 
-
-		
-	.dropbtn img {
-		position: absolute;
-		display: block;
-		width: 300%;
-		float: left;
-		top: -10%;
-		left: -110%;
-	}
+.filter-section input[type="date"] {
+		border: 2px solid #cccccc;
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+}
 		
 	#export-payment-history {
 		background: linear-gradient(to bottom, #37e57e, #77fbac);
@@ -556,6 +527,82 @@ button.delete-btn:hover {
 		border-radius: 5px;
 		cursor: pointer;
 	}
+	
+	/* 🏠 Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: none;
+    border-radius: 10px;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+}
+.home-icon img {
+    display: block;
+    width: 30px;
+}
+
+.dropbtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+	padding: 0px;
+}
+
+.dropbtn:hover {
+    background: none;
+    transform: scale(1.02);
+}	
+	
+.dropbtn img {
+    width: 30px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1;
+    animation: slideDown 0.3s ease-in-out;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+    transition: background 0.3s ease-in-out;
+}	
+
+.dropdown-content a:hover {
+    background: #f0f0f0;
+}	
+
+/* 🎯 Active Page Highlight */
+.navbar a.active {
+    font-weight: bold;
+    background: #2dabe2;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+	
 /* Export Button */
 #export-pdf-btn {
     background: linear-gradient(to bottom, #2dabe2, #83d9ff);
@@ -573,68 +620,7 @@ button.delete-btn:hover {
     background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
 }
 
-	.navbar {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 10px 20px;
-	}
 
-	.navbar a {
-		text-decoration: none;
-		color: white;
-		font-size: 1rem;
-	}
-
-	.dropdown {
-		position: relative;
-		display: inline-block;
-	}
-
-	.dropbtn {
-		background: none;
-		border: none;
-		cursor: pointer;
-	}
-		
-	.dropbtn:hover {
-		background: none; /* No background change on hover */
-	}
-		
-    .dropdown-content {
-        /* border-radius: 10px; */
-        display: none;
-        position: absolute;
-        float: left;
-        top: 187%;
-        left: -277px;
-        text-align: left;
-        background-color: white;
-        min-width: 300px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        z-index: 1;
-	}
-
-	.dropdown-content a {
-		color: black;
-		font-size: 1.0rem;
-		padding: 10px 16px;
-		text-decoration: none;
-		display: block;
-	}
-
-	.dropdown-content a:hover {
-		background-color: #ddd;
-	}
-
-	.navbar a.active {
-		font-size: 1.0rem;
-		font-weight: bold;
-		background-color: #2dabe2;
-		color: white;
-		border-radius: 0px;
-		padding: 10px;
-	}
 
 	/* Style the select dropdown */
 	select {
@@ -645,14 +631,12 @@ button.delete-btn:hover {
 		border: 1px solid #ccc;
 		background-color: white;
 		color: #333;
-		width: 200px;
 		cursor: pointer;
 		transition: background-color 0.3s, border-color 0.3s;
 	}
 
 	select:focus {
 		outline: none;
-		border-color: #47a16b; /* Change border color on focus */
 		background-color: #f1f1f1; /* Change background color on focus */
 	}
 
@@ -670,11 +654,6 @@ button.delete-btn:hover {
 		background-color: #f1f1f1; /* Change background color on hover */
 	}
 
-	/* Styling for the dropdown options when hovering */
-	select:hover {
-		border-color: #47a16b; /* Highlight the border on hover */
-	}
-
 	/* Optional: Add a subtle box-shadow for a modern look */
 	select {
 		box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
@@ -682,13 +661,10 @@ button.delete-btn:hover {
 
 	/* Style for the dropdown arrow */
 	select {
-		appearance: none; /* Remove the default arrow */
-		-webkit-appearance: none;
-		-moz-appearance: none;
-		background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"%3E%3Cpath d="M5 6L2 3H8L5 6Z" fill="gray"/%3E%3C/svg%3E');
-		background-repeat: no-repeat;
-		background-position: right 10px center;
-		padding-right: 30px; /* Adjust for the arrow */
+		border: 2px solid #cccccc;
+		padding: 5px;
+        border-radius: 5px;
+        font-size: 0.8rem;
 	}
 
 	button.edit-btn {
@@ -717,18 +693,11 @@ button.delete-btn:hover {
         background: linear-gradient(to bottom, #e5363b, #fb7679);
         color: white;
     }
-#edit-payment-form input {
-        padding: 10px;
-        width: 57%;
-        font-size: 0.8rem;
-        margin: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-}
+
 #payment-history-table td {
     border: 1px solid #ccc;
     padding: 10px;
-    text-align: center;
+    text-align: left;
     font-size: 0.9rem;
 }
 
@@ -740,32 +709,82 @@ button.delete-btn:hover {
     color: white;
     font-weight: bold;
 }
+
+#payment-history-table td:last-child {
+    text-align: center;  /* Center-align the content of the last column */
+}
+
+
+		/* Style for the modal */
+.popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Popup content */
 .popup-content {
     background-color: #fefefe;
-    margin: 7% auto;
+    margin: 4% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
     max-width: 600px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-.popup-content button {
-    padding: 15px 20%;
-    font-size: 1rem;
-	margin: 10px;
+
+/* Close button */
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
     font-weight: bold;
-    color: white;
-    background: linear-gradient(to bottom, #37e57e, #47a16b);
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
 }
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Form fields */
+#edit-payment-form {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 5px;
+}
+
 #edit-payment-form label {
-    font-size: 1rem;
+    font-size: 0.8em;
     font-weight: bold;
     text-align: left;
 }
+
+#edit-payment-form input {
+    padding: 8px;
+    font-size: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Style for buttons */
+#update-btn {
+    font-size: 1.5rem;
+    background: linear-gradient(to bottom, #37e57e, #47a16b);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
 }
 	
 

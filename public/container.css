@@ -1,333 +1,418 @@
-		body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            display: flex;
-            justify-content: center;
-            align-items: stretch;
-            height: 100vh;
-        }
-
-        .form-container {
-            width: 90%;
-			height: max-content;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-        }
-		
-		.home-icon img {
-		display: block;
-
-		}
+/* 🌟 General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}	
 
 
-				
-	   .logo img {
-            max-width: 25%;
-            margin-top: 10px;
-			margin-bottom: 10px;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin: 10px 0 5px;
-			font-size: 2.0rem;
-            text-align: left;
-        }
-
-        input {
-            width: 93%;
-            padding: 30px;
-			font-size: 2.0rem;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        button {
-            display: block;
-            width: 100%;
-            padding: 40px 15px;
-            margin: 10px 0;
-            background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-		
-		.dropbtn:hover {
-		background: none; /* No background change on hover */
+body {
+    background: linear-gradient(to right, #f9f9f9, #e0f7fa);
+    display: flex;
+    justify-content: flex-start;
+    align-items: stretch;
+    min-height: 100vh;
+    text-align: center;
+    -webkit-text-size-adjust: 100%;
 }
-		
-        button:hover {
-            background: linear-gradient(to bottom, #1a92c7, #6fc9ff);
-        }
 
-        #success-popup {
-        display: none;
-		position: fixed;
-		top: 265px;
-		left: 50%;
-		transform: translateX(-50%);
-		background: linear-gradient(to bottom, #37e57e, #77fbac);
-		color: white;
-		padding: 10px;
-		border-radius: 5px;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-		text-align: center;
-		font-size: 3rem;
-        }
-		
-		
-		.navbar {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 10px 20px;
+/* 📦 Main Form Container */
+.form-container {
+    width: 100%;
+    background: #ffffff;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+    padding: 25px;
+    transition: all 0.3s ease-in-out;
+    animation: fadeIn 0.5s ease-in-out;
+}
 
-		}
+/* 🏆 Logo */
+.logo img {
+    max-width: 220px;
+    margin-bottom: 20px;
+}
+/* 🏠 Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: none;
+    border-radius: 10px;
+}
 
-		.navbar a {
-			text-decoration: none;
-			color: white;
-			font-size: 1rem;
-		}
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+}
 
-		.home-icon img {
-			display: block;
-			width: 60px;
-		}
+.home-icon img {
+    display: block;
+    width: 75px;
+}
 
-		.dropdown {
-			position: relative;
-			display: inline-block;
-		}
+.dropbtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+	padding: 0px;
+}
 
-		.dropbtn {
-			background: none;
-			border: none;
-			cursor: pointer;
-		}
+.dropbtn:hover {
+    background: none;
+    transform: scale(1.02);
+}
 
-		.dropbtn img {
-			position: absolute;
-			display: block;
-			width: 200%;
-			float: left;
-			top: 25%;
-			left: -140%;
-		}
+.dropbtn img {
+    width: 75px;
+}
 
 .dropdown-content {
-    border-radius: 0px;
     display: none;
     position: absolute;
-    float: left;
-    top: 85%;
-    left: -996%;
-    text-align: left;
+    top: 80%;
+    right: 0;
+	text-align: left;
     background-color: white;
-    min-width: 320px;
+    min-width: 350px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
     z-index: 1;
-		}
-
-		.dropdown-content a {
-			color: black;
-			font-size: 1.8rem;
-			padding: 50px 16px;
-			text-decoration: none;
-			display: block;
-		}
-
-		.dropdown-content a:hover {
-			background-color: #ddd;
-		}
-
-		.navbar a.active {
-			font-size: 1.8rem;
-			font-weight: bold;
-			background-color: #2dabe2;
-			color: white;
-			border-radius: 0px;
-			padding: 50px;
-		}
-		
-
-
-	@media (min-width: 1281px) {
-	
-		body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .form-container {
-            width: 90%;
-            max-width: 400px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-        }
-		
-	   .logo img {
-            max-width: 100px;
-            margin-top: 10px;
-			margin-bottom: 10px;
-        }
-		
-		.home-icon img {
-			display: block;
-			width: 32px;
-		}
-		
-		.dropbtn img {
-			position: absolute;
-			display: block;
-			width: 100%;
-			float: left;
-			top: 20%;
-			left: 0%;
-		}
-
-        h1 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin: 10px 0 5px;
-			font-size: 1.0rem;
-            text-align: left;
-        }
-
-        input {
-            width: calc(100% - 20px);
-            padding: 10px;
-			font-size: 1.0rem;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px 15px;
-            margin: 10px 0;
-            background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background: linear-gradient(to bottom, #1a92c7, #6fc9ff);
-        }
-
-        #success-popup {
-            display: none;
-		position: fixed;
-        top: 350px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: linear-gradient(to bottom, #37e57e, #77fbac);
-        color: white;
-        padding: 10px;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        text-align: center;
-        font-size: 1rem;
-	}
-
-        
-
-		.navbar {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 10px 20px;
-
-		}
-
-		.navbar a {
-			text-decoration: none;
-			color: white;
-			font-size: 1rem;
-		}
-
-		.home-icon img {
-			display: block;
-		}
-
-		.dropdown {
-			position: relative;
-			display: inline-block;
-		}
-
-		.dropbtn {
-			background: none;
-			border: none;
-			cursor: pointer;
-		}
-
-    .dropdown-content {
-        border-radius: 0px;
-        display: none;
-        position: absolute;
-        float: left;
-        top: 93%;
-        left: -450%;
-        text-align: left;
-        background-color: white;
-        min-width: 555%;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        z-index: 1;
-		}
-
-		.dropdown-content a {
-			color: black;
-			font-size: 1rem;
-			padding: 10px 16px;
-			text-decoration: none;
-			display: block;
-		}
-
-		.dropdown-content a:hover {
-			background-color: #ddd;
-		}
-
-		.navbar a.active {
-			font-size: 1rem;
-			font-weight: bold;
-			background-color: #2dabe2;
-			color: white;
-			border-radius: 0px;
-			padding: 10px;
-		}
+    animation: slideDown 0.3s ease-in-out;
 }
 
+
+.dropdown-content a {
+    display: block;
+    padding: 40px;
+	text-align:left;
+    text-decoration: none;
+    color: #333;
+    font-size: 2rem;
+    transition: background 0.3s ease-in-out;
+}
+
+.dropdown-content a:hover {
+    background: #f0f0f0;
+}	
+   
+/* 🎯 Active Page Highlight */
+.navbar a.active {
+	color:white;
+	text-align:left;
+    font-weight: bold;
+    background: #2dabe2;
+    padding: 40px;
+    border-radius: 5px;
+}
+
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+
+/* 📝 Form Styling */
+h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* 🎯 Labels */
+label {
+    display: block;
+    margin: 40px 0 5px;
+    font-size: 2rem;
+    text-align: left;
+}
+
+/* 🎨 Inputs */
+input {
+    width: 100%;
+    padding: 30px;
+    font-size: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border 0.3s ease-in-out;
+}
+
+input:focus {
+    border-color: #008cff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
+}
+
+
+/* ✅ Submit Button */
+button {
+    width: 100%;
+    padding: 30px;
+    margin: 40px 0;
+    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, background 0.3s ease-in-out;
+}
+
+button:hover {
+    background: linear-gradient(to right, #0066cc, #0099ff);
+    transform: scale(1.02);
+}
+		
+/* 🎉 Success Popup */
+#success-popup {
+	display: none;
+    position: fixed;
+    top: 405px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom, #37e57e, #77fbac);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    font-size: 3rem;
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in-out;
+}
+		
+
+	@media (min-width: 1024px) {
+	
+body {
+    background: linear-gradient(to right, #f9f9f9, #e0f7fa);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* 📦 Main Form Container */
+.form-container {
+	width: 35%;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+    padding: 25px;
+    transition: all 0.3sease-in-out;
+    animation: fadeIn 0.5sease-in-out;
+}
+
+/* 🏆 Logo */
+.logo img {
+    max-width: 100px;
+	margin-bottom: 5px;
+}
+
+/* 🏠 Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: none;
+    border-radius: 10px;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+}
+.home-icon img {
+    display: block;
+    width: 30px;
+	transition: transform 0.3s ease-in-out;
+}
+
+.home-icon:hover img {
+    transform: scale(1.2); /* Smoothly enlarge the icon on hover */
+}
+
+.dropbtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+	padding: 0px;
+}
+
+.dropbtn img {
+    width: 30px;
+	transition: transform 0.3s ease-in-out;
+}
+
+.dropbtn:hover img {
+    transform: scale(1.1); /* Smoothly enlarge the icon on hover */
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 80%;
+    right: 0;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1;
+    animation: slideDown 0.3s ease-in-out;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+    transition: background 0.3s ease-in-out;
+}
+
+.dropdown-content a:hover {
+    background: #f0f0f0;
+}	
+   
+/* 🎯 Active Page Highlight */
+.navbar a.active {
+    font-weight: bold;
+    background: #2dabe2;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+
+/* 📝 Form Styling */
+h1 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* 🎯 Labels */
+label {
+    display: block;
+    margin: 15px 0 5px;
+    font-size: 1rem;
+    text-align: left;
+}
+
+/* 🎨 Inputs */
+input {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    transition: border 0.3s ease-in-out;
+}
+
+input:focus {
+    border-color: #008cff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
+}
+
+/* Styling for the dropdown options when hovering */
+input:hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
+/* ✅ Submit Button */
+button {
+    width: 100%;
+    padding: 15px;
+    margin: 15px 0;
+    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, background 0.3s ease-in-out;
+}
+
+button:hover {
+    background: linear-gradient(to right, #0066cc, #0099ff);
+    transform: scale(1.05);
+}
+
+#success-popup {
+    display: none;
+    position: fixed;
+    top: 245px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom, #37e57e, #77fbac);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    font-size: 1.5rem;
+}	
+
+}
+
+/* 🌙 Dark Mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #222;
+        color: white;
+    }
+
+	h1{
+		color:white;
+	}
+
+    .form-container {
+        background: #333;
+    }
+
+    .dropdown-content {
+        background: #444;
+    }
+
+    .dropdown-content a {
+        color: white;
+    }
+
+    .dropdown-content a:hover {
+        background: #555;
+    }
+
+    input {
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+    }
+
+    input:focus {
+        border-color: #00c6ff;
+    }
+
+    button {
+        background: linear-gradient(to bottom, #2aa4d9, #114154);
+    }
+
+    button:hover {
+        background: linear-gradient(to right, #004080, #0070e0);
+    }
+
+	#success-popup {
+	background: linear-gradient(to bottom, #36d577, #2d7b4c);
+	}
+
+}

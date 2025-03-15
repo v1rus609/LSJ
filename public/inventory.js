@@ -209,8 +209,9 @@ document.getElementById('container-section').addEventListener('click', (event) =
             <label>Unpaid Amount (For This Container):</label><br>
             <input type="text" name="unpaid_amount[]" class="unpaid-amount" readonly><br><br>
 
-            <button type="button" class="add-container">Add Container</button>
-            <button type="button" class="remove-container">Remove</button><br><br>
+            <button class="add-container"><span class="truck-text">Add Container</span><i class="fas fa-truck"></i></button>
+            <button class="remove-container"><span class="delete-text">Remove</span><i class="fas fa-trash-alt"></i></button><br><br>
+
         `;
         containerSection.appendChild(newGroup);
 
