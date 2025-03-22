@@ -418,9 +418,6 @@ function generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName) {
 
 
 
-
-
-
         // Example export to Excel function (already implemented)
         function exportToExcel() {
             const table = document.getElementById('purchase-table');

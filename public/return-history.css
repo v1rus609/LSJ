@@ -116,7 +116,6 @@ body {
     padding: 15px;
     font-size: 1.5rem;
     border-radius: 5px;
-    border: 1px solid #ccc;
     background-color: white;
     color: #333;
     cursor: pointer;
@@ -129,7 +128,6 @@ body {
 	padding: 15px;
     font-size: 1.5rem;
     border-radius: 5px;
-    border: 1px solid #ccc;
     background-color: white;
     color: #333;
     cursor: pointer;
@@ -325,68 +323,101 @@ h2 {
     cursor: pointer;
 }
 
-/* Form styles */
-#edit-return-form {
+ .edit-btn {
+            background-color: #2fd57a; /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+			padding: 8px 24px;
+			margin: 5px 0px;
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 1.3rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
 
-}
+        .edit-btn .edit-text {
+            position: absolute;
+            left: 8;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
-#edit-return-form label {
-    font-size: 1.5em;
-    font-weight: bold;
-    text-align: left;
-}
+        .edit-btn i {
+            margin-left: 18px;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
-#edit-return-form input, #edit-return-form select {
-    padding: 10px;
-	width: 100%;
-	display: flex;
-    flex-direction: column;
-    gap: 10px;
-    font-size: 1.5rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
+        .edit-btn:hover {
+            background-color: #2fd57a;
+        }
 
-#update-return-btn {
-	width: 100%;
-    font-size: 1.5rem;
-    background: linear-gradient(to bottom, #37e57e, #47a16b);
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+        .edit-btn:hover .edit-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
 
-#update-return-btn:hover {
-    background-color: #45a049;
-}
+        .edit-btn:hover i {
+            transform: translateX(-35%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
 
-button.edit-btn {
-    padding: 8px 24px;
-    font-size: 1.3rem;
-    font-weight: bold;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    margin: 5px 0px;
-    background: linear-gradient(to bottom, #37e57e, #47a16b);
-	color: white;
-}
-/* Delete Button Style */
-button.delete-btn {
-    padding: 8px 12px;
-    font-size: 1.3rem;
-    font-weight: bold;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    margin: 0 0px;
-    background: linear-gradient(to bottom, #e5363b, #fb7679);
-    color: white;
-}
+        .edit-text {
+            transition: opacity 0.3s ease;
+        }
+		
+        .delete-btn {
+            background-color: #ff1a1a; /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 8px 30px; /* Padding around the text */
+			margin: 5px 0px;
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 1.3rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        .delete-btn .delete-text {
+            position: absolute;
+            left: 8;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .delete-btn i {
+            margin-left: 12px;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff1a1a;
+        }
+
+        .delete-btn:hover .delete-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        .delete-btn:hover i {
+            transform: translateX(-40%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .delete-text {
+            transition: opacity 0.3s ease;
+        }
 
 #return-history-table td:last-child {
     text-align: center;  /* Center-align the content of the last column */
@@ -438,7 +469,39 @@ h1 {
     padding: 10px;
     font-size: 0.8rem;
     border-radius: 5px;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+}
+
+#buyer-filter:focus {
+    border-color: #008cff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
+}
+
+/* Styling for the dropdown options when hovering */
+#buyer-filter:hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
+#container-filter:focus {
+    border-color: #008cff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
+}
+
+/* Styling for the dropdown options when hovering */
+#container-filter:hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
+#start-date, #end-date {
+    padding: 10px;
+    font-size: 0.8rem;
+    border-radius: 5px;
+    border: 2px solid #ccc;
     background-color: white;
     color: #333;
     cursor: pointer;
@@ -446,16 +509,26 @@ h1 {
     transition: background-color 0.3s, border-color 0.3s;
 }
 
-#start-date, #end-date {
-    padding: 10px;
-    font-size: 0.8rem;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    background-color: white;
-    color: #333;
-    cursor: pointer;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s, border-color 0.3s;
+#start-date:focus {
+    border-color: #008cff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
+}
+
+/* Styling for the dropdown options when hovering */
+#start-date:hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
+#end-date:focus {
+    border-color: #008cff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
+}
+
+/* Styling for the dropdown options when hovering */
+#end-date:hover {
+    border-color: #008cff; /* Highlight the border on hover */
 }
 
 #return-history-table {
@@ -500,8 +573,12 @@ h1 {
 .home-icon img {
     display: block;
     width: 30px;
+	transition: transform 0.3s ease-in-out;
 }
 
+.home-icon:hover img {
+    transform: scale(1.2); /* Smoothly enlarge the icon on hover */
+}
 .dropbtn {
     background: none;
     border: none;
@@ -516,6 +593,11 @@ h1 {
 	
 .dropbtn img {
     width: 30px;
+	transition: transform 0.3s ease-in-out;
+}
+
+.dropbtn:hover img {
+    transform: scale(1.1); /* Smoothly enlarge the icon on hover */
 }
 
 .dropdown-content {
@@ -557,32 +639,101 @@ h1 {
 	display: inline-block;
 }
 
-button.edit-btn {
-        padding: 4px 20px;
-        font-size: 0.8rem;
-        font-weight: bold;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.2s;
-        margin: 5px 0px;
-        background: linear-gradient(to bottom, #37e57e, #47a16b);
-        color: white;
-    }
+        .edit-btn {
+            background-color: #2fd57a; /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+			padding: 8px 15px;
+			margin: 5px 0px;
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 0.8rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
 
+        .edit-btn .edit-text {
+            position: absolute;
+            left: 8;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
-button.delete-btn {
-        padding: 4px 13px;
-        font-size: 0.8rem;
-        font-weight: bold;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.2s;
-        margin: 0 0px;
-        background: linear-gradient(to bottom, #e5363b, #fb7679);
-        color: white;
-	}
+        .edit-btn i {
+            margin-left: 18px;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .edit-btn:hover {
+            background-color: #2fd57a;
+        }
+
+        .edit-btn:hover .edit-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        .edit-btn:hover i {
+            transform: translateX(-50%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .edit-text {
+            transition: opacity 0.3s ease;
+        }
+		
+        .delete-btn {
+            background-color: #ff1a1a; /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 8px 20px; /* Padding around the text */
+			margin: 5px 0px;
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 0.8rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        .delete-btn .delete-text {
+            position: absolute;
+            left: 8;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .delete-btn i {
+            margin-left: 12px;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff1a1a;
+        }
+
+        .delete-btn:hover .delete-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        .delete-btn:hover i {
+            transform: translateX(-50%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .delete-text {
+            transition: opacity 0.3s ease;
+        }
 	
 	#return-history-table td:last-child {
     text-align: center;  /* Center-align the content of the last column */

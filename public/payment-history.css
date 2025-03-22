@@ -218,37 +218,96 @@ tfoot th {
 }
 
 
-/* Export Button */
-#export-payment-history {
-    background: linear-gradient(to bottom, #37e57e, #77fbac);
-    color: white;
-	font-size: 1.5rem;
-    font-weight: bold;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
 
-#export-payment-history:hover {
-    background: linear-gradient(to bottom, #2ac363, #63e29b);
-}
+        #export-btn {
+            background: linear-gradient(to bottom, #2fc36b, #77fbac);
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 15px 100px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 1.5rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
 
-/* Export Button */
-#export-pdf-btn {
-	background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-	color: white;
-	font-weight: bold;
-	font-size: 1.5rem;
-	padding: 10px 20px;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-}
+        #export-btn .excel-text {
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
-#export-pdf-btn:hover {
-	background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
-}
+        #export-btn i {
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-btn:hover {
+           background: linear-gradient(to bottom, #2fc36b, #77fbac);
+        }
+
+        #export-btn:hover .excel-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        #export-btn:hover i {
+            transform: translateX(-0%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .excel-text {
+            transition: opacity 0.3s ease;
+        }
+
+        #export-pdf-btn {
+			background: linear-gradient(to bottom, #2dabe2, #83d9ff); /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 15px 100px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 1.5rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        #export-pdf-btn .pdf-text {
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-pdf-btn i {
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-pdf-btn:hover {
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff); /* Red background for delete */
+        }
+
+        #export-pdf-btn:hover .pdf-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        #export-pdf-btn:hover i {
+            transform: translateX(-0%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .pdf-text {
+            transition: opacity 0.3s ease;
+        }
 
 .navbar {
     display: flex;
@@ -331,43 +390,103 @@ tfoot th {
 
 
 
-/* Edit Button Style */
-button.edit-btn {
-    padding: 8px 24px;
-    font-size: 1.3rem;
-    font-weight: bold;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    margin: 5px 0px;
-    background: linear-gradient(to bottom, #37e57e, #47a16b);
-    color: white;
-}
+ .edit-btn {
+            background-color: #2fd57a; /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+			padding: 8px 24px;
+			margin: 5px 0px;
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 1.3rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
 
-button.edit-btn:hover {
-    background-color: #45a049;  /* Darker Green */
-    transform: scale(1.05);  /* Slight scale effect on hover */
-}
+        .edit-btn .edit-text {
+            position: absolute;
+            left: 8;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
-/* Delete Button Style */
-button.delete-btn {
-    padding: 8px 12px;
-    font-size: 1.3rem;
-    font-weight: bold;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    margin: 0 0px;
-    background: linear-gradient(to bottom, #e5363b, #fb7679);
-    color: white;
-}
+        .edit-btn i {
+            margin-left: 18px;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
-button.delete-btn:hover {
-    background-color: #e53935;  /* Darker Red */
-    transform: scale(1.05);  /* Slight scale effect on hover */
-}
+        .edit-btn:hover {
+            background-color: #2fd57a;
+        }
+
+        .edit-btn:hover .edit-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        .edit-btn:hover i {
+            transform: translateX(-35%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .edit-text {
+            transition: opacity 0.3s ease;
+        }
+		
+        .delete-btn {
+            background-color: #ff1a1a; /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 8px 30px; /* Padding around the text */
+			margin: 5px 0px;
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 1.3rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        .delete-btn .delete-text {
+            position: absolute;
+            left: 8;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .delete-btn i {
+            margin-left: 12px;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff1a1a;
+        }
+
+        .delete-btn:hover .delete-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        .delete-btn:hover i {
+            transform: translateX(-40%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .delete-text {
+            transition: opacity 0.3s ease;
+        }
+
+
 
 /* Style for the modal */
 .popup {
@@ -499,16 +618,22 @@ h2 {
 		margin-bottom: 5px;
 	}
 	
-	.filter-section button {
-		padding: 7px 10px;
-        font-size: 0.8rem;
-        color: #fff;
-        background: linear-gradient(to bottom, #37b0e5, #76d2fb);
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.3s;
-	}
+.filter-section button {
+    padding: 7px 10px;
+    font-size: 0.8rem;
+	font-weight:bold;
+    color: #fff;
+    background: linear-gradient(to bottom, #37b0e5, #76d2fb);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+	transition: transform 0.3s ease-in-out;
+}
+	
+
+.filter-section button:hover {
+    transform: scale(1.1); /* Smoothly enlarge the icon on hover */
+}
 
 .filter-section input[type="date"] {
 		border: 2px solid #cccccc;
@@ -517,17 +642,7 @@ h2 {
         font-size: 0.8rem;
 }
 		
-	#export-payment-history {
-		background: linear-gradient(to bottom, #37e57e, #77fbac);
-		color: white;
-		font-size: 0.8rem;
-		font-weight: bold;
-		padding: 10px 20px;
-		border: none;
-		border-radius: 5px;
-		cursor: pointer;
-	}
-	
+
 	/* 🏠 Navbar */
 .navbar {
     display: flex;
@@ -546,6 +661,11 @@ h2 {
 .home-icon img {
     display: block;
     width: 30px;
+	transition: transform 0.3s ease-in-out;
+}
+
+.home-icon:hover img {
+    transform: scale(1.2); /* Smoothly enlarge the icon on hover */
 }
 
 .dropbtn {
@@ -562,6 +682,11 @@ h2 {
 	
 .dropbtn img {
     width: 30px;
+	transition: transform 0.3s ease-in-out;
+}
+
+.dropbtn:hover img {
+    transform: scale(1.1); /* Smoothly enlarge the icon on hover */
 }
 
 .dropdown-content {
@@ -603,22 +728,7 @@ h2 {
 	display: inline-block;
 }
 	
-/* Export Button */
-#export-pdf-btn {
-    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-    color: white;
-	margin-top: -5px;
-	font-size: 0.8rem;
-    font-weight: bold;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
 
-#export-pdf-btn:hover {
-    background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
-}
 
 
 
@@ -667,32 +777,101 @@ h2 {
         font-size: 0.8rem;
 	}
 
-	button.edit-btn {
-			padding: 4px 20px;
-			font-size: 0.8rem;
-			font-weight: bold;
-			border-radius: 5px;
-			border: none;
-			cursor: pointer;
-			transition: background-color 0.3s, transform 0.2s;
+        .edit-btn {
+            background-color: #2fd57a; /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+			padding: 8px 15px;
 			margin: 5px 0px;
-			background: linear-gradient(to bottom, #37e57e, #47a16b);
-			color: white;
-		}
-	
-	
-	    button.delete-btn {
-        padding: 4px 13px;
-        font-size: 0.8rem;
-        font-weight: bold;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.2s;
-        margin: 0 0px;
-        background: linear-gradient(to bottom, #e5363b, #fb7679);
-        color: white;
-    }
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 0.8rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        .edit-btn .edit-text {
+            position: absolute;
+            left: 8;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .edit-btn i {
+            margin-left: 18px;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .edit-btn:hover {
+            background-color: #2fd57a;
+        }
+
+        .edit-btn:hover .edit-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        .edit-btn:hover i {
+            transform: translateX(-50%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .edit-text {
+            transition: opacity 0.3s ease;
+        }
+		
+        .delete-btn {
+            background-color: #ff1a1a; /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 8px 20px; /* Padding around the text */
+			margin: 5px 0px;
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 0.8rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        .delete-btn .delete-text {
+            position: absolute;
+            left: 8;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .delete-btn i {
+            margin-left: 12px;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff1a1a;
+        }
+
+        .delete-btn:hover .delete-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        .delete-btn:hover i {
+            transform: translateX(-50%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .delete-text {
+            transition: opacity 0.3s ease;
+        }
 
 #payment-history-table td {
     border: 1px solid #ccc;
@@ -784,6 +963,96 @@ h2 {
     cursor: pointer;
 }
 
+        #export-btn {
+            background: linear-gradient(to bottom, #2fc36b, #77fbac);
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 10px 60px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 0.8rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        #export-btn .excel-text {
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-btn i {
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-btn:hover {
+            background: linear-gradient(to bottom, #2fc36b, #77fbac);
+        }
+
+        #export-btn:hover .excel-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        #export-btn:hover i {
+            transform: translateX(-0%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .excel-text {
+            transition: opacity 0.3s ease;
+        }
+
+        #export-pdf-btn {
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff); /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 10px 60px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 0.8rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        #export-pdf-btn .pdf-text {
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-pdf-btn i {
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-pdf-btn:hover {
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff); /* Red background for delete */
+        }
+
+        #export-pdf-btn:hover .pdf-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        #export-pdf-btn:hover i {
+            transform: translateX(-0%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .pdf-text {
+            transition: opacity 0.3s ease;
+        }
+		
 
 }
 	

@@ -166,37 +166,95 @@ tfoot {
 }
 
 
-/* Export Button */
-#export-btn {
-	background: linear-gradient(to bottom, #37e57e, #77fbac);
-	color: white;
-	font-weight: bold;
-	font-size: 1.5rem;
-	padding: 15px 15px;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-}
+        #export-btn {
+			background: linear-gradient(to bottom, #2fc36b, #77fbac);		
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 15px 100px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 1.5rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
 
-#export-btn:hover {
-	background: linear-gradient(to bottom, #2ac363, #63e29b);
-}
+        #export-btn .excel-text {
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
-		/* Export Button */
-#export-pdf-btn {
-	background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-	color: white;
-	font-weight: bold;
-	font-size: 1.5rem;
-	padding: 15px 15px;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-}
+        #export-btn i {
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
-#export-pdf-btn:hover {
-	background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
-}
+        #export-btn:hover {
+            background: linear-gradient(to bottom, #2fc36b, #77fbac);
+        }
+
+        #export-btn:hover .excel-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        #export-btn:hover i {
+            transform: translateX(-0%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .excel-text {
+            transition: opacity 0.3s ease;
+        }
+
+        #export-pdf-btn {
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff);/* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 15px 100px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 1.5rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        #export-pdf-btn .pdf-text {
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-pdf-btn i {
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-pdf-btn:hover {
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+        }
+
+        #export-pdf-btn:hover .pdf-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        #export-pdf-btn:hover i {
+            transform: translateX(-0%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .pdf-text {
+            transition: opacity 0.3s ease;
+        }
 
 option {
 	font-weight: bold;
@@ -547,6 +605,11 @@ h1 {
     font-size: 0.8rem;
 }
 
+
+.datefilters input:hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
 label{
     font-weight: bold;
     margin-right: 5px;
@@ -557,6 +620,10 @@ label{
     padding: 5px;
     border-radius: 5px;
     font-size: 0.8rem;
+}
+
+select:hover {
+    border-color: #008cff; /* Highlight the border on hover */
 }
 
 option {
@@ -622,40 +689,96 @@ tfoot {
 }
 
 
-/* Export Button */
-#export-btn {
-	margin-top: -5px;
-	font-size: 0.8rem;
-    background: linear-gradient(to bottom, #37e57e, #77fbac);
-    color: white;
-    font-weight: bold;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+        #export-btn {
+            background: linear-gradient(to bottom, #2fc36b, #77fbac);
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 10px 60px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 0.8rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
 
-#export-btn:hover {
-    background: linear-gradient(to bottom, #2ac363, #63e29b);
-}
+        #export-btn .excel-text {
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
-/* Export Button */
-#export-pdf-btn {
-    background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-    color: white;
-	margin-top: -5px;
-	font-size: 0.8rem;
-    font-weight: bold;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+        #export-btn i {
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
-#export-pdf-btn:hover {
-    background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
-}
+        #export-btn:hover {
+           background: linear-gradient(to bottom, #2fc36b, #77fbac);
+        }
 
+        #export-btn:hover .excel-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        #export-btn:hover i {
+            transform: translateX(-0%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .excel-text {
+            transition: opacity 0.3s ease;
+        }
+
+        #export-pdf-btn {
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff); /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 10px 60px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 0.8rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        #export-pdf-btn .pdf-text {
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-pdf-btn i {
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-pdf-btn:hover {
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+        }
+
+        #export-pdf-btn:hover .pdf-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        #export-pdf-btn:hover i {
+            transform: translateX(-0%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .pdf-text {
+            transition: opacity 0.3s ease;
+        }
+		
 .home-icon img {
     display: block;
     width: 30px;

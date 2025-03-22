@@ -95,11 +95,13 @@ option {
     border: none;
     padding: 30px 15px;
     border-radius: 4px;
-    cursor: pointer;
+    transition: transform 0.2s ease-in-out, background 0.3s ease-in-out;	
 }
 
-.submit-payment[type="submit"]:hover {
-    background: linear-gradient(to bottom, #2ac363, #63e29b);
+
+form button[type="submit"]:hover {
+    background: linear-gradient(to bottom, #2ec16a, #5cc385);
+	transform: scale(1.02);
 }
 
 .navbar {
@@ -251,30 +253,50 @@ label {
     text-align: left;
 }
 
-input, select {
+input {
 	font-size:1rem;
     width: 100%;
     padding: 8px;
     border-radius: 5px;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     box-sizing: border-box;
     margin-bottom: 0px;
 }
 
+input:hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
+select {
+	font-size:1rem;
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+    box-sizing: border-box;
+    margin-bottom: 0px;
+}
+
+select:hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
 
 .submit-payment[type="submit"] {
-	font-size: 1rem;
+	font-size: 1.0rem;
     background: linear-gradient(to bottom, #37e57e, #77fbac);
 	width: 100%;
     color: white;
     border: none;
-    padding: 10px 15px;
+    padding: 15px 15px;
     border-radius: 4px;
     cursor: pointer;
+    transition: transform 0.2s ease-in-out, background 0.3s ease-in-out;	
 }
 
 .submit-payment[type="submit"]:hover {
-    background: linear-gradient(to bottom, #2ac363, #63e29b);
+    background: linear-gradient(to bottom, #2ec16a, #5cc385);
+	transform: scale(1.03);
 }
 
 #success-popup {
@@ -307,6 +329,11 @@ input, select {
 .home-icon img {
     display: block;
     width: 30px;
+	transition: transform 0.3s ease-in-out;
+}
+
+.home-icon:hover img {
+    transform: scale(1.2); /* Smoothly enlarge the icon on hover */
 }
 
 .dropbtn {
@@ -323,6 +350,11 @@ input, select {
 	
 .dropbtn img {
     width: 30px;
+	transition: transform 0.3s ease-in-out;
+}
+
+.dropbtn:hover img {
+    transform: scale(1.1); /* Smoothly enlarge the icon on hover */
 }
 
 .dropdown-content {

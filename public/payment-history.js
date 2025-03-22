@@ -57,8 +57,10 @@ function fetchPaymentHistory(buyerName = 'all', startDate = null, endDate = null
                     <td>${formatNumberWithCommas(payment.cash_amount.toFixed(2))}</td>
                     <td>${formatNumberWithCommas(payment.total.toFixed(2))}</td>
                     <td>
-                        <button class="edit-btn" data-id="${payment.id}">Edit</button>
-                        <button class="delete-btn" data-id="${payment.id}">Delete</button>
+					
+						<button class="edit-btn" data-id="${payment.id}"><span class="edit-text">Edit</span><i class="fas fa-edit"></i></button>
+						<button class="delete-btn" data-id="${payment.id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>	
+   
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -115,9 +117,16 @@ document.getElementById('payment-method').addEventListener('change', function ()
 
 // Edit button functionality
 document.addEventListener('click', function (event) {
-    if (event.target.classList.contains('edit-btn')) {
-        const id = event.target.getAttribute('data-id');  // Get the correct ID
-        
+    let target = event.target;
+
+    // Ensure we always target the button (even if clicking on the icon inside it)
+    if (target.tagName === 'I') {
+        target = target.closest('button'); 
+    }
+
+    if (target && target.classList.contains('edit-btn')) {
+        const id = target.getAttribute('data-id');  // Get the correct ID
+
         // Fetch payment record by ID and populate the edit form
         fetch(`/payment/${id}`)
             .then(response => response.json())
@@ -137,9 +146,11 @@ document.addEventListener('click', function (event) {
 
                 // Show the modal for editing
                 document.getElementById('edit-payment-form').style.display = 'block';
-            });
+            })
+            .catch(err => console.error('Error fetching payment data:', err));
     }
 });
+
 // Close the edit modal
 document.getElementById('close-edit-btn').addEventListener('click', function () {
     document.getElementById('edit-payment-form').style.display = 'none';
@@ -188,8 +199,15 @@ document.getElementById('update-payment-btn').addEventListener('click', function
 
 // Handle Delete button functionality with confirmation
 document.addEventListener('click', function (event) {
-    if (event.target.classList.contains('delete-btn')) {
-        const id = event.target.getAttribute('data-id');
+    let target = event.target;
+
+    // Ensure we always target the button (even if clicking on the icon inside it)
+    if (target.tagName === 'I') {
+        target = target.closest('button');
+    }
+
+    if (target && target.classList.contains('delete-btn')) {
+        const id = target.getAttribute('data-id');
         console.log('Deleting payment with ID:', id);
 
         if (!id) {
@@ -375,15 +393,14 @@ function generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName) {
     };
 }
 
+        // Example export to Excel function (already implemented)
+        function exportToExcel() {
+		const table = document.getElementById('payment-history-table');
+		const workbook = XLSX.utils.table_to_book(table, { sheet: "Payment History" });
+		const fileName = `Payment_History_${new Date().toISOString().slice(0, 10)}.xlsx`;
+		XLSX.writeFile(workbook, fileName);
 
-
-// Add event listener for export to Excel
-document.getElementById('export-payment-history').addEventListener('click', function () {
-    const table = document.getElementById('payment-history-table');
-    const workbook = XLSX.utils.table_to_book(table, { sheet: "Payment History" });
-    const fileName = `Payment_History_${new Date().toISOString().slice(0, 10)}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
-});
+        }
 
 
 

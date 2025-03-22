@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buyer Timeline</title>
-    <link rel="stylesheet" href="buyer-timeline.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
- 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Link to Font Awesome for the trash icon -->
+    <link rel="stylesheet" href="buyer-timeline.css">
 </head>
 <body>
     <div class="container">
@@ -38,9 +35,10 @@
 
         <h1>Buyer Timeline</h1>
 
-        <label>Select Buyer:</label>
         <select id="buyer-dropdown"></select>
-<table id="timeline-table">
+	
+	<div class="table-wrapper">
+	<table id="timeline-table">
     <thead>
         <tr>
             <th>Date</th>
@@ -69,11 +67,17 @@
         </tr>
     </tfoot>
 </table>
+</div>
 
-		<button id="export-excel">Export to Excel</button>
-		<button id="export-pdf">Export to PDF</button>
+		
+		<button id="export-excel"><span class="excel-text">Export to Excel</span><i class="fas fa-file-excel"></i></button>	
+		<button id="export-pdf" onclick="exportToPDF()"><span class="pdf-text">Export to PDF</span><i class="fas fa-file-pdf"></i></button>	
+		
         <script src="buyer-timeline.js"></script>
 
     </div>
+	
+	
+	
 </body>
 </html>

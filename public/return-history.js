@@ -75,8 +75,8 @@ function fetchReturnHistory() {
                     <td>${formatNumberWithCommas(returnRecord.returned_price_per_kg)}</td>
                     <td>${formatNumberWithCommas(returnRecord.total_amount)}</td>
                     <td>
-                        <button class="edit-btn" data-id="${returnRecord.id}">Edit</button>
-                        <button class="delete-btn" data-id="${returnRecord.id}">Delete</button>
+						<button class="edit-btn" data-id="${returnRecord.id}"><span class="edit-text">Edit</span><i class="fas fa-edit"></i></button>
+						<button class="delete-btn" data-id="${returnRecord.id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>	
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -143,8 +143,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Handle Delete button functionality
 document.addEventListener('click', function (event) {
-    if (event.target.classList.contains('delete-btn')) {
-        const id = event.target.getAttribute('data-id');
+    let target = event.target;
+
+    // Ensure we always target the button (even if clicking on the icon inside it)
+    if (target.tagName === 'I') {
+        target = target.closest('button');
+    }
+
+    if (target && target.classList.contains('delete-btn')) {
+        const id = target.getAttribute('data-id');
         console.log('Deleting return record with ID:', id); // Log the ID to check if it's undefined
 
         if (!id) {
@@ -155,7 +162,7 @@ document.addEventListener('click', function (event) {
         // Show confirmation dialog before proceeding with deletion
         const confirmed = confirm('Are you sure you want to delete this return record?');
         if (!confirmed) {
-            return;  // If not confirmed, stop the delete process
+            return; // If not confirmed, stop the delete process
         }
 
         // Proceed with the delete request
@@ -164,7 +171,7 @@ document.addEventListener('click', function (event) {
             .then(data => {
                 if (data.success) {
                     alert('Return record deleted successfully');
-                    fetchReturnHistory();  // Refresh the return history after deletion
+                    fetchReturnHistory(); // Refresh the return history after deletion
                 } else {
                     alert('Failed to delete return record');
                 }
@@ -173,33 +180,57 @@ document.addEventListener('click', function (event) {
     }
 });
 
+
+		
 // Handle Edit button functionality
 document.addEventListener('click', function (event) {
-    if (event.target.classList.contains('edit-btn')) {
-        const id = event.target.getAttribute('data-id');  // Get the correct ID
+    let target = event.target;
+
+    // Ensure we always target the button (even if clicking on the icon inside it)
+    if (target.tagName === 'I') {
+        target = target.closest('button');
+    }
+
+    if (target && target.classList.contains('edit-btn')) {
+        const id = target.getAttribute('data-id'); // Get the correct ID
         
+        if (!id) {
+            console.error("ID is missing for the edit button.");
+            return; // Prevent proceeding if ID is missing
+        }
+
         // Fetch return record by ID and populate the edit form
         fetch(`/purchase-return/${id}`)
             .then(response => response.json())
             .then(data => {
+                if (!data) {
+                    alert('Error: Return record not found.');
+                    return;
+                }
+
                 // Populate form fields
                 document.getElementById('return-id').value = data.id;
                 document.getElementById('return-date').value = data.return_date; // Set return date
                 document.getElementById('returned-kg').value = data.returned_kg;  // Set returned kg
                 document.getElementById('returned-price-per-kg').value = data.returned_price_per_kg;  // Set returned price per kg
                 document.getElementById('total-amount').value = data.total_amount;  // Set total amount
-                
-                // Set the buyer name (no need to submit buyer_name, only show it)
-                document.getElementById('buyer-name').value = data.buyer_name;  // Set the buyer name from the database
 
-                // Set the container number (no need to submit container_id, only show it)
-                document.getElementById('container-name').value = data.container_number;  // Set container name (not container_id)
+                // Set the buyer name (for display only)
+                document.getElementById('buyer-name').value = data.buyer_name;  
+
+                // Set the container number (for display only)
+                document.getElementById('container-name').value = data.container_number;  
                 
                 // Show the modal for editing
                 document.getElementById('edit-return-form').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error fetching return record:', error);
+                alert('Failed to fetch return details.');
             });
     }
 });
+
 
 // Close the edit modal
 document.getElementById('close-edit-btn').addEventListener('click', function () {

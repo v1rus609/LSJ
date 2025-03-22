@@ -4,6 +4,7 @@
     <title>Payment History</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Link to Font Awesome for the trash icon -->
     <link rel="stylesheet" href="payment-history.css">
 </head>
 <body>
@@ -82,8 +83,9 @@
         </div>
     </div>
             <div class="export-button" style="text-align:center">
-            <button id="export-payment-history">Export to Excel</button>
-		<button id="export-pdf-btn" onclick="exportToPDF()">Export to PDF</button>
+		
+				   <button id="export-btn" onclick="exportToExcel()"><span class="excel-text">Export to Excel</span><i class="fas fa-file-excel"></i></button>	
+		   <button id="export-pdf-btn" onclick="exportToPDF()"><span class="pdf-text">Export to PDF</span><i class="fas fa-file-pdf"></i></button>	
         </div>
 		
 <!-- Edit Payment Modal -->

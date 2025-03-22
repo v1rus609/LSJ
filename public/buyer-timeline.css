@@ -1,114 +1,128 @@
-/* General Styles */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
+ /* 🌟 General Styles */
+* {
+    margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}	
+
+body {
+    background: linear-gradient(to right, #f9f9f9, #e0f7fa);
     display: flex;
-    text-align: center;
     justify-content: center;
     align-items: stretch;
+    min-height: 100vh;
+	text-align:center;
+    -webkit-text-size-adjust: 100%;
+    transition: backdrop-filter 0.3s ease-in-out; /* Smooth transition for blur */
 }
 
+.container {
+    width: 100%;
+    background: #ffffff;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+    padding: 25px;
+    transition: all 0.3s ease-in-out;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Logo Styling */
 .logo {
     text-align: center;
+}
+
+/* 🏆 Logo */
+.logo img {
+	text-align: center;
+    max-width: 220px;
     margin-bottom: 20px;
 }
 
-.logo img {
-    max-width: 100px;
-    margin: 0 auto 10px;
-    display: block;
+ h1 {
+	text-align:center;
+    font-size: 3rem;
+    margin-bottom: 40px;
+    color: #333;
 }
 
-/* Container */
-.container {
-    width: 100%;
-    background: #fff;
-    padding: 5px;
-    border-radius: 3px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-}
-/* Navbar */
 .navbar {
-    padding: 10px;
-    border-radius: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 50px 20px;
+    background: none;
+    border-radius: 10px;
 }
 
 .navbar a {
-    color: white;
     text-decoration: none;
-
+    color: white;
+    font-size: 1.2rem;
 }
 
-.navbar a:hover {
-    background-color: #0056b3;
-    border-radius: 5px;
-}
 .home-icon img {
     display: block;
+    width: 75px;
 }
 
 .dropdown {
-    position: relative;
-    display: inline-block;
+	position: relative;
+	display: inline-block;
 }
+
 .dropbtn {
     background: none;
     border: none;
     cursor: pointer;
+	padding: 0px;
+}
+		
+.dropbtn:hover {
+    background: none;
+    transform: scale(1.02);
 }
 
 .dropbtn img {
-    display: block;
+    width: 75px;
 }
+
 .dropdown-content {
-    border-radius: 5px;
     display: none;
     position: absolute;
-    float: left;
-top: 80%;
-    left: -103%;
-    text-align: left;
+    top: 110%;
+    right: 0;
+	text-align: left;
     background-color: white;
-    min-width: 140px;
+    min-width: 350px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
     z-index: 1;
+    animation: slideDown 0.3s ease-in-out;
 }
+
 .dropdown-content a {
-	color: black;
-	font-size: 0.8rem;
-	padding: 15px 16px;
-	text-decoration: none;
-	display: block;
-	}
-	
-.dropdown-content a:hover {
-    background-color: #ddd;
-}
-
-.dropdown:hover .dropdown-content {
     display: block;
-}
-	
-	.navbar a.active {
-			font-size: 0.8rem;
-			font-weight: bold;
-			background-color: #2dabe2;
-			color: white;
-			border-radius: 0px;
-			padding: 15px;
-		}
-
-/* Heading */
-h1 {
-    text-align: center;
+    padding: 40px;
+	text-align:left;
+    text-decoration: none;
     color: #333;
-font-size:1.5rem;
-    margin-bottom: 20px;
-}
+    font-size: 2rem;
+    transition: background 0.3s ease-in-out;
+}	
+
+.dropdown-content a:hover {
+    background: #f0f0f0;
+}	
+
+/* 🎯 Active Page Highlight */
+.navbar a.active {
+	color:white;
+	text-align:left;
+    font-weight: bold;
+    background: #2dabe2;
+    padding: 40px;
+    border-radius: 5px;
+}	
 
 /* Buyer Dropdown */
 label {
@@ -117,151 +131,51 @@ label {
 }
 
 #buyer-dropdown {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 15px;
+    font-size: 1.5rem;
+    margin: 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
-	font-size: 0.8rem;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, border-color 0.3s;
 }
+
+option {
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+/* Table Wrapper Styling */
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
 
 /* Table Styles */
 table {
     width: 100%;
-    table-layout: fixed; /* Prevent table from stretching */
-    overflow-x: auto; /* Enable horizontal scrolling */
-    display: block; /* Necessary for scrolling */
-    white-space: nowrap; /* Prevent text from wrapping */
-}
-
-th, td {
-    border: 1px solid #ddd;
-    font-size: 0.6rem;
-    text-align: left;
-}
-
-th {
-    background-color: #007BFF;
-    color: white;
-    font-weight: bold;
-}
-
-/* Table Row Alternating Colors */
-tbody tr:nth-child(odd) {
-    background-color: #f9f9f9;
-}
-
-tbody tr:nth-child(even) {
-    background-color: #fff;
-}
-
-/* Highlight row on hover */
-tbody tr:hover {
-    background-color: #d0e2ff;
-}
-
-#total-cash, #total-bank, #total-non-cash, #total-bill, #total-taka {
-    font-weight: bold;
-}
-
-/* General button styling */
-button {
-    font-family: Arial, sans-serif; /* Use a clean font */
-    font-size: 14px; /* Set a readable font size */
-    padding: 10px 20px; /* Add padding for better clickability */
-    margin: 10px; /* Space between buttons */
-    cursor: pointer; /* Change cursor to pointer when hovering */
-    border-radius: 5px; /* Rounded corners */
-    border: 1px solid #ccc; /* Light border around the buttons */
-    transition: background-color 0.3s, border-color 0.3s; /* Smooth transition for hover effect */
-}
-
-/* "Export to PDF" button specific styles */
-#export-pdf {
-background: linear-gradient(to bottom, #2dabe2, #83d9ff);
-    color: white;
-    font-weight: bold;
-    font-size: 0.8rem;
-    padding: 10px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-}
-
-#export-pdf:hover {
-    background-color: #45a049; /* Darker green on hover */
-    border-color: #3e8e41; /* Darker border color on hover */
-}
-
-/* "Export to Excel" button specific styles */
-#export-excel {
-background: linear-gradient(to bottom, #37e57e, #77fbac);
-    color: white;
-    font-weight: bold;
-    font-size: 0.8rem;
-    padding: 10px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;/
-}
-
-#export-excel:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-    border-color: #004085; /* Darker border color on hover */
-}
-
-/* Optional: Add some additional spacing for better layout */
-#export-pdf, #export-excel {
-    display: inline-block;
-    text-align: center;
-}
-
-
-@media (min-width: 1281px) {
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f9f9f9;
-        display: flex
-;
-        min-height: 100vh;
-        flex-wrap: nowrap;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-	/* Container */
-.container {
-    width: 90%;
-    max-width: 1200px;
     margin: 20px auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
+    background: white;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Table Styles */
-table {
-    width: 100%;
-    border-collapse: collapse;
-	display: inline-table; /* Necessary for scrolling */
-    margin-top: 20px;
-	white-space: wrap;
-}
-
-th, td {
-
-    padding: 10px;
-	    font-size: 0.8rem;
+td {
+    border: 1px solid #ccc;
+    padding: 20px;
     text-align: left;
-}
+    font-size: 1.5rem;
 
+}
 
 th {
-    background-color: #007BFF;
+    background: #333;
+    padding: 10px;
+    font-size: 1.5rem;
+    text-align: left;
     color: white;
     font-weight: bold;
 }
@@ -279,6 +193,7 @@ tbody tr:nth-child(even) {
 tbody tr:hover {
     background-color: #d0e2ff;
 }
+
 #total-cash, #total-bank, #total-non-cash, #total-bill, #total-taka {
     font-weight: bold;
 }
@@ -295,51 +210,354 @@ button {
     transition: background-color 0.3s, border-color 0.3s; /* Smooth transition for hover effect */
 }
 
-/* "Export to PDF" button specific styles */
-#export-pdf {
-background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+        #export-excel {
+            background: linear-gradient(to bottom, #2fc36b, #77fbac);
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 15px 100px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 1.5rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        #export-excel .excel-text {
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-excel i {
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-excel:hover {
+            background: linear-gradient(to bottom, #2fc36b, #77fbac);
+        }
+
+        #export-excel:hover .excel-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        #export-excel:hover i {
+            transform: translateX(0%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .excel-text {
+            transition: opacity 0.3s ease;
+        }
+
+        #export-pdf {
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff); /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 15px 100px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 1.5rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        #export-pdf .pdf-text {
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-pdf i {
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-pdf:hover {
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+        }
+
+        #export-pdf:hover .pdf-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        #export-pdf:hover i {
+            transform: translateX(0%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .pdf-text {
+            transition: opacity 0.3s ease;
+        }
+
+
+@media (min-width: 1024px) {
+
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f9f9f9;
+	font-size: 1.0rem;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	align-items: center; /* Center vertically */
+	justify-content: center; /* Center horizontally */
+	min-height: 100vh; /* Ensure full height */
+	text-align: center;
+}
+
+.container {
+	width: 55%;
+	background: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+		
+h1 {
+	font-size:1.5rem;
+	text-align: center;
+	margin-bottom: 20px;
+}
+		
+.logo img {
+    max-width: 100px;
+	margin: 0 auto 10px;
+    display: block;
+ }
+
+
+
+	/* 🏠 Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: none;
+    border-radius: 10px;
+}
+
+.navbar a {
+    text-decoration: none;
     color: white;
-    font-weight: bold;
-    font-size: 0.8rem;
-    padding: 10px 10px;
+    font-size: 1.2rem;
+}
+.home-icon img {
+    display: block;
+    width: 30px;
+	transition: transform 0.3s ease-in-out;
+}
+
+.home-icon:hover img {
+    transform: scale(1.2); /* Smoothly enlarge the icon on hover */
+}
+
+.dropbtn {
+    background: none;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
+	padding: 0px;
 }
 
-#export-pdf:hover {
-    background-color: #45a049; /* Darker green on hover */
-    border-color: #3e8e41; /* Darker border color on hover */
+.dropbtn:hover {
+    background: none;
+    transform: scale(1.02);
+}	
+	
+.dropbtn img {
+    width: 30px;
+	transition: transform 0.3s ease-in-out;
 }
 
-/* "Export to Excel" button specific styles */
-#export-excel {
-    background-color: #007bff; /* Blue background */
-    color: white; /* White text color */
+.dropbtn:hover img {
+    transform: scale(1.1); /* Smoothly enlarge the icon on hover */
 }
 
-#export-excel:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-    border-color: #004085; /* Darker border color on hover */
-}
-
-/* Optional: Add some additional spacing for better layout */
-#export-pdf, #export-excel {
-    display: inline-block;
-    text-align: center;
-}
 .dropdown-content {
-    border-radius: 5px;
     display: none;
     position: absolute;
-    float: left;
-    top: 75%;
-    left: -100%;
-    text-align: left;
+    top: 100%;
+    right: 0;
     background-color: white;
-    min-width: 140px;
+    min-width: 200px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
     z-index: 1;
+    animation: slideDown 0.3s ease-in-out;
 }
+
+.dropdown-content a {
+    display: block;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+    transition: background 0.3s ease-in-out;
+}	
+
+.dropdown-content a:hover {
+    background: #f0f0f0;
+}	
+
+/* 🎯 Active Page Highlight */
+.navbar a.active {
+    font-weight: bold;
+    background: #2dabe2;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+#buyer-dropdown {
+    padding: 10px;
+    font-size: 1rem;
+    margin: 10px;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, border-color 0.3s;
+
+}	
+
+#buyer-dropdown:hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
+#buyer-dropdown:focus {
+    border-color: #008cff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
+}
+
+option {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+
+td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+    font-size: 0.9rem;
+
+}
+
+th {
+    background: #333;
+    padding: 10px;
+    font-size: 0.8rem;
+    text-align: left;
+    color: white;
+    font-weight: bold;
+}
+
+       #export-excel {
+            background: linear-gradient(to bottom, #2fc36b, #77fbac);
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 10px 60px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 0.8rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        #export-excel .excel-text {
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-excel i {
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-excel:hover {
+            background: linear-gradient(to bottom, #2fc36b, #77fbac);
+        }
+
+        #export-excel:hover .excel-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        #export-excel:hover i {
+            transform: translateX(0%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .excel-text {
+            transition: opacity 0.3s ease;
+        }
+
+        #export-pdf {
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff); /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 10px 60px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 0.8rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        #export-pdf .pdf-text {
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-pdf i {
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #export-pdf:hover {
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff);
+        }
+
+        #export-pdf:hover .pdf-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        #export-pdf:hover i {
+            transform: translateX(0%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .pdf-text {
+            transition: opacity 0.3s ease;
+        }	
 
 }

@@ -194,10 +194,13 @@ form button[type="submit"] {
     padding: 30px 0px;
     border-radius: 4px;
     cursor: pointer;
+    transition: transform 0.2s ease-in-out, background 0.3s ease-in-out;	
 }
 
+
 form button[type="submit"]:hover {
-    background: linear-gradient(to bottom, #2ac363, #63e29b);
+    background: linear-gradient(to bottom, #2ec16a, #5cc385);
+	transform: scale(1.02);
 }
 
 
@@ -416,6 +419,7 @@ select:hover {
         }
 
         .add-container i {
+			font-size: 0.9rem;
             margin-left: 18px;
             opacity: 0;
             transition: transform 0.3s ease, opacity 0.3s ease;
