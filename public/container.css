@@ -1,4 +1,4 @@
-/* 🌟 General Styles */
+ /* 🌟 General Styles */
 * {
     margin: 0;
     padding: 0;
@@ -6,11 +6,10 @@
     font-family: 'Arial', sans-serif;
 }	
 
-
 body {
     background: linear-gradient(to right, #f9f9f9, #e0f7fa);
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: stretch;
     min-height: 100vh;
     text-align: center;
@@ -150,7 +149,7 @@ input:focus {
 button {
     width: 100%;
     padding: 30px;
-    margin: 40px 0;
+    margin: 38px 0;
     background: linear-gradient(to bottom, #2dabe2, #83d9ff);
     color: white;
     border: none;
