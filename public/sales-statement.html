@@ -18,17 +18,18 @@
                     <img src="menu-icon.png" alt="Menu">
                 </button>
                 <div class="dropdown-content">
-                    <a href="container.html">Add Container</a>
-                    <a href="containers.html">Container List</a>
-                    <a href="buyers.html">Add Buyer</a>
-                    <a href="inventory.html">Inventory</a>
-                    <a href="purchase.html">Purchase History</a>
-                    <a href="received-payment.html">Received Payment</a>
-                    <a href="payment-history.html">Payment History</a>
-                    <a href="sales-statement.html" class="active"> Sales Statement </a>
-                    <a href="purchase-return.html"> Purchase Return </a>
-                    <a href="return-history.html"> Return History </a>
-                    <a href="buyer-timeline.html"> Buyer Timeline </a>
+					<a href="container.html" class="admin-only">Add Container</a>
+					<a href="containers.html">Container List</a>
+					<a href="buyers.html">Add Buyer</a>
+					<a href="inventory.html" class="admin-only">Inventory</a>
+					<a href="purchase.html">Purchase History</a>
+					<a href="received-payment.html" class="admin-only">Received Payment</a>
+					<a href="payment-history.html">Payment History</a>
+					<a href="sales-statement.html"class="active"> Sales Statement </a>
+					<a href="purchase-return.html" class="admin-only"> Purchase Return </a>
+					<a href="return-history.html"> Return History </a>
+					<a href="buyer-timeline.html"> Buyer Timeline </a>
+					<a href="#" id="logout-btn"class="active2">Logout</a>
                 </div>
             </div>
         </div>
@@ -85,5 +86,37 @@
         <script src="sales-statement.js"></script> <!-- Link to the JavaScript file -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     </div>
+		<script>
+		fetch('/check-role')
+			.then(res => res.json())
+			.then(data => {
+				if (!data.loggedIn) {
+					window.location.href = '/login.html';
+					return;
+				}
+
+				window.isAdmin = data.role === 'Admin';
+
+				if (!window.isAdmin) {
+										// 🔒 Hide Admin-only navbar links
+							const protectedLinks = document.querySelectorAll('.admin-only');
+							protectedLinks.forEach(link => link.style.display = 'none');
+				}
+
+				return fetch('/buyers/list');
+			})
+			.then(response => {
+				if (!response.ok) throw new Error('Failed to fetch buyer data.');
+				return response.json();
+			})
+			.then(data => {
+				buyerData = data;
+				renderTable(buyerData);
+			})
+			.catch(error => {
+				console.error('❌ Error fetching buyers:', error);
+				document.getElementById('error-message').style.display = 'block';
+			});
+</script>
 </body>
 </html>

@@ -66,6 +66,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+
+    document.getElementById('logout-btn')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch('/logout', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Logout failed.');
+                }
+            })
+            .catch(err => {
+                console.error('Logout error:', err);
+                alert('Something went wrong during logout.');
+            });
+    });
+
 // ✅ **Dropdown Menu Handling**
 document.addEventListener("DOMContentLoaded", function() {
     const dropdownButton = document.querySelector(".dropbtn");

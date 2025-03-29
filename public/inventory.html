@@ -28,6 +28,7 @@
 			<a href="purchase-return.html"> Purchase Return </a>
 			<a href="return-history.html"> Return History </a>
 			<a href="buyer-timeline.html"> Buyer Timeline </a>
+			<a href="#" id="logout-btn"class="active2">Logout</a>
 			</div>
 		</div>
 	</div>
@@ -92,5 +93,28 @@
     </div>
 
     <script src="inventory.js"></script>
+		    <script>
+        // Ensure the user is logged in
+    // Ensure the user is logged in and has the appropriate role
+    fetch('/check-role')
+        .then(response => response.json())  // Parse JSON response from server
+        .then(data => {
+            if (!data.loggedIn) {
+                window.location.href = '/login.html'; // Redirect to login page if not logged in
+            } else {
+                // Check if the logged-in user is an Admin
+                if (data.role !== 'Admin') {
+                    // If the user is not an Admin, redirect to index.html
+                    window.location.href = '/index.html';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error checking user role:', error);
+            window.location.href = '/login.html'; // Redirect to login if error occurs
+        });
+
+    </script>
+	
 </body>
 </html>

@@ -20,17 +20,18 @@
 					<img src="menu-icon.png" alt="Menu">
 				</button>
 				<div class="dropdown-content">
-					<a href="container.html">Add Container</a>
-					<a href="containers.html">Container List</a>
-					<a href="buyers.html">Add Buyer</a>
-					<a href="inventory.html">Inventory</a>
-					<a href="purchase.html" class="active">Purchase History</a>
-					<a href="received-payment.html">Received Payment</a>
-					<a href="payment-history.html">Payment History</a>			
-					<a href="sales-statement.html"> Sales Statement </a>
-					<a href="purchase-return.html"> Purchase Return </a>
-					<a href="return-history.html"> Return History </a>
-					<a href="buyer-timeline.html"> Buyer Timeline </a>
+			<a href="container.html" class="admin-only">Add Container</a>
+			<a href="containers.html">Container List</a>
+			<a href="buyers.html">Add Buyer</a>
+			<a href="inventory.html" class="admin-only">Inventory</a>
+			<a href="purchase.html"class="active">Purchase History</a>
+			<a href="received-payment.html" class="admin-only">Received Payment</a>
+			<a href="payment-history.html">Payment History</a>
+			<a href="sales-statement.html"> Sales Statement </a>
+			<a href="purchase-return.html" class="admin-only"> Purchase Return </a>
+			<a href="return-history.html"> Return History </a>
+			<a href="buyer-timeline.html"> Buyer Timeline </a>
+			<a href="#" id="logout-btn"class="active2">Logout</a>
 				</div>
 			</div>
 		</div>
@@ -76,12 +77,12 @@
                         <th>Date</th>
                         <th>Buyer</th>
                         <th>Container</th>
-						 <th>Bill No.</th>  <!-- ✅ New Column -->
+						<th>Bill No.</th>  <!-- ✅ New Column -->
                         <th>Quantity</th>
                         <th>Rate</th>
                         <th>Paid</th>
                         <th>Unpaid</th>
-                        <th>Total Price</th>                   
+                        <th>Total Price</th>
                     </tr>
                 </thead>
                 <tbody>

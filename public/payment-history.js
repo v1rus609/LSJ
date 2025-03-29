@@ -49,6 +49,17 @@ function fetchPaymentHistory(buyerName = 'all', startDate = null, endDate = null
             // Populate table rows
             data.payments.forEach(payment => {
                 const row = document.createElement('tr');
+
+                let actionsCell = '';
+                if (window.isAdmin) {
+                    actionsCell = `
+                        <td>
+                            <button class="edit-btn" data-id="${payment.id}"><span class="edit-text">Edit</span><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" data-id="${payment.id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    `;
+                }
+
                 row.innerHTML = `
                     <td>${payment.buyer_name || 'N/A'}</td>
                     <td>${formatDate(payment.payment_date)}</td>
@@ -56,12 +67,7 @@ function fetchPaymentHistory(buyerName = 'all', startDate = null, endDate = null
                     <td>${formatNumberWithCommas(payment.bank_amount.toFixed(2))}</td>
                     <td>${formatNumberWithCommas(payment.cash_amount.toFixed(2))}</td>
                     <td>${formatNumberWithCommas(payment.total.toFixed(2))}</td>
-                    <td>
-					
-						<button class="edit-btn" data-id="${payment.id}"><span class="edit-text">Edit</span><i class="fas fa-edit"></i></button>
-						<button class="delete-btn" data-id="${payment.id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>	
-   
-                    </td>
+                    ${actionsCell}
                 `;
                 tableBody.appendChild(row);
             });
@@ -71,6 +77,27 @@ function fetchPaymentHistory(buyerName = 'all', startDate = null, endDate = null
         })
         .catch(error => console.error('Error fetching payment history:', error));
 }
+
+// Role check before calling anything
+fetch('/check-role')
+    .then(res => res.json())
+    .then(data => {
+        if (!data.loggedIn) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        window.isAdmin = data.role === 'Admin';
+		
+		        if (!window.isAdmin) {
+								// 🔒 Hide Admin-only navbar links
+                    const protectedLinks = document.querySelectorAll('.admin-only');
+                    protectedLinks.forEach(link => link.style.display = 'none');
+        }
+
+        // Load history after confirming role
+        fetchPaymentHistory();
+    });
 
 // Add event listener for the date filter
 document.getElementById('apply-date-filter').addEventListener('click', function () {
@@ -402,7 +429,22 @@ function generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName) {
 
         }
 
-
+    document.getElementById('logout-btn')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch('/logout', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Logout failed.');
+                }
+            })
+            .catch(err => {
+                console.error('Logout error:', err);
+                alert('Something went wrong during logout.');
+            });
+    });
 
 // Fetch all payment history on page load
 document.addEventListener("DOMContentLoaded", function() {

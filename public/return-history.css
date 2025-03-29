@@ -231,6 +231,14 @@ body {
     border-radius: 5px;
 }	
 
+.navbar a.active2 {
+	text-align:left;
+    border-radius: 5px;
+}
+.navbar a.active2:hover {
+	color:white;
+    	background: linear-gradient(to bottom, #fb356c, #ff2832);
+}	
 
 
 /* Style for the "Export to Excel" button */
@@ -321,6 +329,52 @@ h2 {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+#edit-return-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Form fields */
+#edit-return-form {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 5px;
+}
+
+#edit-return-form label {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: left;
+}
+
+#edit-return-form input {
+	width: 100%;
+	margin-top: 15px;
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 1.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+
+/* Style for buttons */
+#update-return-btn {
+    font-size: 1.5rem;
+	width: 100%;
+    background: linear-gradient(to bottom, #37e57e, #47a16b);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#update-return-btn:hover {
+    background-color: #45a049;
 }
 
  .edit-btn {
@@ -435,7 +489,6 @@ body {
 	align-items: center; /* Center vertically */
 	justify-content: center; /* Center horizontally */
 	min-height: 100vh; /* Ensure full height */
-	text-align: center;
 }
 
 .container {
@@ -739,6 +792,7 @@ h1 {
     text-align: center;  /* Center-align the content of the last column */
 }
 
+
 /* Style for the "Export to Excel" button */
 #export-excel-return-history {
         background: linear-gradient(to bottom, #37e57e, #77fbac);
@@ -779,4 +833,41 @@ button:focus {
     outline: none; /* Remove the default outline on focus */
 }
 
+    .popup-content {
+        background-color: #fefefe;
+        margin: 4% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+    }
+	
+	    .close-btn {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+	
+	h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+    #edit-return-form label {
+        font-size: 0.8em;
+        font-weight: bold;
+    }
+
+	#edit-return-form input {
+        padding: 8px;
+		margin-top: 5px;
+		margin-bottom: 0px;
+        font-size: 0.8rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
 }

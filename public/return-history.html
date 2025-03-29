@@ -21,17 +21,19 @@
                     <img src="menu-icon.png" alt="Menu" width="24">
                 </button>
                 <div class="dropdown-content">
-                    <a href="container.html">Add Container</a>
-                    <a href="containers.html">Container List</a>
-                    <a href="buyers.html">Add Buyer</a>
-                    <a href="inventory.html">Inventory</a>
-                    <a href="purchase.html">Purchase History</a>
-                    <a href="received-payment.html">Received Payment</a>
-                    <a href="payment-history.html">Payment History</a>
-                    <a href="sales-statement.html"> Sales Statement </a>
-                    <a href="purchase-return.html"> Purchase Return </a>
-                    <a href="return-history.html" class="active"> Return History </a>
-                    <a href="buyer-timeline.html"> Buyer Timeline </a>
+					<a href="container.html" class="admin-only">Add Container</a>
+					<a href="containers.html">Container List</a>
+					<a href="buyers.html">Add Buyer</a>
+					<a href="inventory.html" class="admin-only">Inventory</a>
+					<a href="purchase.html">Purchase History</a>
+					<a href="received-payment.html" class="admin-only">Received Payment</a>
+					<a href="payment-history.html">Payment History</a>
+					<a href="sales-statement.html"> Sales Statement </a>
+					<a href="purchase-return.html" class="admin-only"> Purchase Return </a>
+					<a href="return-history.html" class="active"> Return History </a>
+					<a href="buyer-timeline.html"> Buyer Timeline </a>
+					<a href="#" id="logout-btn"class="active2">Logout</a>
+
                 </div>
             </div>
         </div>
@@ -109,7 +111,7 @@
 
     </div>
 <!-- Edit Return Modal Form -->
-<div id="edit-return-form" class="popup" style="display: none;">
+<div id="edit-return-form" class="popup" id="edit-return-form" style="display: none;">
     <div class="popup-content">
         <span id="close-edit-btn" class="close-btn">&times;</span>
         <h2>Return Record</h2>

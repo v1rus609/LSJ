@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LSJ Login</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="login-container">
+		 <div class="logo">
+        <img src="logo.png" alt="Company Logo">
+        </div>
+        <h2>Login</h2>
+
+        <form id="login-form">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+            
+            <button type="submit">Login</button>
+        </form>
+        <p id="error-message" style="color:red; display:none;">Invalid credentials</p>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent form submission (default behavior)
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Send the login credentials to the backend
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })  // Send username and password as JSON
+            })
+            .then(response => response.json())  // Parse the response from the backend
+            .then(data => {
+                if (data.success) {
+                    // If login is successful, redirect to the appropriate page (admin or user)
+                    window.location.href = data.redirectTo; // Redirect based on role
+                } else {
+                    // If login fails, show an error message
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error during login:', error);
+            });
+        });
+    </script>
+</body>
+</html>

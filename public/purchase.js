@@ -54,6 +54,16 @@ function fetchPurchases(filters = {}) {
 
             data.forEach((purchase, index) => {
                 const row = document.createElement('tr');
+                let actionCell = '';
+                if (isAdmin) {
+                    actionCell = `
+                        <td class="action-cell">
+                        <button class="edit-btn" data-id="${purchase.sale_id}"><span class="edit-text">Edit</span><i class="fas fa-edit"></i></button>
+						<button class="delete-btn" data-id="${purchase.sale_id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>	
+                        </td>
+                    `;
+                }
+
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${formatDate(purchase.purchase_date) || "N/A"}</td>
@@ -65,12 +75,8 @@ function fetchPurchases(filters = {}) {
                     <td>${formatNumberWithCommas(purchase.paid_amount || 0)}</td>
                     <td>${formatNumberWithCommas(purchase.unpaid_amount || 0)}</td>
                     <td>${formatNumberWithCommas(purchase.total_price || 0)}</td>
-                    <td>
-                        <button class="edit-btn" data-id="${purchase.sale_id}"><span class="edit-text">Edit</span><i class="fas fa-edit"></i></button>
-						<button class="delete-btn" data-id="${purchase.sale_id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>		
-                    </td>
+                    ${actionCell}
                 `;
-
                 tableBody.appendChild(row);
 
                 totalPaid += purchase.paid_amount;
@@ -84,6 +90,30 @@ function fetchPurchases(filters = {}) {
         })
         .catch(error => console.error('Error fetching purchases:', error));
 }
+
+
+// Role check first before loading anything
+fetch('/check-role')
+    .then(res => res.json())
+    .then(data => {
+        if (!data.loggedIn) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        isAdmin = data.role === 'Admin';
+		
+		        if (!window.isAdmin) {
+
+								// 🔒 Hide Admin-only navbar links
+                    const protectedLinks = document.querySelectorAll('.admin-only');
+                    protectedLinks.forEach(link => link.style.display = 'none');
+        }
+
+        // Fetch filters and purchases
+        fetchFilters();
+        fetchPurchases();
+    });
 
 
 // Apply filters immediately when a buyer or container is selected
@@ -445,7 +475,23 @@ function formatQuantity() {
     inputField.value = decimal ? `${integer}.${decimal}` : integer;
 }
 
-
+    document.getElementById('logout-btn')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch('/logout', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Logout failed.');
+                }
+            })
+            .catch(err => {
+                console.error('Logout error:', err);
+                alert('Something went wrong during logout.');
+            });
+    });
+	
 // Format date to dd-mm-yyyy
 function formatDate(dateString) {
     const [year, month, day] = dateString.split('-');

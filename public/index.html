@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>LSI Management System</title>
     <link rel="stylesheet" href="index.css">
 </head>
@@ -10,17 +11,18 @@
             <img src="logo.png" alt="Company Logo">
         </div>
         <div class="menu">
-            <a href="container.html">Add Container</a>
+            <a href="container.html" class="protected-link">Add Container</a> <!-- Admin-only link -->          
             <a href="containers.html">Container List</a>
             <a href="buyers.html">Add Buyer</a>
-            <a href="inventory.html">Sell Inventory</a>
+			<a href="inventory.html" class="protected-link">Sell Inventory</a> <!-- Admin-only link -->
             <a href="purchase.html">Purchase History</a>
-			<a href="received-payment.html">Received Payment</a>
-			<a href="payment-history.html">Payment History</a>
-            <a href="sales-statement.html"> Sales Statement </a>
-			<a href="purchase-return.html"> Purchase Return </a>
-			<a href="return-history.html"> Return History </a>
-			<a href="buyer-timeline.html"> Buyer Timeline </a>
+            <a href="received-payment.html	"class="protected-link">Received Payment</a>
+            <a href="payment-history.html">Payment History</a>
+            <a href="sales-statement.html">Sales Statement</a>
+            <a href="purchase-return.html"	class="protected-link">Purchase Return</a>
+            <a href="return-history.html">Return History</a>
+            <a href="buyer-timeline.html">Buyer Timeline</a>
+			<a href="#" id="logout-btn">Logout</a>
         </div>
         <div class="counter" id="metric-display">
             <button onclick="prevMetric()">&#8249;</button>
@@ -33,6 +35,24 @@
     </div>
 
     <script src="index.js"></script>
-	
+
+    <script>
+        // Ensure the user is logged in
+        fetch('/check-role')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.loggedIn) {
+                    window.location.href = '/login.html'; // Redirect to login if not logged in
+                } else {
+                    // Hide Admin-only links if user is not an Admin
+                    if (data.role !== 'Admin') {
+                        // Hide the Admin links
+                        const adminLinks = document.querySelectorAll('.protected-link');
+                        adminLinks.forEach(link => link.style.display = 'none');
+                    }
+                }
+            });
+    </script>
+
 </body>
 </html>

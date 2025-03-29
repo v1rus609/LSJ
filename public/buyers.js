@@ -70,21 +70,25 @@ function renderTable(data) {
     tableBody.innerHTML = ''; 
 
     data.forEach(buyer => {
-        const row = `
-            <tr>
-                <td>${buyer.id}</td>
-                <td>${buyer.name}</td>
-                <td>${buyer.location}</td>
-                <td>${buyer.contact_number}</td>
-                <td>${formatTableNumber(buyer.opening_balance)}</td> <!-- ✅ Prevents null error -->
-                <td>
-				<button class="delete-btn" onclick="deleteBuyer(${buyer.id})"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>
-                </td>
-            </tr>
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${buyer.id}</td>
+            <td>${buyer.name}</td>
+            <td>${buyer.location}</td>
+            <td>${buyer.contact_number}</td>
+            <td>${formatTableNumber(buyer.opening_balance)}</td>
+            <td class="action-column">
+                <button class="delete-btn" onclick="deleteBuyer(${buyer.id})"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>
+            </td>
         `;
-        tableBody.innerHTML += row;
+        tableBody.appendChild(row);
     });
+
+    if (!window.isAdmin) {
+        document.querySelectorAll('.action-column').forEach(cell => cell.style.display = 'none');
+    }
 }
+
 
 // ✅ **Filter buyers based on search input**
 document.getElementById('search-box').addEventListener('input', function () {
@@ -122,6 +126,23 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+    document.getElementById('logout-btn')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch('/logout', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Logout failed.');
+                }
+            })
+            .catch(err => {
+                console.error('Logout error:', err);
+                alert('Something went wrong during logout.');
+            });
+    });
 
 // ✅ **Handle dropdown visibility**
 document.addEventListener("DOMContentLoaded", function () {

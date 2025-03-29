@@ -285,6 +285,23 @@ document.getElementById('sell-form').addEventListener('submit', function (event)
     });
 });
 
+    document.getElementById('logout-btn')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch('/logout', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Logout failed.');
+                }
+            })
+            .catch(err => {
+                console.error('Logout error:', err);
+                alert('Something went wrong during logout.');
+            });
+    });
+
 document.addEventListener("DOMContentLoaded", function() {
     // Get the dropdown button and menu
     const dropdownButton = document.querySelector(".dropbtn");

@@ -246,6 +246,23 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+    document.getElementById('logout-btn')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch('/logout', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Logout failed.');
+                }
+            })
+            .catch(err => {
+                console.error('Logout error:', err);
+                alert('Something went wrong during logout.');
+            });
+    });
+
 // **Function to Filter Dropdown Options Based on Search**
 function filterDropdownOptions(dropdown, searchTerm) {
     const options = dropdown.querySelectorAll('option');

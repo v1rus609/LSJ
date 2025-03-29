@@ -298,6 +298,15 @@ form button[type="submit"]:hover {
     border-radius: 5px;
 }	
 
+.navbar a.active2 {
+	text-align:left;
+    border-radius: 5px;
+}
+.navbar a.active2:hover {
+	color:white;
+    background: linear-gradient(to bottom, #fb356c, #ff2832);
+}
+
 @media (min-width: 1024px) {
 	
 

@@ -272,8 +272,64 @@ function generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName) {
     };
 }
 
+    document.getElementById('logout-btn')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch('/logout', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Logout failed.');
+                }
+            })
+            .catch(err => {
+                console.error('Logout error:', err);
+                alert('Something went wrong during logout.');
+            });
+    });
 
+		fetch('/check-role')
+			.then(res => res.json())
+			.then(data => {
+				if (!data.loggedIn) {
+					window.location.href = '/login.html';
+					return;
+				}
 
+				window.isAdmin = data.role === 'Admin';
+
+				if (!window.isAdmin) {
+									// 🔒 Hide Action column header
+							const actionHeader = document.getElementById('action-column');
+							if (actionHeader) actionHeader.style.display = 'none';
+				
+					const formElements = document.querySelectorAll('form input, form button');
+					formElements.forEach(el => el.disabled = true);
+
+					const actionsTh = document.querySelector('th:last-child');
+					if (actionsTh && actionsTh.textContent.includes('Actions')) {
+						actionsTh.style.display = 'none';
+					}
+										// 🔒 Hide Admin-only navbar links
+							const protectedLinks = document.querySelectorAll('.admin-only');
+							protectedLinks.forEach(link => link.style.display = 'none');
+				}
+
+				return fetch('/buyers/list');
+			})
+			.then(response => {
+				if (!response.ok) throw new Error('Failed to fetch buyer data.');
+				return response.json();
+			})
+			.then(data => {
+				buyerData = data;
+				renderTable(buyerData);
+			})
+			.catch(error => {
+				console.error('❌ Error fetching buyers:', error);
+				document.getElementById('error-message').style.display = 'block';
+			});
 
 document.addEventListener("DOMContentLoaded", function() {
     // Get the dropdown button and menu

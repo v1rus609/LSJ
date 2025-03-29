@@ -52,50 +52,79 @@ function fetchReturnHistory() {
     if (startDate) query += `start_date=${startDate}&`;
     if (endDate) query += `end_date=${endDate}`;
 
-    fetch(query)
-        .then(response => response.json())
-        .then(data => {
-            tableBody.innerHTML = ''; // Clear the existing table data
+fetch(query)
+    .then(response => response.json())
+    .then(data => {
+        tableBody.innerHTML = ''; // Clear the existing table data
 
-            let totalReturnedKg = 0;
-            let totalAmount = 0;
+        let totalReturnedKg = 0;
+        let totalAmount = 0;
 
-            if (data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="7">No data found</td></tr>';
-            }
+        if (data.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="7">No data found</td></tr>';
+        }
 
-            data.forEach((returnRecord, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = ` 
-                    <td>${index + 1}</td>
-                    <td>${returnRecord.buyer_name}</td>
-                    <td>${returnRecord.container_number}</td>
-                    <td>${formatDate(returnRecord.return_date)}</td>
-                    <td>${formatNumberWithCommas(returnRecord.returned_kg)}</td>
-                    <td>${formatNumberWithCommas(returnRecord.returned_price_per_kg)}</td>
-                    <td>${formatNumberWithCommas(returnRecord.total_amount)}</td>
+        data.forEach((returnRecord, index) => {
+            const row = document.createElement('tr');
+
+            let actionCell = '';
+            if (window.isAdmin) {
+                actionCell = `
                     <td>
-						<button class="edit-btn" data-id="${returnRecord.id}"><span class="edit-text">Edit</span><i class="fas fa-edit"></i></button>
-						<button class="delete-btn" data-id="${returnRecord.id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>	
+                        <button class="edit-btn" data-id="${returnRecord.id}"><span class="edit-text">Edit</span><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" data-id="${returnRecord.id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>
                     </td>
                 `;
-                tableBody.appendChild(row);
+            }
 
-                // Add to total values
-                totalReturnedKg += parseFloat(returnRecord.returned_kg) || 0;
-                totalAmount += parseFloat(returnRecord.total_amount) || 0;
-            });
-
-            // ✅ Update total row
-            totalRow.innerHTML = `
-                <td colspan="4" style="text-align: center;"><strong>Total</strong></td>
-                <td><strong>${formatNumberWithCommas(totalReturnedKg)}</strong></td>
-                <td></td>
-                <td><strong>${formatNumberWithCommas(totalAmount)}</strong></td>
+            row.innerHTML = ` 
+                <td>${index + 1}</td>
+                <td>${returnRecord.buyer_name}</td>
+                <td>${returnRecord.container_number}</td>
+                <td>${formatDate(returnRecord.return_date)}</td>
+                <td>${formatNumberWithCommas(returnRecord.returned_kg)}</td>
+                <td>${formatNumberWithCommas(returnRecord.returned_price_per_kg)}</td>
+                <td>${formatNumberWithCommas(returnRecord.total_amount)}</td>
+                ${actionCell}
             `;
-        })
-        .catch(error => console.error('Error fetching return history:', error));
+            tableBody.appendChild(row);
+
+            // Add to total values
+            totalReturnedKg += parseFloat(returnRecord.returned_kg) || 0;
+            totalAmount += parseFloat(returnRecord.total_amount) || 0;
+        });
+
+        // ✅ Update total row
+        totalRow.innerHTML = `
+            <td colspan="4" style="text-align: center;"><strong>Total</strong></td>
+            <td><strong>${formatNumberWithCommas(totalReturnedKg)}</strong></td>
+            <td></td>
+            <td><strong>${formatNumberWithCommas(totalAmount)}</strong></td>
+        `;
+    })
+    .catch(error => console.error('Error fetching return history:', error));
 }
+
+// ✅ Fetch role before doing anything
+fetch('/check-role')
+    .then(res => res.json())
+    .then(data => {
+        if (!data.loggedIn) {
+            window.location.href = '/login.html';
+            return;
+        }
+        window.isAdmin = data.role === 'Admin';
+		
+						if (!window.isAdmin) {
+	
+										// 🔒 Hide Admin-only navbar links
+							const protectedLinks = document.querySelectorAll('.admin-only');
+							protectedLinks.forEach(link => link.style.display = 'none');
+				}
+
+        // Proceed with loading return history (query should be defined beforehand)
+        fetch(query); // or call your function that wraps this fetch logic
+    });
 
 // ✅ Helper function: Format numbers with commas
 function formatNumberWithCommas(number) {
@@ -475,7 +504,22 @@ document.getElementById('export-pdf-return-history').addEventListener('click', f
             .catch(error => console.error('Error fetching buyers:', error));
     }
 
-
+    document.getElementById('logout-btn')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch('/logout', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Logout failed.');
+                }
+            })
+            .catch(err => {
+                console.error('Logout error:', err);
+                alert('Something went wrong during logout.');
+            });
+    });
 
 document.addEventListener("DOMContentLoaded", function() {
     // Get the dropdown button and menu
