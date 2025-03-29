@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const bcrypt = require('bcryptjs');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
@@ -12,7 +14,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 // Routes
 app.use('/containers', require('./routes/containers'));
 
@@ -21,27 +22,130 @@ app.use('/buyers', buyersRoutes);
 
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// Add a New Buyer
-app.post('/buyers/add', (req, res) => {
-    const { name, location, contact_number, paid_amount, unpaid_amount, total_amount } = req.body;
+// Set up session middleware
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true
+}));
 
-    if (!name || !location || !contact_number || paid_amount || unpaid_amount  || total_amount ) {
-        return res.status(400).send('All fields are required.');
+// Dummy users for testing (hashed admin password)
+const users = [
+    { 
+        id: 1, 
+        username: 'admin', 
+        password: bcrypt.hashSync('admin123', 10),  // Hash the admin password
+        role: 'Admin' 
+    }, 
+    { 
+        id: 2, 
+        username: 'user', 
+        password: bcrypt.hashSync('user123', 10), 
+        role: 'User' 
     }
+];
 
-    const insertQuery = `
-        INSERT INTO buyers (name, location, contact_number, paid_amount, unpaid_amount, total_amount)
-        VALUES (?, ?, ?, ?, ?, ?)
-    `;
+// Middleware to ensure user is logged in
+const ensureLoggedIn = (req, res, next) => {
+    if (req.session.userId) {
+        return next(); // If user is logged in, proceed
+    } else {
+        return res.redirect('/login.html'); // If not logged in, redirect to login page
+    }
+};
 
-    db.run(insertQuery, [name, location, contact_number, paid_amount, unpaid_amount, total_amount], function (err) {
+// Middleware to ensure user is an Admin
+const ensureAdmin = (req, res, next) => {
+    console.log('Session Role:', req.session.role);  // Debugging log to check session role
+    if (req.session.role === 'Admin') {
+        return next(); // Proceed if Admin
+    } else {
+        console.log('Access Denied - Not Admin');
+        return res.status(403).send('Access denied: You do not have permission to view this page.');
+    }
+};
+
+// Middleware to prevent access to login page if already logged in
+const preventLoginPage = (req, res, next) => {
+    if (req.session.userId) {
+        return res.redirect('/index.html'); // Redirect to the home page if already logged in
+    }
+    next(); // Otherwise, continue to the login page
+};
+
+// Login route (applies preventLoginPage middleware)
+app.post('/login', preventLoginPage, (req, res) => {
+    const { username, password } = req.body;
+
+    const user = users.find(u => u.username === username);
+
+    if (user && bcrypt.compareSync(password, user.password)) {
+        req.session.userId = user.id;
+        req.session.role = user.role;
+
+        const redirectTo = '/index.html';  // Both Admin and User redirected to index.html
+        res.json({ success: true, redirectTo });  // Ensure this sends back JSON
+    } else {
+        res.json({ success: false });  // JSON response for login failure
+    }
+});
+
+
+
+// Admin-only page (accessible only for Admin)
+app.get('/admin-page', ensureLoggedIn, (req, res) => {
+    if (req.session.role !== 'Admin') {
+        return res.status(403).send('Access denied');
+    }
+    res.send('Welcome to the Admin Page');
+});
+
+// User-only page (accessible only for Users)
+app.get('/user-page', ensureLoggedIn, (req, res) => {
+    if (req.session.role !== 'User') {
+        return res.status(403).send('Access denied');
+    }
+    res.send('Welcome to the User Page');
+});
+
+// Apply the middleware for restricted routes
+app.get('/container.html', ensureLoggedIn, ensureAdmin, (req, res) => {
+    res.sendFile(__dirname + '/container.html'); // Only accessible by Admins
+});
+
+app.get('/inventory.html', ensureLoggedIn, ensureAdmin, (req, res) => {
+    res.sendFile(__dirname + '/inventory.html');
+});
+
+app.get('/buyers.html', ensureLoggedIn, ensureAdmin, (req, res) => {
+    res.sendFile(__dirname + '/buyers.html');
+});
+
+// Add more Admin-only routes as needed
+app.get('/index.html', ensureLoggedIn, (req, res) => {
+    res.sendFile(__dirname + '/index.html'); // Home page, accessible only after login
+});
+
+// Endpoint to check if the user is logged in and their role
+app.get('/check-role', (req, res) => {
+    if (req.session.userId) {
+        return res.json({ loggedIn: true, role: req.session.role });
+    } else {
+        return res.json({ loggedIn: false });
+    }
+});
+
+// Logout route
+app.post('/logout', (req, res) => {
+    req.session.destroy((err) => {
         if (err) {
-            console.error('Error inserting buyer:', err.message);
-            return res.status(500).send('Error saving buyer.');
+            return res.status(500).json({ success: false });
         }
-        res.redirect('/buyers.html?message=Buyer%20added%20successfully');
+        res.clearCookie('connect.sid');
+        res.json({ success: true });
     });
 });
+
 
 // Fetch Buyer List
 app.get('/buyers/list', (req, res) => {
