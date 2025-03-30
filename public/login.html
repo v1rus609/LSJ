@@ -23,35 +23,49 @@
         </form>
         <p id="error-message" style="color:red; display:none;">Invalid credentials</p>
     </div>
-
-    <script>
-        document.getElementById('login-form').addEventListener('submit', function(event) {
-            event.preventDefault();  // Prevent form submission (default behavior)
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            // Send the login credentials to the backend
-            fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })  // Send username and password as JSON
-            })
-            .then(response => response.json())  // Parse the response from the backend
-            .then(data => {
-                if (data.success) {
-                    // If login is successful, redirect to the appropriate page (admin or user)
-                    window.location.href = data.redirectTo; // Redirect based on role
-                } else {
-                    // If login fails, show an error message
-                    document.getElementById('error-message').style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('Error during login:', error);
-            });
+<script>
+    // 👮 Check if already logged in
+    fetch('/check-role')
+        .then(res => res.json())
+        .then(data => {
+            if (data.loggedIn) {
+                window.location.href = '/index.html';
+            }
+        })
+        .catch(err => {
+            console.error('Error checking session:', err);
         });
-    </script>
+</script>
+
+<script>
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // ✅ Redirect all users (Admin or User) to index.html
+                window.location.href = '/index.html';
+            } else {
+                document.getElementById('error-message').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error during login:', error);
+        });
+    });
+</script>
+
+
 </body>
 </html>

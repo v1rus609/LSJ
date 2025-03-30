@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Download Database</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .download-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .download-container h2 {
+            margin-bottom: 20px;
+        }
+
+        .download-container a {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #2dabe2;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .download-container a:hover {
+            background-color: #1a92c7;
+        }
+    </style>
+</head>
+<body>
+    <div class="download-container">
+        <h2>Download Current Database</h2>
+        <a href="/download-db" download>📥 Download database.db</a>
+    </div>
+</body>
+</html>
