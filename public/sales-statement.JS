@@ -136,6 +136,24 @@ function updateSalesTable(salesData, purchaseReturnsData, buyersData) {
     });
 }
 
+fetch('/check-role')
+    .then(res => res.json())
+    .then(data => {
+        if (!data.loggedIn) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        isAdmin = data.role === 'Admin';
+
+        if (!isAdmin) {
+            document.getElementById('export-sales-statement')?.remove();
+            document.getElementById('export-pdf-btn')?.remove();
+        }
+
+        fetchFilters();
+        fetchPurchases();
+    });
 
 // ✅ Function to Fetch and Update Balance Table
 function fetchSalesAndBalanceUpdates() {

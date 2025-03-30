@@ -105,6 +105,25 @@ fetch(query)
     .catch(error => console.error('Error fetching return history:', error));
 }
 
+fetch('/check-role')
+    .then(res => res.json())
+    .then(data => {
+        if (!data.loggedIn) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        isAdmin = data.role === 'Admin';
+
+        if (!isAdmin) {
+            document.getElementById('export-excel-return-history')?.remove();
+            document.getElementById('export-pdf-return-history')?.remove();
+        }
+
+        fetchFilters();
+        fetchPurchases();
+    });
+
 // ✅ Fetch role before doing anything
 fetch('/check-role')
     .then(res => res.json())

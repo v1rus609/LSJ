@@ -120,6 +120,25 @@ data.timeline.forEach((entry) => {
 	});
 
  });
+ 
+ fetch('/check-role')
+    .then(res => res.json())
+    .then(data => {
+        if (!data.loggedIn) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        isAdmin = data.role === 'Admin';
+
+        if (!isAdmin) {
+            document.getElementById('export-excel')?.remove();
+            document.getElementById('export-pdf')?.remove();
+        }
+
+        fetchFilters();
+        fetchPurchases();
+    });
 
 // Export to Excel
 document.getElementById('export-excel').addEventListener('click', function () {

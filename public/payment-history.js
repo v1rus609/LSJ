@@ -183,6 +183,25 @@ document.getElementById('close-edit-btn').addEventListener('click', function () 
     document.getElementById('edit-payment-form').style.display = 'none';
 });
 
+fetch('/check-role')
+    .then(res => res.json())
+    .then(data => {
+        if (!data.loggedIn) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        isAdmin = data.role === 'Admin';
+
+        if (!isAdmin) {
+            document.getElementById('export-btn')?.remove();
+            document.getElementById('export-pdf-btn')?.remove();
+        }
+
+        fetchFilters();
+        fetchPurchases();
+    });
+
 
 // Update payment record with confirmation dialog
 document.getElementById('update-payment-btn').addEventListener('click', function () {

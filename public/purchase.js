@@ -115,7 +115,25 @@ fetch('/check-role')
         fetchPurchases();
     });
 
+fetch('/check-role')
+    .then(res => res.json())
+    .then(data => {
+        if (!data.loggedIn) {
+            window.location.href = '/login.html';
+            return;
+        }
 
+        isAdmin = data.role === 'Admin';
+
+        if (!isAdmin) {
+            document.getElementById('export-btn')?.remove();
+            document.getElementById('export-pdf-btn')?.remove();
+        }
+
+        fetchFilters();
+        fetchPurchases();
+    });
+	
 // Apply filters immediately when a buyer or container is selected
 document.getElementById('buyer-filter').addEventListener('change', function () {
     const filters = {
