@@ -45,54 +45,55 @@ const users = [
     }
 ];
 
-// Middleware to ensure user is logged in
+// ✅ Middleware to ensure user is logged in
 const ensureLoggedIn = (req, res, next) => {
     if (req.session.userId) {
-        return next(); // If user is logged in, proceed
+        return next();
     } else {
-        return res.redirect('/login.html'); // If not logged in, redirect to login page
+        return res.redirect('/login.html');
     }
 };
 
-// Middleware to ensure user is an Admin
+// ✅ Middleware to ensure user is an Admin
 const ensureAdmin = (req, res, next) => {
-    console.log('Session Role:', req.session.role);  // Debugging log to check session role
+    console.log('Session Role:', req.session.role);
     if (req.session.role === 'Admin') {
-        return next(); // Proceed if Admin
+        return next();
     } else {
         console.log('Access Denied - Not Admin');
         return res.status(403).send('Access denied: You do not have permission to view this page.');
     }
 };
 
-// Middleware to prevent access to login page if already logged in
+// ✅ Middleware to prevent access to login page if already logged in
 const preventLoginPage = (req, res, next) => {
     if (req.session.userId) {
-        return res.redirect('/index.html'); // Redirect to the home page if already logged in
+        return res.redirect('/index.html');
     }
-    next(); // Otherwise, continue to the login page
+    next();
 };
 
-// Login route (applies preventLoginPage middleware)
+// ✅ Route to serve login.html with session check
+app.get('/login.html', preventLoginPage, (req, res) => {
+    res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+// ✅ Login handler (POST)
 app.post('/login', preventLoginPage, (req, res) => {
     const { username, password } = req.body;
-
     const user = users.find(u => u.username === username);
 
     if (user && bcrypt.compareSync(password, user.password)) {
         req.session.userId = user.id;
         req.session.role = user.role;
 
-        const redirectTo = '/index.html';  // Both Admin and User redirected to index.html
-        res.json({ success: true, redirectTo });  // Ensure this sends back JSON
+        res.json({ success: true, redirectTo: '/index.html' });
     } else {
-        res.json({ success: false });  // JSON response for login failure
+        res.json({ success: false });
     }
 });
 
-
-
-// Admin-only page (accessible only for Admin)
+// ✅ Admin-only page example
 app.get('/admin-page', ensureLoggedIn, (req, res) => {
     if (req.session.role !== 'Admin') {
         return res.status(403).send('Access denied');
@@ -100,7 +101,7 @@ app.get('/admin-page', ensureLoggedIn, (req, res) => {
     res.send('Welcome to the Admin Page');
 });
 
-// User-only page (accessible only for Users)
+// ✅ User-only page example
 app.get('/user-page', ensureLoggedIn, (req, res) => {
     if (req.session.role !== 'User') {
         return res.status(403).send('Access denied');
@@ -145,6 +146,17 @@ app.post('/logout', (req, res) => {
         res.json({ success: true });
     });
 });
+
+app.get('/download-db', ensureLoggedIn, (req, res) => {
+    const filePath = path.join(__dirname, 'database.db');
+    res.download(filePath, 'database.db', (err) => {
+        if (err) {
+            console.error('Error downloading database:', err);
+            res.status(500).send('Error downloading the file.');
+        }
+    });
+});
+
 
 
 // Fetch Buyer List
