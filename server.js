@@ -149,13 +149,22 @@ app.post('/logout', (req, res) => {
 
 app.get('/download-db', ensureLoggedIn, (req, res) => {
     const filePath = path.join(__dirname, 'database.db');
-    res.download(filePath, 'database.db', (err) => {
+
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+
+    const filename = `database-${yyyy}-${mm}-${dd}.db`;
+
+    res.download(filePath, filename, (err) => {
         if (err) {
-            console.error('Error downloading database:', err);
+            console.error('❌ Error downloading database:', err);
             res.status(500).send('Error downloading the file.');
         }
     });
 });
+
 
 
 
