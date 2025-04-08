@@ -304,8 +304,21 @@ app.get('/dashboard-metrics', (req, res) => {
         FROM sales`;
     const queryTotalBuyers = `SELECT COUNT(*) AS total_buyers FROM buyers`;
     const queryTotalContainers = `SELECT COUNT(*) AS total_containers FROM containers`;
-    const queryRemainingWeight = `SELECT IFNULL(SUM(remaining_weight), 0) AS total_remaining_weight FROM containers`;  // Query for remaining weight
-    const queryOpeningBalance = `SELECT IFNULL(SUM(opening_balance), 0) AS total_opening_balance FROM buyers`; // Query for opening balance
+
+    // Query for calculating total remaining weight dynamically
+    const queryRemainingWeight = `
+        SELECT 
+            SUM(c.weight - IFNULL(s.total_weight_sold, 0) + IFNULL(pr.total_weight_returned, 0)) AS total_remaining_weight
+        FROM containers c
+        LEFT JOIN 
+            (SELECT container_id, SUM(weight_sold) AS total_weight_sold FROM sales GROUP BY container_id) s
+            ON c.id = s.container_id
+        LEFT JOIN 
+            (SELECT container_id, SUM(returned_kg) AS total_weight_returned FROM purchase_returns GROUP BY container_id) pr
+            ON c.id = pr.container_id;
+    `;
+
+    const queryOpeningBalance = `SELECT IFNULL(SUM(opening_balance), 0) AS total_opening_balance FROM buyers`; 
 
     db.serialize(() => {
         let metrics = {
@@ -316,69 +329,57 @@ app.get('/dashboard-metrics', (req, res) => {
             total_buyers: 0,
             total_containers: 0,
             total_remaining_weight: 0,
-            total_opening_balance: 0 // New field for opening balance
+            total_opening_balance: 0
         };
-
-        console.log("🔍 Fetching dashboard metrics...");
 
         db.get(queryTotalSell, (err, row) => {
             if (err) return res.status(500).send('Error fetching total sales.');
             metrics.total_sell = row.total_sell || 0;
-            console.log(`🟢 Total Sales: ${metrics.total_sell}`);
         });
 
         db.get(queryTotalPurchaseReturns, (err, row) => {
             if (err) return res.status(500).send('Error fetching total purchase returns.');
             metrics.total_purchase_returns = row.total_purchase_returns || 0;
-            console.log(`🟠 Total Purchase Returns: ${metrics.total_purchase_returns}`);
         });
 
         db.get(queryTotalPaid, (err, row) => {
             if (err) return res.status(500).send('Error fetching total paid.');
             metrics.total_paid = row.total_paid || 0;
-            console.log(`🔵 Total Paid: ${metrics.total_paid}`);
         });
 
         db.get(queryTotalBuyers, (err, row) => {
             if (err) return res.status(500).send('Error fetching total buyers.');
             metrics.total_buyers = row.total_buyers || 0;
-            console.log(`👥 Total Buyers: ${metrics.total_buyers}`);
         });
 
         db.get(queryTotalContainers, (err, row) => {
             if (err) return res.status(500).send('Error fetching total containers.');
             metrics.total_containers = row.total_containers || 0;
-            console.log(`📦 Total Containers: ${metrics.total_containers}`);
         });
 
-        db.get(queryRemainingWeight, (err, row) => { // Fetch remaining weight
-            if (err) return res.status(500).send('Error fetching total remaining weight.');
-            metrics.total_remaining_weight = row.total_remaining_weight || 0; // Add the remaining weight to the metrics
-            console.log(`📦 Total Remaining Weight: ${metrics.total_remaining_weight}`);
+        db.get(queryRemainingWeight, (err, row) => {
+            if (err) return res.status(500).send('Error fetching remaining weight.');
+            metrics.total_remaining_weight = row.total_remaining_weight || 0; // Add remaining weight dynamically
         });
 
-        db.get(queryOpeningBalance, (err, row) => { // Fetch opening balance for all buyers
+        db.get(queryOpeningBalance, (err, row) => {
             if (err) return res.status(500).send('Error fetching opening balance.');
             metrics.total_opening_balance = row.total_opening_balance || 0;
-            console.log(`📊 Total Opening Balance: ${metrics.total_opening_balance}`);
         });
 
-        // ✅ Ensure calculations happen after all queries complete
         setTimeout(() => {
-            // ✅ Calculate Net Sales (Including Opening Balance)
+            // Calculate Net Sales (Including Opening Balance)
             metrics.net_sale = metrics.total_sell + metrics.total_opening_balance - metrics.total_purchase_returns;
-            console.log(`💰 Net Sales Calculated (Including Opening Balance): ${metrics.net_sale}`);
 
-            // ✅ Calculate Total Unpaid Correctly
+            // Calculate Total Unpaid Correctly
             metrics.total_unpaid = metrics.net_sale - metrics.total_paid;
             if (isNaN(metrics.total_unpaid)) metrics.total_unpaid = 0; // Prevent NaN
-
-            console.log(`📊 Final Metrics:\n`, metrics);
 
             res.json(metrics);
         }, 500);
     });
 });
+
 
 // Handle received payment
 app.post('/payments/receive', (req, res) => {
@@ -867,24 +868,15 @@ app.post('/sales/statement/update/:buyerId', (req, res) => {
 });
 
 
-// ✅ **API: Fetch Updated Containers List with Correct Remaining Weight Calculation**
+// Fetch containers (only for dropdown, no remaining weight needed for inventory or purchase pages)
 app.get('/containers/list', (req, res) => {
     const query = `
         SELECT 
             c.id AS container_id,
             c.container_number,
             c.weight AS initial_weight,
-            c.arrival_date,
-            IFNULL(s.total_weight_sold, 0) AS total_weight_sold,
-            IFNULL(pr.total_weight_returned, 0) AS total_weight_returned,
-            (c.weight - IFNULL(s.total_weight_sold, 0) + IFNULL(pr.total_weight_returned, 0)) AS remaining_weight
+            c.arrival_date
         FROM containers c
-        LEFT JOIN 
-            (SELECT container_id, SUM(weight_sold) AS total_weight_sold FROM sales GROUP BY container_id) s
-            ON c.id = s.container_id
-        LEFT JOIN 
-            (SELECT container_id, SUM(returned_kg) AS total_weight_returned FROM purchase_returns GROUP BY container_id) pr
-            ON c.id = pr.container_id;
     `;
 
     db.all(query, [], (err, rows) => {
@@ -893,9 +885,10 @@ app.get('/containers/list', (req, res) => {
             return res.status(500).json({ error: 'Failed to fetch containers' });
         }
 
-        res.json(rows);  // ✅ Return correct remaining weight
+        res.json(rows);  // Return containers without remaining_weight
     });
 });
+
 
 // ✅ API to fetch all purchase returns (needed for frontend calculations)
 app.get('/purchase-return/list', (req, res) => {
@@ -1215,15 +1208,45 @@ app.put('/purchase-record/update', (req, res) => {
 
 // Delete a purchase record
 app.delete('/purchase-record/delete/:id', (req, res) => {
-    const id = req.params.id;
-    db.run('DELETE FROM sales WHERE id = ?', [id], function(err) {
-        if (err) {
-            console.error('Error deleting purchase record:', err);
-            return res.status(500).json({ success: false, error: 'Failed to delete record' });
-        }
-        res.json({ success: true });
+    const saleId = req.params.id;
+    
+    // Start a database transaction
+    db.serialize(() => {
+        // Step 1: Fetch the sale's weight_sold and container_id
+        db.get('SELECT weight_sold, container_id FROM sales WHERE id = ?', [saleId], (err, row) => {
+            if (err) {
+                console.error('Error fetching sale details:', err.message);
+                return res.status(500).json({ success: false, error: 'Error fetching sale details' });
+            }
+
+            if (!row) {
+                return res.status(404).json({ success: false, error: 'Sale not found' });
+            }
+
+            const { weight_sold, container_id } = row;
+
+            // Step 2: Update the remaining_weight of the container
+            db.run('UPDATE containers SET remaining_weight = remaining_weight + ? WHERE id = ?', [weight_sold, container_id], function (err) {
+                if (err) {
+                    console.error('Error updating container remaining_weight:', err.message);
+                    return res.status(500).json({ success: false, error: 'Error updating container remaining weight' });
+                }
+
+                // Step 3: Delete the sale record
+                db.run('DELETE FROM sales WHERE id = ?', [saleId], function (err) {
+                    if (err) {
+                        console.error('Error deleting sale record:', err.message);
+                        return res.status(500).json({ success: false, error: 'Failed to delete sale' });
+                    }
+
+                    // Step 4: Respond to the client
+                    res.json({ success: true, message: 'Sale deleted and container updated successfully' });
+                });
+            });
+        });
     });
 });
+
 
 
 // Get all purchase return records with optional filters for buyer, container, start date, and end date
