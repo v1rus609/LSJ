@@ -5,6 +5,8 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Link to Font Awesome for the trash icon -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
     <link rel="stylesheet" href="buyer-timeline.css">
 </head>
 <body>
@@ -57,22 +59,24 @@
         </tr>
     </thead>
     <tbody></tbody>
-    <tfoot>
-        <tr>
-            <td colspan="6" style="text-align: right; padding-right: 20px;"><strong>Total</strong></td>
-            <td id="total-cash">0</td>
-            <td id="total-bank">0</td>
-            <td id="total-non-cash">0</td>
-            <td id="total-bill">0</td>
-            <td id="total-taka">0</td>
-        </tr>
-    </tfoot>
+<tfoot>
+    <tr>
+        <td colspan="4"><strong>Total</strong></td>
+        <td id="total-quantity">0</td> <!-- Total Quantity -->
+		<td id="total-rate"></td>
+        <td id="total-cash">0</td>
+        <td id="total-bank">0</td>
+        <td id="total-non-cash">0</td>
+        <td id="total-bill">0</td>
+        <td id="total-taka">0</td>
+    </tr>
+</tfoot>
 </table>
 </div>
 
 		
 		<button id="export-excel"><span class="excel-text">Export to Excel</span><i class="fas fa-file-excel"></i></button>	
-		<button id="export-pdf" onclick="exportToPDF()"><span class="pdf-text">Export to PDF</span><i class="fas fa-file-pdf"></i></button>	
+		<button id="export-pdf"><span class="pdf-text">Export to PDF</span><i class="fas fa-file-pdf"></i></button>	
 		
         <script src="buyer-timeline.js"></script>
 

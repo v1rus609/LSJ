@@ -24,10 +24,9 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error fetching containers:', error);
             document.getElementById('error-message').style.display = 'block'; // Show error message if data fetch fails
         });
-
-   function renderTable(data) {
+function renderTable(data) {
     containerList.innerHTML = ''; // Clear existing rows
-    let totalSold = 0, totalReturned = 0, totalRemaining = 0; // Initialize totals
+    let totalSold = 0, totalReturned = 0, totalRemaining = 0, totalWeight = 0; // Initialize totals
 
     data.forEach(container => {
         const arrivalDate = new Date(container.arrival_date);
@@ -37,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         totalSold += parseFloat(container.total_weight_sold) || 0;
         totalReturned += parseFloat(container.total_weight_returned) || 0;
         totalRemaining += parseFloat(container.remaining_weight) || 0;
+        totalWeight += parseFloat(container.weight) || 0; // Accumulate total weight
 
         const row = `
             <tr>
@@ -53,14 +53,15 @@ document.addEventListener('DOMContentLoaded', function () {
         containerList.innerHTML += row;
     });
 
-    // Totals Row
+    // Totals Row (including total of Weight column)
     const totalRow = `
         <tr class="total-row">
-            <td colspan="4"><strong>Totals:</strong></td>
+            <td colspan="3"><strong>Totals:</strong></td>
+            <td><strong>${formatNumberWithCommas(totalWeight)}</strong></td> <!-- Total Weight -->
             <td><strong>${formatNumberWithCommas(totalSold)}</strong></td>
             <td><strong>${formatNumberWithCommas(totalReturned)}</strong></td>
             <td><strong>${formatNumberWithCommas(totalRemaining)}</strong></td>
-
+            <td></td> <!-- Empty cell for Action column -->
         </tr>
     `;
     containerList.innerHTML += totalRow;

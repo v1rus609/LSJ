@@ -175,68 +175,73 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const table = document.getElementById('purchase-table');
 
-table.addEventListener('click', function (event) {
-    let target = event.target;
+    table.addEventListener('click', function (event) {
+        let target = event.target;
 
-    // Ensure we always target the button (even if clicking on the icon inside it)
-    if (target.tagName === 'I') {
-        target = target.closest('button'); 
-    }
+        // Ensure we always target the button (even if clicking on the icon inside it)
+        if (target.tagName === 'I') {
+            target = target.closest('button'); 
+        }
 
-    if (target && target.classList.contains('edit-btn')) {
-        const id = target.getAttribute('data-id');
-
-        fetch(`/purchase-record/${id}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log('Fetched record for editing:', data);
-
-                document.getElementById('purchase-date').value = data.purchase_date;
-                document.getElementById('buyer-name').value = data.buyer_name || "N/A";
-                document.getElementById('buyer-filter').value = data.buyer_id;
-                document.getElementById('quantity').value = data.weight_sold;
-                document.getElementById('rate').value = data.price_per_kg;
-                document.getElementById('paid-amount').value = data.paid_amount;
-                document.getElementById('unpaid-amount').value = data.unpaid_amount;
-                document.getElementById('total-price').value = data.total_price;
-                document.getElementById('purchase-id').value = data.sale_id;
-                document.getElementById('bill-no').value = data.bill_no || '';
-
-                document.getElementById('buyer-name').disabled = true;
-                document.getElementById('edit-form').style.display = 'block';
-            })
-            .catch(err => console.error('Error fetching purchase data:', err));
-    }
-
-    if (target && target.classList.contains('delete-btn')) {
-        const id = target.getAttribute('data-id');
-        if (confirm('Are you sure you want to delete this record?')) {
-            fetch(`/purchase-record/delete/${id}`, {
-                method: 'DELETE',
-            })
+        // Handle Edit Button
+        if (target && target.classList.contains('edit-btn')) {
+            const id = target.getAttribute('data-id');
+            fetch(`/purchase-record/${id}`)
                 .then(response => response.json())
                 .then(data => {
-                    alert('Purchase record deleted successfully');
-                    location.reload(); // Refresh the table
+                    // Fill form fields with data
+                    document.getElementById('purchase-date').value = data.purchase_date;
+                    document.getElementById('buyer-name').value = data.buyer_name || "N/A";
+                    document.getElementById('buyer-filter').value = data.buyer_id;
+                    document.getElementById('quantity').value = data.weight_sold;
+                    document.getElementById('rate').value = data.price_per_kg;
+                    document.getElementById('paid-amount').value = data.paid_amount;
+                    document.getElementById('unpaid-amount').value = data.unpaid_amount;
+                    document.getElementById('total-price').value = data.total_price;
+                    document.getElementById('purchase-id').value = data.sale_id;
+                    document.getElementById('bill-no').value = data.bill_no || '';
+                    document.getElementById('buyer-name').disabled = true;
+                    document.getElementById('edit-form').style.display = 'block';
                 })
-                .catch(error => console.error('Error deleting purchase record:', error));
+                .catch(err => console.error('Error fetching purchase data:', err));
         }
-    }
-});
 
+        // Handle Delete Button
+        if (target && target.classList.contains('delete-btn')) {
+            const id = target.getAttribute('data-id');
+            if (confirm('Are you sure you want to delete this record?')) {
+                // Call backend to delete the sale
+                fetch(`/purchase-record/delete/${id}`, {
+                    method: 'DELETE',
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Purchase record deleted successfully');
+                            // Re-fetch the purchase data to update the table
+                            fetchPurchases(); // This will update the table with the latest data
+                        } else {
+                            alert('Failed to delete purchase record');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting purchase record:', error);
+                    });
+            }
+        }
+    });
 
     // Recalculate the Price and Unpaid Amount when any of the fields change
     document.getElementById('quantity').addEventListener('input', updatePriceAndUnpaidAmount);
     document.getElementById('rate').addEventListener('input', updatePriceAndUnpaidAmount);
     document.getElementById('paid-amount').addEventListener('input', updateUnpaidAmount);
 
+    // Price and Unpaid Amount Calculation
     function updatePriceAndUnpaidAmount() {
         const quantity = parseFloat(document.getElementById('quantity').value) || 0;
         const rate = parseFloat(document.getElementById('rate').value) || 0;
         const price = quantity * rate;
-
         document.getElementById('total-price').value = price.toFixed(2); // Set the Price (Quantity * Rate)
-
         updateUnpaidAmount(); // Recalculate Unpaid Amount whenever Price is updated
     }
 
@@ -244,7 +249,6 @@ table.addEventListener('click', function (event) {
         const price = parseFloat(document.getElementById('total-price').value) || 0;
         const paidAmount = parseFloat(document.getElementById('paid-amount').value) || 0;
         const unpaidAmount = price - paidAmount;
-
         document.getElementById('unpaid-amount').value = unpaidAmount.toFixed(2); // Set the Unpaid Amount (Price - Paid Amount)
     }
 
@@ -297,6 +301,7 @@ table.addEventListener('click', function (event) {
         .catch(error => console.error('Error updating purchase record:', error));
     });
 });
+
 
         // Helper function to format numbers with commas
         function formatNumberWithCommas(number) {

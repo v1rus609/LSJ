@@ -203,7 +203,7 @@ tbody tr:hover {
     background-color: #d0e2ff;
 }
 
-#total-cash, #total-bank, #total-non-cash, #total-bill, #total-taka {
+#total-quantity, #total-cash, #total-bank, #total-non-cash, #total-bill, #total-taka {
     font-weight: bold;
 }
 

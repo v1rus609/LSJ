@@ -63,7 +63,9 @@ document.getElementById('buyer-search').addEventListener('input', function () {
 fetch('/containers/list')
     .then(response => response.json())
     .then(data => {
-        containerData = data;
+        // Filter out containers where remaining weight is 0
+        const availableContainers = data.filter(container => container.remaining_weight > 0);
+        containerData = availableContainers;
         document.querySelectorAll('.container-dropdown').forEach(dropdown => {
             renderContainerDropdown(dropdown, containerData);
         });
@@ -321,3 +323,4 @@ document.addEventListener("DOMContentLoaded", function() {
         dropdownContent.style.display = "none";
     });
 });
+
