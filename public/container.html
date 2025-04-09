@@ -44,10 +44,10 @@
 	   <h1>Add Container</h1>
         <form action="/containers/add" method="POST">
             <label for="container_number">Container Number:</label>
-            <input type="text" id="container_number" name="container_number" required>
+            <input type="text" id="container_number" name="container_number" required autocomplete="off">
 
             <label for="weight">Weight (kg):</label>
-            <input type="text" id="weight" name="weight" step="0.01" required>
+            <input type="text" id="weight" name="weight" step="0.01" required autocomplete="off">
 
             <label for="arrival_date">Arrival Date:</label>
             <input type="date" id="arrival_date" name="arrival_date" required>

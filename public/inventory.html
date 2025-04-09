@@ -38,7 +38,7 @@
 	<h1>Sell Inventory</h1>
 	
 		<label for="buyer-search">Search Buyer:</label><br>
-		<input type="text" id="buyer-search" placeholder="Search Buyer..."><br><br>
+		<input type="text" id="buyer-search" placeholder="Search Buyer..." autocomplete="off"><br><br>
         <!-- Select Buyer -->
         <label>Select Buyer:</label><br>
         <select name="buyer_id" id="buyer-dropdown" required>
@@ -53,7 +53,7 @@
 <div id="container-section">
     <div class="container-group">
         <label>Bill No.:</label><br>
-        <input type="text" name="bill_no[]" id="bill-no" value="Bill No:" required><br><br>
+        <input type="text" name="bill_no[]" id="bill-no" value="Bill No:" autocomplete="off" required><br><br>
 
 
         <label>Select Container:</label><br>
@@ -63,13 +63,13 @@
         </select><br><br>
 
         <label>Weight Sold (KG):</label><br>
-        <input type="text" name="weight_sold[]" class="weight-sold" step="0.01" required><br><br>
+        <input type="text" name="weight_sold[]" class="weight-sold" step="0.01" autocomplete="off" required><br><br>
 
         <label>Price Per KG:</label><br>
-        <input type="text" name="price_per_kg[]" class="price-per-kg" step="0.01" required><br><br>
+        <input type="text" name="price_per_kg[]" class="price-per-kg" step="0.01" autocomplete="off" required><br><br>
 
         <label>Paid Amount (For This Container):</label><br>
-        <input type="text" name="paid_amount[]" class="paid-amount" step="0.01" value="0" required><br><br>
+        <input type="text" name="paid_amount[]" class="paid-amount" step="0.01" value="0" autocomplete="off" required><br><br>
 
         <label>Unpaid Amount (For This Container):</label><br>
         <input type="text" name="unpaid_amount[]" class="unpaid-amount" readonly><br><br>
