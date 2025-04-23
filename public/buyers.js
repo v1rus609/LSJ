@@ -67,12 +67,12 @@ function deleteBuyer(buyerId) {
 // ✅ **Render Table with Fixed Decimal Formatting**
 function renderTable(data) {
     const tableBody = document.getElementById('buyer-list');
-    tableBody.innerHTML = ''; 
+    tableBody.innerHTML = ''; // Clear the existing table rows
 
-    data.forEach(buyer => {
+    data.forEach((buyer, index) => { // Use index to get serial number dynamically
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${buyer.id}</td>
+            <td>${index + 1}</td> <!-- Dynamically set serial number -->
             <td>${buyer.name}</td>
             <td>${buyer.location}</td>
             <td>${buyer.contact_number}</td>
@@ -88,6 +88,7 @@ function renderTable(data) {
         document.querySelectorAll('.action-column').forEach(cell => cell.style.display = 'none');
     }
 }
+
 
 
 // ✅ **Filter buyers based on search input**
