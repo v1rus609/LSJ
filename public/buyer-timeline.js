@@ -24,103 +24,103 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
     // Fetch opening balance for the selected buyer
-    buyerDropdown.addEventListener("change", function () {
-        const buyerId = buyerDropdown.value;
-        if (!buyerId) return;
+// Fetch opening balance for the selected buyer
+buyerDropdown.addEventListener("change", function () {
+    const buyerId = buyerDropdown.value;
+    if (!buyerId) return;
 
-        // Fetch opening balance for the selected buyer
-        fetch(`/buyers/opening-balance/${buyerId}`)
-            .then(response => response.json())
-            .then(data => {
-                const openingBalance = data.opening_balance || 0; // Default to 0 if no opening balance
+    // Fetch opening balance for the selected buyer
+    fetch(`/buyers/opening-balance/${buyerId}`)
+        .then(response => response.json())
+        .then(data => {
+            let openingBalance = data.opening_balance || 0; // Default to 0 if no opening balance
 
-                // Fetch buyer timeline data
-                fetch(`/buyer-timeline?buyer_id=${buyerId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        tableBody.innerHTML = ""; // Clear previous data
+            // Fetch buyer timeline data
+            fetch(`/buyer-timeline?buyer_id=${buyerId}`)
+                .then(response => response.json())
+                .then(data => {
+                    tableBody.innerHTML = ""; // Clear previous data
 
-                        let totalCash = 0;
-                        let totalBank = 0;
-                        let totalNonCash = 0;
-                        let totalBill = openingBalance; // Start with opening balance as initial totalBill
-                        let runningTotalTaka = openingBalance; // Initialize running total with opening balance
-                        let totalQuantity = 0; // Initialize total quantity
+                    let totalCash = 0;
+                    let totalBank = 0;
+                    let totalNonCash = 0;
+                    let totalBill = openingBalance; // Start with opening balance as initial totalBill
+                    let runningTotalTaka = openingBalance; // Initialize running total with opening balance
+                    let totalQuantity = 0; // Initialize total quantity
 
-                        // Add Opening Balance as the first row if greater than 0
-                        if (openingBalance > 0) {
-                            const openingBalanceRow = `<tr>
-                                <td>-</td>
-                                <td>Opening Balance</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>${openingBalance.toLocaleString()}</td> <!-- Only Bill Amount -->
-                                <td>${runningTotalTaka.toLocaleString()}</td> <!-- Use runningTotalTaka -->
-                                <td>-</td>
-                            </tr>`;
-                            tableBody.innerHTML += openingBalanceRow;
+                    // Add Opening Balance as the first row if greater than 0 or negative
+                    const openingBalanceRow = `<tr>
+                        <td>-</td>
+                        <td>Opening Balance</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>${openingBalance.toLocaleString()}</td> <!-- Only Bill Amount -->
+                        <td>${runningTotalTaka.toLocaleString()}</td> <!-- Use runningTotalTaka -->
+                        <td>-</td>
+                    </tr>`;
+                    tableBody.innerHTML += openingBalanceRow;
+
+                    // Loop through timeline data and add rows
+                    data.timeline.forEach((entry) => {
+                        // Parse numbers safely
+                        const cash = parseFloat(entry.cash) || 0;
+                        const bank = parseFloat(entry.bank) || 0;
+                        const nonCash = parseFloat(entry.non_cash) || 0;
+                        const billAmount = parseFloat(entry.bill_amount) || 0;
+                        const totalTakaValue = parseFloat(entry.total_taka) || 0;
+                        const quantity = parseFloat(entry.quantity) || 0; // Get quantity
+
+                        // Capitalize the first letter of the "Details" field
+                        let details = entry.details || '-';
+                        details = details.charAt(0).toUpperCase() + details.slice(1); // Capitalize first letter
+
+                        // Sum up totals (except Total Taka)
+                        totalCash += cash;
+                        totalBank += bank;
+                        totalNonCash += nonCash;
+                        totalQuantity += quantity; // Add quantity to total
+
+                        // Only add the purchase amount to the totalBill, excluding returns and payments
+                        if (entry.type === 'Purchase') {
+                            totalBill += billAmount;
                         }
 
-                        // Loop through timeline data and add rows
-                        data.timeline.forEach((entry) => {
-                            // Parse numbers safely
-                            const cash = parseFloat(entry.cash) || 0;
-                            const bank = parseFloat(entry.bank) || 0;
-                            const nonCash = parseFloat(entry.non_cash) || 0;
-                            const billAmount = parseFloat(entry.bill_amount) || 0;
-                            const totalTakaValue = parseFloat(entry.total_taka) || 0;
-                            const quantity = parseFloat(entry.quantity) || 0; // Get quantity
+                        // Update running total of Taka for this entry
+                        runningTotalTaka += billAmount; // Add purchase bill amount to runningTotalTaka
+                        runningTotalTaka -= (cash + bank + nonCash); // Deduct payments and returns from running total
 
-                            // Capitalize the first letter of the "Details" field
-                            let details = entry.details || '-';
-                            details = details.charAt(0).toUpperCase() + details.slice(1); // Capitalize first letter
-
-                            // Sum up totals (except Total Taka)
-                            totalCash += cash;
-                            totalBank += bank;
-                            totalNonCash += nonCash;
-                            totalQuantity += quantity; // Add quantity to total
-
-                            // Only add the purchase amount to the totalBill, excluding returns and payments
-                            if (entry.type === 'Purchase') {
-                                totalBill += billAmount;
-                            }
-
-                            // Update running total of Taka for this entry
-                            runningTotalTaka += billAmount; // Add purchase bill amount to runningTotalTaka
-                            runningTotalTaka -= (cash + bank + nonCash); // Deduct payments and returns from running total
-
-                            // Add row to the table
-                            const row = `<tr>
-                                <td>${entry.date}</td>
-                                <td>${entry.type || '-'}</td>
-                                <td>${entry.bill_no || '-'}</td> <!-- Bill No. comes after Details -->
-                                <td>${details}</td> <!-- Use the capitalized details here -->
-                                <td>${quantity || '-'}</td> <!-- Display quantity -->
-                                <td>${entry.rate || '-'}</td>
-                                <td>${cash.toLocaleString()}</td>
-                                <td>${bank.toLocaleString()}</td>
-                                <td>${nonCash.toLocaleString()}</td>
-                                <td>${billAmount.toLocaleString()}</td>
-                                <td>${runningTotalTaka.toLocaleString()}</td> <!-- Updated Total Taka -->
-                            </tr>`;
-                            tableBody.innerHTML += row;
-                        });
-
-                        // Update total row with the sum of quantities
-                        document.getElementById("total-cash").textContent = totalCash.toLocaleString();
-                        document.getElementById("total-bank").textContent = totalBank.toLocaleString();
-                        document.getElementById("total-non-cash").textContent = totalNonCash.toLocaleString();
-                        document.getElementById("total-bill").textContent = totalBill.toLocaleString();
-                        document.getElementById("total-taka").textContent = runningTotalTaka.toLocaleString(); // Updated Total Taka
-                        document.getElementById("total-quantity").textContent = totalQuantity.toLocaleString(); // Updated Total Quantity
+                        // Add row to the table
+                        const row = `<tr>
+                            <td>${entry.date}</td>
+                            <td>${entry.type || '-'}</td>
+                            <td>${entry.bill_no || '-'}</td> <!-- Bill No. comes after Details -->
+                            <td>${details}</td> <!-- Use the capitalized details here -->
+                            <td>${quantity || '-'}</td> <!-- Display quantity -->
+                            <td>${entry.rate || '-'}</td>
+                            <td>${cash.toLocaleString()}</td>
+                            <td>${bank.toLocaleString()}</td>
+                            <td>${nonCash.toLocaleString()}</td>
+                            <td>${billAmount.toLocaleString()}</td>
+                            <td>${runningTotalTaka.toLocaleString()}</td> <!-- Updated Total Taka -->
+                        </tr>`;
+                        tableBody.innerHTML += row;
                     });
-            });
-    });
+
+                    // Update total row with the sum of quantities
+                    document.getElementById("total-cash").textContent = totalCash.toLocaleString();
+                    document.getElementById("total-bank").textContent = totalBank.toLocaleString();
+                    document.getElementById("total-non-cash").textContent = totalNonCash.toLocaleString();
+                    document.getElementById("total-bill").textContent = totalBill.toLocaleString();
+                    document.getElementById("total-taka").textContent = runningTotalTaka.toLocaleString(); // Updated Total Taka
+                    document.getElementById("total-quantity").textContent = totalQuantity.toLocaleString(); // Updated Total Quantity
+                });
+        });
+});
+
 
     // Fetch user role and hide actions if not admin
     fetch('/check-role')
@@ -164,31 +164,42 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error('❌ Error fetching buyers:', error);
             document.getElementById('error-message').style.display = 'block';
         });
+		
+		
+// Render Table function to populate data
+function renderTable(data) {
+    const buyerDropdown = document.getElementById("buyer-dropdown");
+    const selectedBuyerId = buyerDropdown.value; // Get the selected buyer's ID
 
-    // Render Table function to populate data
-    function renderTable(data) {
-        const tableBody = document.getElementById("timeline-table").querySelector("tbody");
-        tableBody.innerHTML = ''; // Clear existing rows
-
-        data.forEach(entry => {
-            const row = `
-                <tr>
-                    <td>${entry.date || '-'}</td>
-                    <td>${entry.type || '-'}</td>
-                    <td>${entry.bill_no || '-'}</td>
-                    <td>${entry.details || '-'}</td>
-                    <td>${entry.quantity || '-'}</td>
-                    <td>${entry.rate || '-'}</td>
-                    <td>${entry.cash || 0}</td>
-                    <td>${entry.bank || 0}</td>
-                    <td>${entry.non_cash || 0}</td>
-                    <td>${entry.bill_amount || 0}</td>
-                    <td>${entry.total_taka || 0}</td>
-                </tr>
-            `;
-            tableBody.innerHTML += row;
-        });
+    if (!selectedBuyerId || selectedBuyerId === "") {
+        // If no buyer is selected, do not render the table
+        return;
     }
+
+    const tableBody = document.getElementById("timeline-table").querySelector("tbody");
+    tableBody.innerHTML = ''; // Clear existing rows
+
+    // Loop through data and add rows to the table
+    data.forEach(entry => {
+        const row = `
+            <tr>
+                <td>${entry.date || '-'}</td>
+                <td>${entry.type || '-'}</td>
+                <td>${entry.bill_no || '-'}</td>
+                <td>${entry.details || '-'}</td>
+                <td>${entry.quantity || '-'}</td>
+                <td>${entry.rate || '-'}</td>
+                <td>${entry.cash || '-'}</td>
+                <td>${entry.bank || '-'}</td>
+                <td>${entry.non_cash || '-'}</td>
+                <td>${entry.bill_amount || '-'}</td>
+                <td>${entry.total_taka || '-'}</td>
+            </tr>
+        `;
+        tableBody.innerHTML += row;
+    });
+}
+
 
     // Export to Excel functionality
     document.getElementById('export-excel').addEventListener('click', function () {

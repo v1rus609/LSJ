@@ -28,7 +28,7 @@ function renderTable(data) {
     containerList.innerHTML = ''; // Clear existing rows
     let totalSold = 0, totalReturned = 0, totalRemaining = 0, totalWeight = 0; // Initialize totals
 
-    data.forEach(container => {
+    data.forEach((container, index) => {
         const arrivalDate = new Date(container.arrival_date);
         const formattedDate = new Intl.DateTimeFormat('en-GB').format(arrivalDate); // Format date as dd/mm/yyyy
 
@@ -40,7 +40,7 @@ function renderTable(data) {
 
         const row = `
             <tr>
-                <td>${container.id}</td>
+                <td>${index + 1}</td> <!-- Render the row number based on the index -->
                 <td>${formattedDate}</td>
                 <td>${container.container_number}</td>
                 <td>${formatNumberWithCommas(container.weight)}</td>
@@ -94,7 +94,6 @@ function renderTable(data) {
         }
     }
 }
-
 
     // Helper function to format numbers with commas
     function formatNumberWithCommas(number) {
