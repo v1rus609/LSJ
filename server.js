@@ -512,59 +512,73 @@ app.post('/payments/distribute', (req, res) => {
 });
 
 
-app.get('/buyers/unpaid-amount/:buyer_id', (req, res) => {
-    const buyerId = req.params.buyer_id;
+app.get('/buyers/unpaid-amount/:id', (req, res) => {
+    const buyerId = req.params.id;  // Parameter passed in the URL is 'id'
 
     const queryTotalUnpaid = `
         SELECT IFNULL(SUM(unpaid_amount), 0) AS total_unpaid 
         FROM sales 
-        WHERE buyer_id = ?`;
+        WHERE buyer_id = ?`;  // buyer_id still refers to the id of the buyer
 
     const queryTotalPaid = `
         SELECT IFNULL(SUM(cash_amount + bank_amount), 0) AS total_paid 
         FROM payment_history 
-        WHERE buyer_id = ?`;
+        WHERE buyer_id = ?`;  // buyer_id still refers to the id of the buyer
 
     const queryTotalReturns = `
         SELECT IFNULL(SUM(total_amount), 0) AS total_returns 
         FROM purchase_returns 
-        WHERE buyer_id = ?`;
+        WHERE buyer_id = ?`;  // buyer_id still refers to the id of the buyer
+
+    const queryOpeningBalance = `
+        SELECT IFNULL(opening_balance, 0) AS opening_balance 
+        FROM buyers 
+        WHERE id = ?`;  // This is the id in the 'buyers' table
 
     db.serialize(() => {
-        db.get(queryTotalUnpaid, [buyerId], (err, unpaidRow) => {
+        db.get(queryOpeningBalance, [buyerId], (err, openingBalanceRow) => {
             if (err) {
-                console.error('❌ Error fetching unpaid amount:', err.message);
-                return res.status(500).json({ error: 'Error fetching unpaid amount' });
+                console.error('❌ Error fetching opening balance:', err.message);
+                return res.status(500).json({ error: 'Error fetching opening balance' });
             }
-            console.log(`📊 Buyer ${buyerId} | Total Unpaid from Sales:`, unpaidRow.total_unpaid);
+            console.log(`💼 Buyer ${buyerId} | Opening Balance:`, openingBalanceRow.opening_balance);
 
-            db.get(queryTotalPaid, [buyerId], (err, paidRow) => {
+            db.get(queryTotalUnpaid, [buyerId], (err, unpaidRow) => {
                 if (err) {
-                    console.error('❌ Error fetching total paid:', err.message);
-                    return res.status(500).json({ error: 'Error fetching total paid' });
+                    console.error('❌ Error fetching unpaid amount:', err.message);
+                    return res.status(500).json({ error: 'Error fetching unpaid amount' });
                 }
-                console.log(`💰 Buyer ${buyerId} | Total Paid from Payment History:`, paidRow.total_paid);
+                console.log(`📊 Buyer ${buyerId} | Total Unpaid from Sales:`, unpaidRow.total_unpaid);
 
-                db.get(queryTotalReturns, [buyerId], (err, returnRow) => {
+                db.get(queryTotalPaid, [buyerId], (err, paidRow) => {
                     if (err) {
-                        console.error('❌ Error fetching total returns:', err.message);
-                        return res.status(500).json({ error: 'Error fetching total returns' });
+                        console.error('❌ Error fetching total paid:', err.message);
+                        return res.status(500).json({ error: 'Error fetching total paid' });
                     }
-                    console.log(`🔄 Buyer ${buyerId} | Total Purchase Returns:`, returnRow.total_returns);
+                    console.log(`💰 Buyer ${buyerId} | Total Paid from Payment History:`, paidRow.total_paid);
 
-                    // ✅ Final Unpaid Calculation
-                    const totalUnpaid = unpaidRow.total_unpaid || 0;
-                    const totalPaid = paidRow.total_paid || 0;
-                    const totalReturns = returnRow.total_returns || 0;
+                    db.get(queryTotalReturns, [buyerId], (err, returnRow) => {
+                        if (err) {
+                            console.error('❌ Error fetching total returns:', err.message);
+                            return res.status(500).json({ error: 'Error fetching total returns' });
+                        }
+                        console.log(`🔄 Buyer ${buyerId} | Total Purchase Returns:`, returnRow.total_returns);
 
-                    console.log(`📢 Calculating Final Unpaid Amount: ${totalUnpaid} - ${totalPaid} - ${totalReturns}`);
+                        // ✅ Final Unpaid Calculation
+                        const openingBalance = openingBalanceRow.opening_balance || 0;
+                        const totalUnpaid = unpaidRow.total_unpaid || 0;
+                        const totalPaid = paidRow.total_paid || 0;
+                        const totalReturns = returnRow.total_returns || 0;
 
-                    const adjustedUnpaid = totalUnpaid - totalPaid - totalReturns;
-                    const finalUnpaid = Math.max(0, adjustedUnpaid); // Prevent negative unpaid amounts
+                        console.log(`📢 Calculating Final Unpaid Amount: ${openingBalance} + ${totalUnpaid} - ${totalPaid} - ${totalReturns}`);
 
-                    console.log(`✅ Final Adjusted Unpaid Amount for Buyer ${buyerId}:`, finalUnpaid);
+                        const adjustedUnpaid = openingBalance + totalUnpaid - totalPaid - totalReturns;
+                        const finalUnpaid = Math.max(0, adjustedUnpaid); // Prevent negative unpaid amounts
 
-                    res.json({ unpaid_amount: finalUnpaid });
+                        console.log(`✅ Final Adjusted Unpaid Amount for Buyer ${buyerId}:`, finalUnpaid);
+
+                        res.json({ unpaid_amount: finalUnpaid });
+                    });
                 });
             });
         });
@@ -1488,6 +1502,44 @@ app.delete('/container/delete/:id', (req, res) => {
         res.json({ success: true, message: 'Container deleted successfully' });
     });
 });
+
+app.get('/containers/all', (req, res) => {
+    const query = 'SELECT * FROM containers';
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error('Error fetching containers:', err.message);
+            return res.status(500).json({ success: false, message: 'Error fetching containers' });
+        }
+        console.log('Fetched containers:', rows);  // Log the result
+        res.json(rows);
+    });
+});
+// Add the route to handle previous sales return
+app.post('/previous-sales-return', (req, res) => {
+    const { buyer_id, container_id, returned_kg, returned_price_per_kg, total_amount } = req.body;
+
+    // Validate required fields
+    if (!buyer_id || !container_id || !returned_kg || !returned_price_per_kg || !total_amount) {
+        return res.status(400).json({ success: false, message: 'All fields are required' });
+    }
+
+    // Here, you should handle the logic to record the return
+    // For example, insert the return record in the purchase_returns table
+    const query = `
+        INSERT INTO purchase_returns (return_date, buyer_id, container_id, returned_kg, returned_price_per_kg, total_amount)
+        VALUES (CURRENT_DATE, ?, ?, ?, ?, ?)
+    `;
+
+    db.run(query, [buyer_id, container_id, returned_kg, returned_price_per_kg, total_amount], function(err) {
+        if (err) {
+            console.error('❌ Error processing sales return:', err.message);
+            return res.status(500).json({ success: false, message: 'Error processing sales return' });
+        }
+
+        res.json({ success: true, message: 'Sales return successfully recorded' });
+    });
+});
+
 
 
 // Start the Server
