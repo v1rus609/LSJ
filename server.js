@@ -724,7 +724,7 @@ app.get('/sales/statement', (req, res) => {
 });
 
 
-// Fetch Containers based on Sales
+// Fetch Containers based on Purchase Returns for a specific Buyer
 app.get('/get-containers-by-buyer', (req, res) => {
     const buyerId = req.query.id;  // Get buyerId from query string
 
@@ -732,26 +732,27 @@ app.get('/get-containers-by-buyer', (req, res) => {
         return res.status(400).json({ error: 'Invalid buyer ID.' });
     }
 
-    // Query to fetch containers based on sales (since purchases must be made for a return to happen)
+    // Query to fetch containers based on purchase returns (since containers are involved in returns)
     const query = `
         SELECT containers.id, containers.container_number
         FROM containers
-        JOIN sales ON containers.id = sales.container_id
-        WHERE sales.buyer_id = ?`;
+        JOIN purchase_returns ON containers.id = purchase_returns.container_id
+        WHERE purchase_returns.buyer_id = ?`;
     
     db.all(query, [buyerId], (err, results) => {
         if (err) {
-            console.error('Error fetching containers from sales:', err.message);
+            console.error('Error fetching containers from purchase returns:', err.message);
             return res.status(500).json({ error: 'Failed to fetch containers.' });
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ error: 'No containers found for this buyer.' });
+            return res.status(404).json({ error: 'No containers found for this buyer in purchase returns.' });
         }
 
         res.json(results);  // Return the list of containers as a JSON response
     });
 });
+
 
 // Fetch Purchase Returns (Return History) with filters
 // Backend: Purchase Returns with Date Filtering
@@ -1537,6 +1538,21 @@ app.post('/previous-sales-return', (req, res) => {
         }
 
         res.json({ success: true, message: 'Sales return successfully recorded' });
+    });
+});
+
+app.post('/container/update/:id', (req, res) => {
+    const containerId = req.params.id;
+    const { weight, remaining_weight } = req.body;
+
+    const query = `UPDATE containers SET weight = ?, remaining_weight = ? WHERE id = ?`;
+
+    db.run(query, [weight, remaining_weight, containerId], function (err) {
+        if (err) {
+            console.error('Error updating container:', err);
+            return res.status(500).json({ success: false, error: err.message });
+        }
+        res.json({ success: true });
     });
 });
 
