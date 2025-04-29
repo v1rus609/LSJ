@@ -49,13 +49,19 @@
 
         <!-- Filters -->
         <div class="filters">
-            <select id="buyer-filter">
-            <option value="">All Buyers</option>
-            </select>
+            <div class="filter-container">
+                <select id="buyer-filter">
+                    <option value="">All Buyers</option>
+                </select>
+                <input type="text" id="buyer-search-box" placeholder="Search Buyer by Name..." />
+            </div>
 
-            <select id="container-filter">
-            <option value="">All Containers</option>
-            </select>
+            <div class="filter-container">
+                <select id="container-filter">
+                    <option value="">All Containers</option>
+                </select>
+                <input type="text" id="container-search-box" placeholder="Search Container by Number..." />
+            </div>
         </div>
 		
 		<div class="datefilters">

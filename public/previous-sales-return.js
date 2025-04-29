@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const returnedPriceInput = document.getElementById('returned-price-per-kg');
     const totalAmountInput = document.getElementById('total-amount');
     const submitButton = document.getElementById('submit-return');
+	const buyerSearch = document.getElementById('buyer-search');
+	    const containerSearch = document.getElementById('container-search');
 
     let maxReturnableAmount = 0;
 
@@ -35,6 +37,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     option.textContent = buyer.name;
                     buyerSelect.appendChild(option);
                 });
+				                // Apply search functionality to buyer dropdown
+                buyerSearch.addEventListener('input', function () {
+                    filterDropdownOptions(buyerSelect, buyerSearch.value);
+                });
             })
             .catch(error => console.error('❌ Error fetching buyers:', error));
     }
@@ -62,6 +68,11 @@ fetch('/containers/all')
                 option.textContent = container.container_number;
                 containerSelect.appendChild(option);
             });
+			
+			                // Apply search functionality to container dropdown
+                containerSearch.addEventListener('input', function () {
+                    filterDropdownOptions(containerSelect, containerSearch.value);
+                });
         } else {
             // Log the error or handle it if the data is not an array
             console.error('Expected an array but got:', data);
@@ -153,6 +164,20 @@ fetch('/containers/all')
     fetchBuyers();
 });
 
+// **Function to Filter Dropdown Options Based on Search**
+function filterDropdownOptions(dropdown, searchTerm) {
+    const options = dropdown.querySelectorAll('option');
+    const filterValue = searchTerm.toLowerCase();
+    options.forEach(function (option) {
+        const text = option.textContent || option.innerText;
+        if (text.toLowerCase().includes(filterValue)) {
+            option.style.display = ''; // Show matching option
+        } else {
+            option.style.display = 'none'; // Hide non-matching option
+        }
+    });
+}
+
 // **Dropdown Toggle**
 document.addEventListener("DOMContentLoaded", function () {
     const dropdownButton = document.querySelector(".dropbtn");
@@ -185,3 +210,5 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert('Something went wrong during logout.');
             });
     });
+	
+	

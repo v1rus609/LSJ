@@ -53,13 +53,16 @@
             <div class="filter-row">
                 <div class="form-group">
                     <label for="buyer-filter">Filter by Buyer:</label>
+										                <input type="text" id="buyer-search-box" placeholder="Search Buyer by Name..." />
                     <select id="buyer-filter">
                         <option value="0">All Buyers</option>
                     </select>
+
                 </div>
 
                 <div class="form-group">
                     <label for="container-filter">Filter by Container:</label>
+					                <input type="text" id="container-search-box" placeholder="Search Container by Number..." />
                     <select id="container-filter">
                         <option value="0">Select Container</option>
                     </select>
@@ -107,7 +110,7 @@
 		</div>
 	    <div class="export-button" style="text-align:center">
 		<button id="export-excel-return-history">Export Excel</button>
-		<button id="export-pdf-return-history">Export PDF</button>
+		   <button id="export-pdf-btn" onclick="exportToPDF()">Export to PDF</button>	
         </div>
 
     </div>

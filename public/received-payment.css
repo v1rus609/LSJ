@@ -277,13 +277,13 @@ input:hover {
 }
 
 select {
-	font-size:1rem;
-    width: 100%;
-    padding: 8px;
-    border-radius: 5px;
-    border: 2px solid #ccc;
-    box-sizing: border-box;
-    margin-bottom: 0px;
+        font-size: 1rem;
+        width: 100%;
+        padding: 8px;
+        border-radius: 5px;
+        border: 2px solid #ccc;
+        box-sizing: border-box;
+        margin-top: 10px;
 }
 
 select:hover {

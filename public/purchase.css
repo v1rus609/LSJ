@@ -48,21 +48,21 @@ body.blur {
 	margin-bottom: 20px;
 	display: flex;
 	justify-content: center;
-	gap: 15px;
+	gap: 5px;
 	align-items: center;
 }
 
 .filters label {
 	font-weight: bold;
 	margin-right: 5px;
-	font-size: 1.3rem;
+	font-size: 1.0rem;
 }
 
 .filters select {
 	border: 2px solid #cccccc;
 	padding: 15px;
 	border-radius: 5px;
-	font-size: 1.3rem;
+	font-size: 1.0rem;
 }
 
 .filters button {
@@ -74,7 +74,7 @@ body.blur {
 .filters button {
 	background: linear-gradient(to bottom, #2dabe2, #83d9ff);
 	color: white;
-	font-size: 1.3rem;
+	font-size: 1.0rem;
 	padding: 10px;
 	font-weight: bold;
 	border: none;
@@ -89,6 +89,28 @@ body.blur {
 
 .filters button:hover {
 	background: linear-gradient(to bottom, #1c8bb8, #63c6f5);
+}
+
+#buyer-search-box{
+	border: 2px solid #cccccc;
+	padding: 15px;
+	border-radius: 5px;
+	font-size: 1.0rem;
+}
+
+#container-search-box  {
+	border: 2px solid #cccccc;
+	padding: 15px;
+	border-radius: 5px;
+	font-size: 1.0rem;
+}
+
+#container-search-box :hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
+#buyer-search-box :hover {
+    border-color: #008cff; /* Highlight the border on hover */
 }
 
 /* Table Styling */
@@ -586,7 +608,7 @@ h1 {
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 5px;
 	align-items: center;
 }
 
@@ -1055,6 +1077,28 @@ tfoot {
 
 #apply-date-filter:hover {
     transform: scale(1.1); /* Smoothly enlarge the icon on hover */
+}
+
+#buyer-search-box{
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+	border: 2px solid #cccccc;
+}
+
+#container-search-box  {
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+	border: 2px solid #cccccc;
+}
+
+#container-search-box :hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
+#buyer-search-box :hover {
+    border-color: #008cff; /* Highlight the border on hover */
 }
 
 }

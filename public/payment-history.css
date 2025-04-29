@@ -151,6 +151,19 @@ option:hover {
 .filter-section input[type="date"]:hover {
     border-color: #008cff; /* Highlight the border on hover */
 }
+.buyer-filter input{
+padding: 15px;
+    font-size: 1.5rem;
+    margin: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
 
 
 /* Table Wrapper Styling */
@@ -580,6 +593,7 @@ h2 {
 #update-payment-btn:hover {
     background-color: #45a049;
 }
+
 
 
 
@@ -1061,7 +1075,12 @@ h2 {
             transition: opacity 0.3s ease;
         }
 		
-
+ .buyer-filter input {
+        border: 2px solid #cccccc;
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+    }
 }
 	
 

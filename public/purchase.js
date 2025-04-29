@@ -302,6 +302,75 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// Event listener for the Buyer Search Box
+document.getElementById('buyer-search-box').addEventListener('input', function () {
+    const searchValue = this.value.toLowerCase();
+    const buyerFilter = document.getElementById('buyer-filter');
+    
+    // Filter the buyer dropdown based on the search value
+    for (let i = 0; i < buyerFilter.options.length; i++) {
+        const option = buyerFilter.options[i];
+        const buyerName = option.text.toLowerCase();
+        
+        // Show or hide options based on the search value (case-insensitive)
+        if (buyerName.includes(searchValue)) {
+            option.style.display = 'block';
+        } else {
+            option.style.display = 'none';
+        }
+    }
+
+    // Filter the table rows based on the Buyer search box input
+    filterTableRows();
+});
+
+// Event listener for the Container Search Box
+document.getElementById('container-search-box').addEventListener('input', function () {
+    const searchValue = this.value.toLowerCase();
+    const containerFilter = document.getElementById('container-filter');
+    
+    // Filter the container dropdown based on the search value
+    for (let i = 0; i < containerFilter.options.length; i++) {
+        const option = containerFilter.options[i];
+        const containerNumber = option.text.toLowerCase();
+        
+        // Show or hide options based on the search value (case-insensitive)
+        if (containerNumber.includes(searchValue)) {
+            option.style.display = 'block';
+        } else {
+            option.style.display = 'none';
+        }
+    }
+
+    // Filter the table rows based on the Container search box input
+    filterTableRows();
+});
+
+// Function to filter table rows based on Buyer and Container search values
+function filterTableRows() {
+    const buyerSearchValue = document.getElementById('buyer-search-box').value.toLowerCase();
+    const containerSearchValue = document.getElementById('container-search-box').value.toLowerCase();
+    
+    const tableRows = document.querySelectorAll('#purchase-table tbody tr');
+    
+    tableRows.forEach(row => {
+        const buyerCell = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+        const containerCell = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+        
+        // Check if both Buyer and Container values match the search criteria
+        const buyerMatches = buyerCell.includes(buyerSearchValue);
+        const containerMatches = containerCell.includes(containerSearchValue);
+        
+        // Show or hide the row based on search criteria
+        if (buyerMatches && containerMatches) {
+            row.style.display = '';  // Show row
+        } else {
+            row.style.display = 'none';  // Hide row
+        }
+    });
+}
+
+
 
         // Helper function to format numbers with commas
         function formatNumberWithCommas(number) {

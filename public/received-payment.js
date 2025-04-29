@@ -28,6 +28,23 @@ fetch(`/buyers/unpaid-amount/${buyerId}`)
         .catch(error => console.error('Error fetching unpaid amount:', error));
 });
 
+        // Search functionality for Buyer
+        document.getElementById('buyer-search-box').addEventListener('input', function () {
+            const searchValue = this.value.toLowerCase();
+            const buyerDropdown = document.getElementById('buyer-dropdown');
+            const options = buyerDropdown.getElementsByTagName('option');
+            
+            // Loop through the options and hide those that don't match the search value
+            Array.from(options).forEach(option => {
+                const optionText = option.text.toLowerCase();
+                if (optionText.includes(searchValue)) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        });
+
 // Toggle the "Particulars" field based on payment method
 document.getElementById('payment-method').addEventListener('change', function () {
     const particularsField = document.getElementById('particulars');

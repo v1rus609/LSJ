@@ -141,6 +141,17 @@ body {
     font-size: 0.7rem;
 }
 
+.form-group input {
+    padding: 15px;
+    font-size: 1.5rem;
+    border-radius: 5px;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, border-color 0.3s;
+    }
+
 /* Add space between filters */
 .filters .form-group {
     margin-bottom: 10px;
@@ -259,7 +270,7 @@ body {
 }
 
 /* Style for the "Export Return History to PDF" button */
-#export-pdf-return-history {
+#export-pdf-btn {
 	background: linear-gradient(to bottom, #2dabe2, #83d9ff);
 	color: white;
 	font-weight: bold;
@@ -270,7 +281,7 @@ body {
 	cursor: pointer;
 }
 
-#export-pdf-return-history:hover {
+#export-pdf-btn:hover {
     background-color: #0056b3;  /* Darker blue on hover */
     transform: scale(1.05);  /* Slightly grow the button */
 }
@@ -811,7 +822,7 @@ h1 {
 }
 
 /* Style for the "Export Return History to PDF" button */
-#export-pdf-return-history {
+#export-pdf-btn {
 		background: linear-gradient(to bottom, #2dabe2, #83d9ff);
         color: white;
         margin-top: -5px;
@@ -823,7 +834,7 @@ h1 {
         cursor: pointer;
 }
 
-#export-pdf-return-history:hover {
+#export-pdf-btn:hover {
     background-color: #0056b3;  /* Darker blue on hover */
     transform: scale(1.05);  /* Slightly grow the button */
 }
@@ -869,5 +880,16 @@ button:focus {
         font-size: 0.8rem;
         border: 1px solid #ccc;
         border-radius: 5px;
+    }
+	
+.form-group input {
+        font-size: 0.8rem;
+        width: 100%;
+        margin-top: 0px;
+        padding: 8px;
+        border-radius: 5px;
+        border: 2px solid #ccc;
+        box-sizing: border-box;
+        transition: border 0.3s ease-in-out;
     }
 }

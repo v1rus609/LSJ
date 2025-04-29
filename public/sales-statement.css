@@ -348,6 +348,16 @@ option {
     	background: linear-gradient(to bottom, #fb356c, #ff2832);
 }
 
+.filter-row input {
+		border-radius: 5px;
+		border: 1px solid #ccc;
+		padding: 15px;
+		font-size: 1.5rem;
+}
+
+
+
+
 @media (min-width: 1024px) {
 body {
 	font-family: Arial, sans-serif;
@@ -619,5 +629,10 @@ option {
         .pdf-text {
             transition: opacity 0.3s ease;
         }	
-	
+	 .filter-row input {
+        border: 2px solid #ccc;
+		padding: 10px;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
 }

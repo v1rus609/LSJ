@@ -41,9 +41,12 @@
 
         <!-- Select Buyer -->
         <label>Select Buyer:</label>
-        <select id="buyer-dropdown" required>
-            <option value="">Select a Buyer</option>
-        </select><br><br>
+        <div class="buyer-filter">
+		 <input type="text" id="buyer-search-box" placeholder="Search Buyer by Name..." />
+            <select id="buyer-dropdown" required>
+                <option value="">Select a Buyer</option>
+            </select>
+        </div><br>
 
         <!-- Display Unpaid Balance -->
         <label>Unpaid Balance (BDT):</label>

@@ -17,7 +17,6 @@ function fetchBuyers() {
         .catch(error => console.error('Error fetching buyers:', error));
 }
 
-// ✅ Fetch and populate containers based on the selected buyer
 function fetchContainers(buyerId = null) {
     containerFilter.innerHTML = '<option value="0">Select Container</option>';
 
@@ -26,15 +25,23 @@ function fetchContainers(buyerId = null) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            data.forEach(container => {
-                const option = document.createElement('option');
-                option.value = container.id;
-                option.textContent = container.container_number;
-                containerFilter.appendChild(option);
-            });
+            console.log('Data fetched for containers:', data); // Log the data to inspect the response
+            if (Array.isArray(data)) {
+                data.forEach(container => {
+                    const option = document.createElement('option');
+                    option.value = container.id;
+                    option.textContent = container.container_number;
+                    containerFilter.appendChild(option);
+                });
+            } else {
+                console.error('Expected an array but received:', data);
+            }
         })
-        .catch(error => console.error('Error fetching containers:', error));
+        .catch(error => {
+            console.error('Error fetching containers:', error);
+        });
 }
+
 
 // ✅ Fetch return history with applied filters
 function fetchReturnHistory() {
@@ -105,24 +112,6 @@ fetch(query)
     .catch(error => console.error('Error fetching return history:', error));
 }
 
-fetch('/check-role')
-    .then(res => res.json())
-    .then(data => {
-        if (!data.loggedIn) {
-            window.location.href = '/login.html';
-            return;
-        }
-
-        isAdmin = data.role === 'Admin';
-
-        if (!isAdmin) {
-            document.getElementById('export-excel-return-history')?.remove();
-            document.getElementById('export-pdf-return-history')?.remove();
-        }
-
-        fetchFilters();
-        fetchPurchases();
-    });
 
 // ✅ Fetch role before doing anything
 fetch('/check-role')
@@ -140,9 +129,6 @@ fetch('/check-role')
 							const protectedLinks = document.querySelectorAll('.admin-only');
 							protectedLinks.forEach(link => link.style.display = 'none');
 				}
-
-        // Proceed with loading return history (query should be defined beforehand)
-        fetch(query); // or call your function that wraps this fetch logic
     });
 
 // ✅ Helper function: Format numbers with commas
@@ -332,6 +318,45 @@ document.getElementById('return-form').addEventListener('submit', function (even
     .catch(error => console.error('Error updating return record:', error));
 });
 
+// Event listener for the Buyer Search Box
+document.getElementById('buyer-search-box').addEventListener('input', function () {
+    const searchValue = this.value.toLowerCase();
+    const buyerFilter = document.getElementById('buyer-filter');
+    
+    // Filter the buyer dropdown based on the search value
+    for (let i = 0; i < buyerFilter.options.length; i++) {
+        const option = buyerFilter.options[i];
+        const buyerName = option.text.toLowerCase();
+        
+        // Show or hide options based on the search value (case-insensitive)
+        if (buyerName.includes(searchValue)) {
+            option.style.display = 'block';
+        } else {
+            option.style.display = 'none';
+        }
+    }
+
+});
+
+// Event listener for the Container Search Box
+document.getElementById('container-search-box').addEventListener('input', function () {
+    const searchValue = this.value.toLowerCase();
+    const containerFilter = document.getElementById('container-filter');
+    
+    // Filter the container dropdown based on the search value
+    for (let i = 0; i < containerFilter.options.length; i++) {
+        const option = containerFilter.options[i];
+        const containerNumber = option.text.toLowerCase();
+        
+        // Show or hide options based on the search value (case-insensitive)
+        if (containerNumber.includes(searchValue)) {
+            option.style.display = 'block';
+        } else {
+            option.style.display = 'none';
+        }
+    }
+
+});
 
 
  // Add event listener for the Excel export button
@@ -350,27 +375,16 @@ document.getElementById('return-form').addEventListener('submit', function (even
     });
 
 
-// Add event listener for the PDF export button
-document.getElementById('export-pdf-return-history').addEventListener('click', function () {
+function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // --- Header with Logo ---
-    const headerBarHeight = 20;
-    doc.setFillColor(49, 178, 230);
-    doc.rect(0, 0, doc.internal.pageSize.width, headerBarHeight, 'F');
-    doc.addImage('/public/lsg.png', 'PNG', 14, 5, 30, 10);
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(255, 255, 255);
-    doc.text("Return History", doc.internal.pageSize.width - 50, 12);
-
     // Ensure buyer dropdown exists
-    const buyerDropdown = document.getElementById('buyer-filter');
-    const selectedBuyerId = buyerDropdown.value; 
-    const buyerName = buyerDropdown.selectedOptions[0] ? buyerDropdown.selectedOptions[0].text : "All Buyers";
+    const buyerDropdown = document.getElementById('buyer-filter'); 
+    const selectedBuyerId = buyerDropdown.value; // Get selected buyer's ID
+    const buyerName = buyerDropdown.selectedOptions[0] ? buyerDropdown.selectedOptions[0].text : "All Buyers"; // Get selected buyer's name or 'All Buyers'
 
-    // Replace spaces with underscores for filename
+    // Replace spaces with underscores in the buyer's name to avoid filename issues
     const sanitizedBuyerName = buyerName.replace(/\s+/g, "_");
 
     // Get current date and time
@@ -379,7 +393,7 @@ document.getElementById('export-pdf-return-history').addEventListener('click', f
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
-    }).replace(/\//g, "-");
+    }).replace(/\//g, "-"); // Convert to "DD-MM-YYYY"
 
     let formattedTime = currentDate.toLocaleTimeString('en-GB', {
         hour: '2-digit',
@@ -387,70 +401,134 @@ document.getElementById('export-pdf-return-history').addEventListener('click', f
         hour12: true
     });
 
-    formattedTime = formattedTime.replace(/[:\s]/g, "-").toUpperCase();
+    formattedTime = formattedTime.replace(/[:\s]/g, "-").toUpperCase(); // Convert time to uppercase "HH-MM-AM/PM"
 
-    // Generate the dynamic filename
-    const fileName = `Return_History_${sanitizedBuyerName}_${formattedDate}_${formattedTime}.pdf`;
+    // **Generate filename without location**
+    const fileName = `Sales_History_${sanitizedBuyerName}_${formattedDate}_${formattedTime}.pdf`;
 
-    // --- Fetch Buyer Location from Database ---
+    // Fetch Buyer Location if a specific buyer is selected
     let buyerLocation = '';
     if (selectedBuyerId !== "0") { 
         fetch(`/buyers/location/${selectedBuyerId}`)
             .then(response => response.json())
             .then(data => {
-                buyerLocation = data.location || ''; 
-                exportPDF(buyerName, buyerLocation);
+                buyerLocation = data.location || ''; // Assign buyer's location if available
+                generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName);
             })
-            .catch(error => console.error('Error fetching buyer location:', error));
+            .catch(error => {
+                console.error('Error fetching buyer location:', error);
+                generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName);
+            });
     } else {
-        exportPDF(buyerName, buyerLocation);
+        generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName);
     }
+}
 
-    // Function to export PDF with watermark
-    function exportPDF(buyerName, buyerLocation) {
-        // Set "INVOICE TO" section
-        const invoiceYPosition = 30;
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(0, 0, 0);
-        doc.setFont("helvetica", "bold");
-        doc.text("INVOICE TO:", 14, invoiceYPosition);
-        doc.setFont("helvetica", "normal");
-        doc.text(buyerName, 14, invoiceYPosition + 5);
-        if (buyerLocation) doc.text(`${buyerLocation}`, 14, invoiceYPosition + 10);
+function generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName) {
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const headerBarHeight = 18;
+    let startY = headerBarHeight + 30; // Default starting position for the first page
 
-        // --- Date Section ---
-        const dateLabel = "DATE:";
-        const dateText = `${formattedDate}`;
-        const dateLabelWidth = doc.getTextWidth(dateLabel);
-        const xPosition = doc.internal.pageSize.width - dateLabelWidth - 40;
+    // Add the watermark first (on top of everything, faint transparency)
+    const watermarkPath = "/public/watermark.png"; // Use your actual watermark path
+    const watermarkImg = new Image();
+    watermarkImg.src = watermarkPath;
 
-        doc.setFont("helvetica", "bold");
-        doc.text(dateLabel, xPosition, invoiceYPosition);
-        doc.setFont("helvetica", "normal");
-        doc.text(dateText, xPosition, invoiceYPosition + 5);
+    watermarkImg.onload = function () {
+        // Function to add Header, Footer, and Watermark to every page
+        function addHeaderAndFooterAndWatermark(doc, pageNumber) {
+            // --- Watermark (on every page) ---
+            doc.setGState(new doc.GState({ opacity: 0.2 })); // Faint watermark
+            const watermarkX = pageWidth / 4;
+            const watermarkY = pageHeight / 3;
+            const watermarkWidth = pageWidth / 2;
+            const watermarkHeight = pageHeight / 4;
+
+            // Add watermark image on top of everything (behind the content)
+            doc.addImage(watermarkImg, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+            doc.setGState(new doc.GState({ opacity: 1 })); // Reset opacity for normal content
+
+            // --- Header ---
+            doc.setFillColor(49, 178, 230);
+            doc.rect(0, 0, pageWidth, headerBarHeight, 'F');
+            doc.addImage('/public/lsg.png', 'PNG', 14, 5, 30, 10); // Add logo
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(255, 255, 255);
+            doc.text("Return History", pageWidth - 50, 11); // Header title
+
+            // --- INVOICE TO Section (Only on the first page) ---
+            if (pageNumber === 1) {
+                const invoiceYPosition = 30;
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont("helvetica", "bold");
+                doc.text("INVOICE TO:", 14, invoiceYPosition);
+                doc.setFont("helvetica", "normal");
+                doc.text(buyerName, 14, invoiceYPosition + 5);
+
+                if (buyerLocation) {
+                    doc.text(buyerLocation, 14, invoiceYPosition + 10);
+                }
+
+                // --- Date Section ---
+                const dateLabel = "DATE:";
+                const dateText = `${formattedDate}`;
+                const dateLabelWidth = doc.getTextWidth(dateLabel);
+                const xPosition = pageWidth - dateLabelWidth - 40; // Right align
+                doc.setFont("helvetica", "bold");
+                doc.text(dateLabel, xPosition, invoiceYPosition);
+                doc.setFont("helvetica", "normal");
+                doc.text(dateText, xPosition, invoiceYPosition + 5);
+            }
+
+            // --- Footer Section (on every page) ---
+            const line1 = "Thank You For Your Business";
+            const line2 = "Generated by bYTE Ltd.";
+            const line3 = "For inquiries, contact support@lsgroup.com.bd";
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(0, 0, 0); // Footer text color
+
+            const line1Width = doc.getTextWidth(line1);
+            const line2Width = doc.getTextWidth(line2);
+            const line3Width = doc.getTextWidth(line3);
+
+            const xPosition1 = (pageWidth - line1Width) / 2.3;
+            const xPosition2 = (pageWidth - line2Width) / 2;
+            const xPosition3 = (pageWidth - line3Width) / 2;
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text(line1, xPosition1, pageHeight - 30);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.text(line2, xPosition2, pageHeight - 20);
+            doc.text(line3, xPosition3, pageHeight - 15);
+        }
 
         // --- Table Section ---
         const table = document.getElementById('return-history-table');
-        doc.autoTable({
+        
+        // Define options for jsPDF autoTable
+        const options = {
             html: table,
-            startY: headerBarHeight + 30, 
             theme: 'grid',
+            startY: startY,  // Start position for table content
+            margin: { horizontal: 10, top: 20, bottom: 40 },
             headStyles: {
-                fillColor: [0, 0, 0],
-                textColor: [255, 255, 255],
+                fillColor: [0, 0, 0], // Black background for table header
+                textColor: [255, 255, 255], // White text in header
                 fontSize: 8,
                 fontStyle: 'bold',
             },
             bodyStyles: {
                 fontSize: 9,
                 textColor: [0, 0, 0],
-            },
-            margin: { top: 10, left: 10, right: 10, bottom: 10 },
-            columnStyles: {
-                0: { halign: 'left' },
-                1: { halign: 'left' },
-                [table.rows[0].cells.length - 1]: { halign: 'LEFT' },
+                fillColor: null, // No background for table cells
             },
             footStyles: {
                 fillColor: [220, 220, 220],
@@ -458,53 +536,26 @@ document.getElementById('export-pdf-return-history').addEventListener('click', f
                 fontSize: 10,
                 fontStyle: 'bold',
             },
-        });
-
-        // --- Footer Section ---
-        const line1 = "Thank You For Your Business";
-        const line2 = "Generated by bYTE Ltd.";
-        const line3 = "For inquiries, contact support@lsgroup.com.bd";
-
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(8);
-        doc.setTextColor(0, 0, 0);
-        const pageHeight = doc.internal.pageSize.height;
-
-        const line1Width = doc.getTextWidth(line1);
-        const line2Width = doc.getTextWidth(line2);
-        const line3Width = doc.getTextWidth(line3);
-
-        const xPosition1 = (doc.internal.pageSize.width - line1Width) / 2.3;
-        const xPosition2 = (doc.internal.pageSize.width - line2Width) / 2;
-        const xPosition3 = (doc.internal.pageSize.width - line3Width) / 2;
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(12);
-        doc.text(line1, xPosition1, pageHeight - 40);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(8);
-        doc.text(line2, xPosition2, pageHeight - 25);
-        doc.text(line3, xPosition3, pageHeight - 20);
-
-        // Load watermark and add it **after** the table
-        const watermarkImg = new Image();
-        watermarkImg.src = "/public/watermark.png"; 
-
-        watermarkImg.onload = function () {
-            const pageWidth = doc.internal.pageSize.width;
-            const pageHeight = doc.internal.pageSize.height;
-
-            // Set watermark transparency and position
-            doc.setGState(new doc.GState({ opacity: 0.2 })); 
-            doc.addImage(watermarkImg, 'PNG', pageWidth / 4, pageHeight / 3, pageWidth / 2, pageHeight / 4);
-            doc.setGState(new doc.GState({ opacity: 1 })); 
-
-            // ✅ Now save the PDF **after** watermark is added
-            doc.save(fileName);
+            pageBreak: 'auto', // Allow page breaks automatically
+            showHead: 'everyPage', // Ensure header shows on every page
+            didDrawPage: function (data) {
+                // Adjust the startY for subsequent pages to create a gap between header and table
+                if (data.pageNumber > 1) {
+                    startY = data.cursor + 30; // Adjust cursor for subsequent pages
+                }
+                
+                // Add watermark to each page
+                addHeaderAndFooterAndWatermark(doc, data.pageNumber); // Add header, footer, and watermark to every page
+            },
         };
-    }
-});
 
+        // Create the table with autoTable and handle page breaks
+        doc.autoTable(options);
+
+        // Save PDF with dynamic filename
+        doc.save(fileName);
+    };
+}
 
     // Function to fetch and populate buyers in the dropdown
     function fetchBuyers() {

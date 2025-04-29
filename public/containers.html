@@ -3,36 +3,39 @@
 <head>
     <title>Container List</title>
     <link rel="stylesheet" href="containers.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Link to Font Awesome for the trash icon -->
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
     <div class="container">
-		<div class="navbar">
-		<a href="index.html" class="home-icon">
+        <div class="navbar">
+            <a href="index.html" class="home-icon">
                 <img src="home-icon.png" alt="Home" width="32">
-		</a>
-		<div class="dropdown">
-			<button class="dropbtn">
-				<img src="menu-icon.png" alt="Menu">
-			</button>
-			<div class="dropdown-content">
-			<a href="container.html" class="admin-only">Add Container</a>
-			<a href="containers.html"class="active">Container List</a>
-			<a href="buyers.html">Add Buyer</a>
-			<a href="inventory.html" class="admin-only">Inventory</a>
-			<a href="purchase.html">Sales History</a>
-			<a href="received-payment.html" class="admin-only">Received Payment</a>
-			<a href="payment-history.html">Payment History</a>
-			<a href="sales-statement.html">Sales Statement</a>
-			<a href="purchase-return.html"class="admin-only">Sales Return</a>
-			<a href="previous-sales-return.html"class="admin-only">Previous Sales Return</a>
-			<a href="return-history.html">Return History</a>
-			<a href="buyer-timeline.html">Buyer Timeline</a>
-			<a href="#" id="logout-btn"class="active2">Logout</a>
-			</div>
-		</div>
-	</div>
+            </a>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <img src="menu-icon.png" alt="Menu">
+                </button>
+                <div class="dropdown-content">
+                    <a href="container.html" class="admin-only">Add Container</a>
+                    <a href="containers.html" class="active">Container List</a>
+                    <a href="buyers.html">Add Buyer</a>
+                    <a href="inventory.html" class="admin-only">Inventory</a>
+                    <a href="purchase.html">Sales History</a>
+                    <a href="received-payment.html" class="admin-only">Received Payment</a>
+                    <a href="payment-history.html">Payment History</a>
+                    <a href="sales-statement.html">Sales Statement</a>
+                    <a href="purchase-return.html" class="admin-only">Sales Return</a>
+                    <a href="previous-sales-return.html" class="admin-only">Previous Sales Return</a>
+                    <a href="return-history.html">Return History</a>
+                    <a href="buyer-timeline.html">Buyer Timeline</a>
+                    <a href="#" id="logout-btn" class="active2">Logout</a>
+                </div>
+            </div>
+        </div>
+
         <div class="logo">
             <img src="logo.png" alt="Company Logo">
         </div>
@@ -51,20 +54,21 @@
                         <th>Sold</th>
                         <th>Returned</th>
                         <th>Remaining Weight</th>
-                        <!-- Add an id for the Action column for easy reference -->
-                        <th id="action-column">Action</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="container-list">
-                    <!-- Rows will be dynamically added here -->
+                    <!-- Dynamically generated rows here -->
                 </tbody>
             </table>
         </div>
+        <button id="export-btn" onclick="exportToExcel()"><span class="excel-text">Export to Excel</span><i class="fas fa-file-excel"></i></button>
+        <button id="export-pdf-btn" onclick="exportToPDF()"><span class="pdf-text">Export to PDF</span><i class="fas fa-file-pdf"></i></button>
     </div>
 
     <script src="containers.js"></script>
-
-<script>
+	
+	<script>
     fetch('/check-role')
         .then(response => response.json())
         .then(data => {
@@ -109,7 +113,6 @@
             window.location.href = '/login.html'; // Redirect on error
         });
 </script>
-
 
 </body>
 </html>

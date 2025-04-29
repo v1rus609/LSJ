@@ -139,18 +139,73 @@ label {
     font-weight: bold;
 }
 
-#buyer-dropdown {
-    padding: 15px;
-    font-size: 1.5rem;
-    margin: 10px;
-    border-radius: 5px;
+/* Search Box Styling */
+#buyer-search-box {
+    padding: 8px;
+    margin-bottom: 15px;
     border: 1px solid #ccc;
-    background-color: white;
-    color: #333;
-    cursor: pointer;
-	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s, border-color 0.3s;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
 }
+
+/* Adjust width of the dropdown and search box for responsiveness */
+#buyer-dropdown {
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}
+
+/* Style the table header and the search input to align nicely */
+.table-wrapper {
+    margin-top: 20px;
+}
+
+#buyer-search-box {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+/* Style for the buyer dropdown container */
+.buyer-dropdown-container {
+    margin-bottom: 15px;
+    max-width: 300px;
+    display: inline-block;
+}
+
+#buyer-dropdown {
+    font-size: 14px;
+    border: 1px solid #ccc;
+    padding: 8px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Hover and focus states for input fields */
+#buyer-search-box:focus, #buyer-dropdown:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Adjust the dropdown appearance */
+#buyer-dropdown option {
+    padding: 8px;
+    font-size: 14px;
+}
+
+/* Dropdown visibility when filtering */
+#buyer-dropdown option[style="display: none;"] {
+    display: none;
+}
+
 
 option {
     font-weight: bold;
@@ -332,6 +387,13 @@ body {
 	border-radius: 8px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
+#buyer-search-box {
+        border: 2px solid #ccc;
+		padding: 10px;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
 		
 h1 {
 	font-size:1.5rem;
@@ -345,9 +407,7 @@ h1 {
     display: block;
  }
 
-
-
-	/* 🏠 Navbar */
+/* 🏠 Navbar */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -432,29 +492,73 @@ h1 {
 	display: inline-block;
 }
 
+/* Search Box Styling */
+#buyer-search-box {
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+}
+
+/* Adjust width of the dropdown and search box for responsiveness */
 #buyer-dropdown {
-    padding: 10px;
-    font-size: 1rem;
-    margin: 10px;
-    border-radius: 5px;
-    border: 2px solid #ccc;
-    background-color: white;
-    color: #333;
-    cursor: pointer;
-	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s, border-color 0.3s;
-
-}	
-
-#buyer-dropdown:hover {
-    border-color: #008cff; /* Highlight the border on hover */
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
 }
 
-#buyer-dropdown:focus {
-    border-color: #008cff;
+/* Style the table header and the search input to align nicely */
+.table-wrapper {
+    margin-top: 20px;
+}
+
+#buyer-search-box {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+/* Style for the buyer dropdown container */
+.buyer-dropdown-container {
+    margin-bottom: 15px;
+    max-width: 300px;
+    display: inline-block;
+}
+
+#buyer-dropdown {
+    font-size: 14px;
+    border: 1px solid #ccc;
+    padding: 8px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Hover and focus states for input fields */
+#buyer-search-box:focus, #buyer-dropdown:focus {
     outline: none;
-    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
+
+/* Adjust the dropdown appearance */
+#buyer-dropdown option {
+    padding: 8px;
+    font-size: 14px;
+}
+
+/* Dropdown visibility when filtering */
+#buyer-dropdown option[style="display: none;"] {
+    display: none;
+}
+
 
 option {
     font-weight: bold;
@@ -479,7 +583,7 @@ th {
     font-weight: bold;
 }
 
-       #export-excel {
+   #export-excel {
             background: linear-gradient(to bottom, #2fc36b, #77fbac);
             color: white; /* White text color */
             border: none; /* Remove default border */
@@ -568,5 +672,6 @@ th {
         .pdf-text {
             transition: opacity 0.3s ease;
         }	
+
 
 }

@@ -3,8 +3,10 @@
 <head>
     <title>Add Buyer</title>
     <link rel="stylesheet" href="buyers.css">
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Link to Font Awesome for the trash icon -->	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Link to Font Awesome for the trash icon -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>	
 </head>
 <body>
     <div class="container">
@@ -82,6 +84,13 @@
         </table>
 </div>
         <p class="error-message" id="error-message" style="display: none;">Failed to load buyer data. Please try again.</p>
+		
+		        <button id="export-btn" onclick="exportToExcel()">
+            <span class="excel-text">Export to Excel</span><i class="fas fa-file-excel"></i>
+        </button>
+        <button id="export-pdf-btn" onclick="exportToPDF()">
+            <span class="pdf-text">Export to PDF</span><i class="fas fa-file-pdf"></i>
+        </button>
     </div>
 
     <script src="buyers.js"></script>
