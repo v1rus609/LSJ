@@ -1,6 +1,6 @@
 let buyerData = []; // Store fetched buyer data for filtering
 
-// ✅ **Function for displaying numbers in the table (Fixed decimal places)**
+// Function for displaying numbers in the table (Fixed decimal places)
 function formatTableNumber(value) {
     if (value === null || value === undefined || value === '') {
         return '0.00'; // Default display value
@@ -12,25 +12,7 @@ function formatTableNumber(value) {
     return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// ✅ **Function to format numbers while allowing decimals**
-function formatInputNumber(value) {
-    if (!value) return ''; // Return empty if value is empty
-
-    let rawValue = value.replace(/,/g, ''); // Remove commas
-    if (isNaN(rawValue)) return value; // If not a number, return original value
-
-    let [integer, decimal] = rawValue.split('.'); // Split integer and decimal parts
-    integer = parseInt(integer, 10).toLocaleString('en-US'); // Add commas to integer part
-
-    return decimal !== undefined ? `${integer}.${decimal}` : integer; // Keep decimals if they exist
-}
-
-// ✅ **Ensure valid number format before submission (removes commas)**
-function getRawNumber(value) {
-    return value ? value.toString().replace(/,/g, '') : ''; // Ensure valid string before replacing
-}
-
-// ✅ **Fetch buyers and populate the table**
+// Fetch buyers and populate the table
 fetch('/buyers/list')
     .then(response => {
         if (!response.ok) throw new Error('Failed to fetch buyer data.');
@@ -45,7 +27,156 @@ fetch('/buyers/list')
         document.getElementById('error-message').style.display = 'block';
     });
 
-// ✅ **Delete a buyer**
+// ✅ **Render Table with Fixed Decimal Formatting**
+function renderTable(data) {
+    const tableBody = document.getElementById('buyer-list');
+    tableBody.innerHTML = ''; // Clear the existing table rows
+
+data.forEach((buyer, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>
+            <span class="name-display" data-id="${buyer.id}">${buyer.name}</span>
+            <input class="name-input" type="text" value="${buyer.name}" data-id="${buyer.id}" style="display: none;" />
+        </td>
+        <td>
+            <span class="location-display" data-id="${buyer.id}">${buyer.location}</span>
+            <input class="location-input" type="text" value="${buyer.location}" data-id="${buyer.id}" style="display: none;" />
+        </td>
+        <td>
+            <span class="contact-display" data-id="${buyer.id}">${buyer.contact_number}</span>
+            <input class="contact-input" type="text" value="${buyer.contact_number}" data-id="${buyer.id}" style="display: none;" />
+        </td>
+        <td>
+            <span class="balance-display" data-id="${buyer.id}">${formatTableNumber(buyer.opening_balance)}</span>
+            <input class="balance-input" type="text" value="${buyer.opening_balance}" data-id="${buyer.id}" style="display: none;" />
+        </td>
+        <td class="action-column">
+            <button class="edit-btn" data-id="${buyer.id}">Edit</button>
+            <button class="delete-btn" onclick="deleteBuyer(${buyer.id})"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>
+        </td>
+    `;
+    tableBody.appendChild(row);
+});
+
+
+    // Add event listeners for "Edit" buttons dynamically after the table is rendered
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', handleEditBuyer);
+    });
+
+    if (!window.isAdmin) {
+        document.querySelectorAll('.action-column').forEach(cell => cell.style.display = 'none');
+    }
+}
+
+
+function handleEditBuyer(event) {
+    const buyerId = parseInt(event.target.dataset.id); // Convert the ID to a number
+
+    // Find the buyer by ID from buyerData
+    const buyer = buyerData.find(b => b.id === buyerId);
+
+    if (!buyer) {
+        console.error('Buyer not found!');
+        alert('Buyer not found!');
+        return;
+    }
+
+    // Select the display and input elements for each field
+    const nameDisplay = document.querySelector(`.name-display[data-id="${buyerId}"]`);
+    const nameInput = document.querySelector(`.name-input[data-id="${buyerId}"]`);
+
+    const locationDisplay = document.querySelector(`.location-display[data-id="${buyerId}"]`);
+    const locationInput = document.querySelector(`.location-input[data-id="${buyerId}"]`);
+
+    const contactDisplay = document.querySelector(`.contact-display[data-id="${buyerId}"]`);
+    const contactInput = document.querySelector(`.contact-input[data-id="${buyerId}"]`);
+
+    const balanceDisplay = document.querySelector(`.balance-display[data-id="${buyerId}"]`);
+    const balanceInput = document.querySelector(`.balance-input[data-id="${buyerId}"]`);
+
+    // Show the input fields and hide the display spans for the current row
+    nameInput.style.display = 'inline';
+    locationInput.style.display = 'inline';
+    contactInput.style.display = 'inline';
+    balanceInput.style.display = 'inline';
+
+    nameDisplay.style.display = 'none';
+    locationDisplay.style.display = 'none';
+    contactDisplay.style.display = 'none';
+    balanceDisplay.style.display = 'none';
+
+    // Change the Edit button to Save button
+    const editButton = document.querySelector(`.edit-btn[data-id="${buyerId}"]`);
+
+    if (editButton) {
+        editButton.innerHTML = "Save";
+        editButton.classList.remove("edit-btn");
+        editButton.classList.add("save-btn");
+
+        // Add event listener to the Save button to save changes
+        editButton.addEventListener('click', function saveChanges() {
+            const newName = nameInput.value;
+            const newLocation = locationInput.value;
+            const newContact = contactInput.value;
+            const newBalance = parseFloat(balanceInput.value.replace(/,/g, ''));
+
+            buyer.name = newName;
+            buyer.location = newLocation;
+            buyer.contact_number = newContact;
+            buyer.opening_balance = newBalance;
+
+            // Update the buyer data in the backend
+            fetch(`/buyers/update/${buyerId}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: newName,
+                    location: newLocation,
+                    contact_number: newContact,
+                    opening_balance: newBalance
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Buyer updated successfully!');
+                    renderTable(buyerData); // Re-render the table after successful update
+                } else {
+                    alert('Failed to update buyer!');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating buyer:', error);
+                alert('Failed to update buyer.');
+            });
+
+            // Change the Save button back to Edit button after saving
+            editButton.innerHTML = "Edit";
+            editButton.classList.remove("save-btn");
+            editButton.classList.add("edit-btn");
+
+            // Hide the input fields and show the display spans again
+            nameInput.style.display = 'none';
+            locationInput.style.display = 'none';
+            contactInput.style.display = 'none';
+            balanceInput.style.display = 'none';
+
+            nameDisplay.style.display = 'inline';
+            locationDisplay.style.display = 'inline';
+            contactDisplay.style.display = 'inline';
+            balanceDisplay.style.display = 'inline';
+        });
+    } else {
+        console.error("Edit button not found for buyer:", buyerId);
+    }
+}
+
+// Delete a buyer
 function deleteBuyer(buyerId) {
     if (confirm('Are you sure you want to delete this buyer?')) {
         fetch(`/buyers/delete/${buyerId}`, { method: 'DELETE' })
@@ -64,34 +195,7 @@ function deleteBuyer(buyerId) {
     }
 }
 
-// ✅ **Render Table with Fixed Decimal Formatting**
-function renderTable(data) {
-    const tableBody = document.getElementById('buyer-list');
-    tableBody.innerHTML = ''; // Clear the existing table rows
-
-    data.forEach((buyer, index) => { // Use index to get serial number dynamically
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${index + 1}</td> <!-- Dynamically set serial number -->
-            <td>${buyer.name}</td>
-            <td>${buyer.location}</td>
-            <td>${buyer.contact_number}</td>
-            <td>${formatTableNumber(buyer.opening_balance)}</td>
-            <td class="action-column">
-                <button class="delete-btn" onclick="deleteBuyer(${buyer.id})"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
-
-    if (!window.isAdmin) {
-        document.querySelectorAll('.action-column').forEach(cell => cell.style.display = 'none');
-    }
-}
-
-
-
-// ✅ **Filter buyers based on search input**
+// Filter buyers based on search input
 document.getElementById('search-box').addEventListener('input', function () {
     const searchValue = this.value.toLowerCase();
     const filteredData = buyerData.filter(buyer =>
@@ -100,6 +204,7 @@ document.getElementById('search-box').addEventListener('input', function () {
     );
     renderTable(filteredData);
 });
+
 function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();

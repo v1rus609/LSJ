@@ -6,6 +6,8 @@
     font-family: 'Arial', sans-serif;
 }	
 
+
+
 body {
     background: linear-gradient(to right, #f9f9f9, #e0f7fa);
     display: flex;
@@ -419,12 +421,30 @@ body {
 }
 
 .container {
-    width: 35%;
+    width: 50%;
     background: white;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     text-align: center;
+}
+
+.edit-btn {
+    background-color: #2fd57a;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    margin: 5px 0px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1.3rem;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    text-align: center;
+    font-weight: bold;
 }
 
 /* 🏆 Logo */
@@ -593,23 +613,7 @@ table tr:hover {
     text-align: center;
 }
    
-.delete-btn {
-    background-color: #ff1a1a; /* Red background for delete */
-    color: white; /* White text color */
-    border: none; /* Remove default border */
-    padding: 8px 16px; /* Padding around the text */
-    cursor: pointer; /* Change cursor to pointer */ 
-    transition: background-color 0.3s ease; /* Smooth transition on hover */
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    text-align: center; /* Center align text */
-    font-size: 0.8rem;
-    font-weight: bold;
-    border-radius: 5px;
-    margin: 0 0px;
-}
+
 
 .delete-btn .delete-text {
     position: absolute;
@@ -794,5 +798,61 @@ table tr:hover {
         .pdf-text {
             transition: opacity 0.3s ease;
         }
+		
+		.delete-btn {
+    background-color: #ff1a1a; /* Red background for delete */
+    color: white; /* White text color */
+    border: none; /* Remove default border */
+    padding: 8px 16px; /* Padding around the text */
+    cursor: pointer; /* Change cursor to pointer */ 
+    transition: background-color 0.3s ease; /* Smooth transition on hover */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    text-align: center; /* Center align text */
+    font-size: 0.7rem;
+    font-weight: bold;
+    border-radius: 5px;
+    margin: 0 0px;
+}
+		
+				    .edit-btn {
+        background-color: #2fd57a;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        margin: 5px 0px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        text-align: center;
+        font-weight: bold;
+    }
+	
+					    .save-btn {
+        background-color: #2fd57a;
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        margin: 5px 0px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        text-align: center;
+        font-weight: bold;
+    }
+			
+
 			
 }
