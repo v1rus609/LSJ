@@ -1557,6 +1557,38 @@ app.post('/container/update/:id', (req, res) => {
 });
 
 
+app.post('/buyers/update/:id', (req, res) => {
+    const { id } = req.params;
+    const { name, location, contact_number, opening_balance } = req.body;
+
+    // SQL query to update the buyer data in the database
+    const query = `
+        UPDATE buyers
+        SET 
+            name = ?, 
+            location = ?, 
+            contact_number = ?, 
+            opening_balance = ?
+        WHERE id = ?
+    `;
+
+    db.run(query, [name, location, contact_number, opening_balance, id], function (err) {
+        if (err) {
+            console.error('Error updating buyer:', err.message);
+            return res.status(500).json({ success: false, message: 'Failed to update buyer.' });
+        }
+
+        // If no rows were affected, the buyer might not exist
+        if (this.changes === 0) {
+            return res.status(404).json({ success: false, message: 'Buyer not found.' });
+        }
+
+        // Respond with success
+        res.json({ success: true, message: 'Buyer updated successfully!' });
+    });
+});
+
+
 
 // Start the Server
 app.listen(process.env.PORT || port, () => {
