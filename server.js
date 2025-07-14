@@ -986,6 +986,17 @@ app.get('/buyer-timeline', (req, res) => {
         JOIN containers ON purchase_returns.container_id = containers.id
         WHERE buyer_id = ?`;
 
+    const queryDiscounts = `
+        SELECT discount_date AS date, 'Discount' AS type, 
+               '-' AS particulars, 
+               NULL AS quantity, NULL AS rate, 
+               NULL AS cash, 
+               NULL AS bank, 
+               NULL AS non_cash, 
+               discount_amount AS discount_amount, 
+               NULL AS bill_no
+        FROM discounts WHERE buyer_id = ?`;
+
     db.all(queryPurchases, [buyerId], (err, purchases) => {
         if (err) {
             console.error("Error fetching purchases:", err.message);
@@ -1004,53 +1015,59 @@ app.get('/buyer-timeline', (req, res) => {
                     return res.status(500).json({ error: "Error fetching returns" });
                 }
 
-                let timeline = [...purchases, ...payments, ...returns].sort((a, b) => new Date(a.date) - new Date(b.date));
+                db.all(queryDiscounts, [buyerId], (err, discounts) => {
+                    if (err) {
+                        console.error("Error fetching discounts:", err.message);
+                        return res.status(500).json({ error: "Error fetching discounts" });
+                    }
 
-                // 🔹 Calculate running balance
-                let runningTotal = 0;
-				                // First, handle the opening balance
-                const openingBalance = 0; // Get the opening balance from database or assume 0
-                if (openingBalance > 0) {
-                    // Add opening balance row only if it's greater than 0
-                    const openingBalanceRow = {
-                        date: '-',
-                        type: 'Opening Balance',
-                        particulars: '-',
-                        details: '-',
-                        quantity: '-',
-                        rate: '-',
-                        cash: '-',
-                        bank: '-',
-                        non_cash: '-',
-                        bill_amount: openingBalance,
-                        total_taka: openingBalance,
-                        bill_no: '-'
-                    };
-                    timeline.unshift(openingBalanceRow);
-                    runningTotal += openingBalance; // Start the running total with the opening balance
-                }
+                    let timeline = [...purchases, ...payments, ...returns, ...discounts];
+                    timeline.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-                timeline.forEach(entry => {
-                    if (entry.bill_amount) {
-                        runningTotal += entry.bill_amount; // Purchases increase total
+                    let runningTotal = 0;
+                    const openingBalance = 0; // Get the opening balance from database or assume 0
+                    if (openingBalance > 0) {
+                        const openingBalanceRow = {
+                            date: '-',
+                            type: 'Opening Balance',
+                            particulars: '-',
+                            details: '-',
+                            quantity: '-',
+                            rate: '-',
+                            cash: '-',
+                            bank: '-',
+                            non_cash: '-',
+                            discount_amount: 0,
+                            bill_amount: openingBalance,
+                            bill_no: '-',
+                            total_taka: openingBalance
+                        };
+                        timeline.unshift(openingBalanceRow);
+                        runningTotal += openingBalance; // Start the running total with the opening balance
                     }
-                    if (entry.cash) {
-                        runningTotal -= entry.cash; // Payments decrease total
-                    }
-                    if (entry.bank) {
-                        runningTotal -= entry.bank; // Payments decrease total
-                    }
-                    if (entry.non_cash) {
-                        runningTotal -= entry.non_cash; // Returns decrease total
-                    }
-                    entry.total_taka = runningTotal; // Store the updated running total
+
+                    timeline.forEach(entry => {
+                        const billAmount = parseFloat(entry.bill_amount) || 0;
+                        const cash = parseFloat(entry.cash) || 0;
+                        const bank = parseFloat(entry.bank) || 0;
+                        const nonCash = parseFloat(entry.non_cash) || 0;
+                        const discount = parseFloat(entry.discount_amount) || 0;
+
+                        runningTotal += billAmount;
+                        runningTotal -= (cash + bank + nonCash + discount);
+
+                        entry.total_taka = runningTotal;
+                    });
+
+                    res.json({ timeline });
                 });
-
-                res.json({ timeline });
             });
         });
     });
 });
+
+
+
 
 
 // ✅ Get Containers a Buyer Purchased From
@@ -1588,7 +1605,90 @@ app.post('/buyers/update/:id', (req, res) => {
     });
 });
 
+// Add Discount Route
+app.post('/discounts/add', (req, res) => {
+    const { buyer_id, discount_date, discount_amount } = req.body;
 
+    // Validation
+    if (!buyer_id || !discount_date || isNaN(discount_amount)) {
+        return res.status(400).json({ success: false, message: 'All fields are required and discount amount must be a valid number' });
+    }
+
+    // Insert the discount into the database
+    const query = `
+        INSERT INTO discounts (buyer_id, discount_date, discount_amount)
+        VALUES (?, ?, ?)
+    `;
+    const params = [buyer_id, discount_date, discount_amount];
+
+    db.run(query, params, function(err) {
+        if (err) {
+            console.error('Error inserting discount:', err.message);
+            return res.status(500).json({ success: false, message: 'Failed to add discount' });
+        }
+
+        res.json({ success: true });
+    });
+});
+
+// Fetch Discount List
+app.get('/discounts/list', (req, res) => {
+    const query = `
+        SELECT 
+            discounts.id, 
+            discounts.discount_date AS date, 
+            discounts.discount_amount, 
+            buyers.name AS buyer_name 
+        FROM discounts
+        JOIN buyers ON discounts.buyer_id = buyers.id
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error('Error fetching discounts:', err.message);
+            return res.status(500).send('Error fetching discounts');
+        }
+
+        res.json(rows);
+    });
+});
+
+
+// Update a discount amount
+app.post('/discounts/edit/:discountId', (req, res) => {
+    const discountId = req.params.discountId; // Get the discount ID from the URL parameter
+    const { discount_amount } = req.body; // Get the new discount amount from the request body
+
+    const query = `UPDATE discounts SET discount_amount = ? WHERE id = ?`; // SQL query to update the discount
+
+    // Execute the SQL query to update the discount amount in the database
+    db.run(query, [discount_amount, discountId], function (err) {
+        if (err) {
+            console.error('Error updating discount:', err.message);
+            return res.status(500).json({ success: false, error: 'Error updating discount' });
+        }
+
+        // Respond with success if the update is successful
+        res.json({ success: true });
+    });
+});
+
+
+// Delete a discount
+app.delete('/discounts/delete/:discountId', (req, res) => {
+    const discountId = req.params.discountId;
+
+    const query = `DELETE FROM discounts WHERE id = ?`;
+
+    db.run(query, [discountId], function (err) {
+        if (err) {
+            console.error('Error deleting discount:', err.message);
+            return res.status(500).json({ success: false, error: 'Error deleting discount' });
+        }
+
+        res.json({ success: true });
+    });
+});
 
 // Start the Server
 app.listen(process.env.PORT || port, () => {
