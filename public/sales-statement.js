@@ -79,26 +79,26 @@ function fetchSalesAndReturns(buyerName = 'all') {
 // ✅ Update Sales Table Dynamically
 function updateSalesTable(salesData, purchaseReturnsData, buyersData) {
     const tableBody = document.getElementById('sales-statement-table').querySelector('tbody');
-    tableBody.innerHTML = '';
+    tableBody.innerHTML = ''; // Clear previous rows
 
     let totalPurchase = 0;
     let totalPaid = 0;
     let totalUnpaid = 0;
     let totalAdvanceReceipt = 0; // For Advance Receipt (Negative Opening Balance)
 
-    // Step 1: Create a map linking buyer_name to buyer_id
+    // Keep track of the serial number
+    let serialNumber = 1;
+
     const buyerIdMap = {};
     buyersData.forEach(buyer => {
         buyerIdMap[buyer.name] = buyer.id;
     });
 
-    salesData.forEach((record, index) => {
+    salesData.forEach((record) => {
         const buyerName = record.buyer_name || 'N/A';
         const totalPurchaseOriginal = record.total_purchase || 0;
         const totalPaidAmount = record.total_paid || 0;
         const totalUnpaidAmount = record.total_unpaid || 0;
-
-        // Step 2: Find the correct `buyer_id`
         const buyerId = buyerIdMap[buyerName];
 
         if (!buyerId) {
@@ -106,54 +106,46 @@ function updateSalesTable(salesData, purchaseReturnsData, buyersData) {
             return;
         }
 
-        // Step 3: Get the Correct Purchase Returns for This Buyer
+        // Calculate Purchase Returns for this buyer
         const buyerReturns = purchaseReturnsData
             .filter(returnData => returnData.buyer_id == buyerId)
             .reduce((sum, returnItem) => sum + (returnItem.total_amount || 0), 0);
 
-        // Fetch the opening balance for this buyer
         fetch(`/buyers/opening-balance/${buyerId}`)
             .then(response => response.json())
             .then(openingBalanceData => {
                 const openingBalance = openingBalanceData.opening_balance || 0;
 
-                // **Positive opening balance**: Used for Amount (BDT)
                 const positiveOpeningBalance = Math.max(0, openingBalance); 
-                // **Negative opening balance**: Used for Advance Receipt
                 const negativeOpeningBalance = Math.min(0, openingBalance); 
 
-                // Adjust Purchase with Opening Balance
                 const adjustedPurchaseAmount = totalPurchaseOriginal - buyerReturns;
                 const adjustedPurchaseWithOpeningBalance = adjustedPurchaseAmount + positiveOpeningBalance;
-
-                // Calculate the adjusted balance
                 const adjustedBalance = adjustedPurchaseWithOpeningBalance - totalPaidAmount + negativeOpeningBalance;
 
                 totalPurchase += adjustedPurchaseWithOpeningBalance;
                 totalPaid += totalPaidAmount;
                 totalUnpaid += adjustedBalance;
-                totalAdvanceReceipt += negativeOpeningBalance; // Add negative opening balance to Advance Receipt
+                totalAdvanceReceipt += negativeOpeningBalance;
 
-                // Append Row to Sales Table
+                // Create Row with Correct Serial Number
                 const row = `
                     <tr>
-                        <td>${index + 1}</td>
+                        <td>${serialNumber++}</td> <!-- Increment serial number for each row -->
                         <td>${buyerName}</td>
-                        <td>${formatNumberWithCommas(adjustedPurchaseWithOpeningBalance)}</td> <!-- Adjusted Purchase -->
-						<td>${formatNumberWithCommas(negativeOpeningBalance)}</td> <!-- Advance Receipt (Negative Opening Balance) -->
+                        <td>${formatNumberWithCommas(adjustedPurchaseWithOpeningBalance)}</td>
+                        <td>${formatNumberWithCommas(negativeOpeningBalance)}</td>
                         <td>${formatNumberWithCommas(totalPaidAmount)}</td>
-                        <td>${formatNumberWithCommas(adjustedBalance)}</td> <!-- Adjusted Balance -->
-                        
+                        <td>${formatNumberWithCommas(adjustedBalance)}</td>
                     </tr>
                 `;
                 tableBody.innerHTML += row;
 
                 // Update Footer Totals
                 document.getElementById('sum-total-purchase').textContent = formatNumberWithCommas(totalPurchase);
-                document.getElementById('sum-total-advance-receipt').textContent = formatNumberWithCommas(totalAdvanceReceipt); // New total for Advance Receipt				
+                document.getElementById('sum-total-advance-receipt').textContent = formatNumberWithCommas(totalAdvanceReceipt);
                 document.getElementById('sum-total-paid').textContent = formatNumberWithCommas(totalPaid);
                 document.getElementById('sum-total-unpaid').textContent = formatNumberWithCommas(totalUnpaid);
-
             })
             .catch(error => console.error('❌ Error fetching opening balance for buyer:', error));
     });

@@ -12,9 +12,27 @@ body {
     justify-content: center;
     align-items: stretch;
     min-height: 100vh;
-	text-align:center;
+    text-align: center;
     -webkit-text-size-adjust: 100%;
-    transition: backdrop-filter 0.3s ease-in-out; /* Smooth transition for blur */
+}
+
+.edit-btn {
+    background-color: #2fd57a;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    margin: 5px 0px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1.3rem;
+    transition: background-color 0.3s ease;
+    display: inline-flex
+;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    text-align: center;
+    font-weight: bold;
 }
 
 .container {
@@ -25,26 +43,77 @@ body {
     transition: all 0.3s ease-in-out;
     animation: fadeIn 0.5s ease-in-out;
 }
-
-/* Logo Styling */
-.logo {
-    text-align: center;
-}
-
+		
+	
 /* 🏆 Logo */
 .logo img {
-	text-align: center;
     max-width: 220px;
     margin-bottom: 20px;
 }
-
+      
  h1 {
-	text-align:center;
     font-size: 3rem;
-    margin-bottom: 40px;
+    margin-bottom: 15px;
     color: #333;
 }
+      
+.search-container {
+	margin-bottom: 20px;
+}
+        
+.search-container input {
+	width: calc(100% - 20px);
+	max-width: 400px;
+	padding: 30px;
+    font-size: 1.8rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
 
+input:focus {
+    border-color: #008cff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 140, 255, 0.5);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+}
+        
+table th, table td {
+    text-align: left;
+	font-size: 1.5rem;
+    padding: 20px;
+    border: 1px solid #ddd;
+}
+
+table th {
+	font-size: 1.5rem;
+    background: #f4f4f4;
+    font-weight: bold;
+}
+        
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+       
+table tr:hover {
+    background-color: #f1f1f1;
+}
+
+	.total-row {
+		background: #f4f4f4;
+	}
+
+.error-message {
+    color: red;
+    font-size: 1rem;
+    margin-top: 10px;
+    text-align: center;
+}
+		
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -70,13 +139,14 @@ body {
 	display: inline-block;
 }
 
+
 .dropbtn {
     background: none;
     border: none;
     cursor: pointer;
 	padding: 0px;
 }
-		
+
 .dropbtn:hover {
     background: none;
     transform: scale(1.02);
@@ -85,6 +155,11 @@ body {
 .dropbtn img {
     width: 75px;
 }
+
+.dropbtn:hover img {
+    transform: scale(1.1); /* Smoothly enlarge the icon on hover */
+}
+
 
 .dropdown-content {
     display: none;
@@ -108,11 +183,12 @@ body {
     color: #333;
     font-size: 2rem;
     transition: background 0.3s ease-in-out;
-}	
+}
 
 .dropdown-content a:hover {
     background: #f0f0f0;
 }	
+
 
 /* 🎯 Active Page Highlight */
 .navbar a.active {
@@ -122,7 +198,7 @@ body {
     background: #2dabe2;
     padding: 40px;
     border-radius: 5px;
-}	
+}
 
 .navbar a.active2 {
 	text-align:left;
@@ -130,152 +206,69 @@ body {
 }
 .navbar a.active2:hover {
 	color:white;
-    	background: linear-gradient(to bottom, #fb356c, #ff2832);
-}	
-
-/* Buyer Dropdown */
-label {
-    font-size: 16px;
-    font-weight: bold;
+    background: linear-gradient(to bottom, #fb356c, #ff2832);
 }
-
-/* Search Box Styling */
-#buyer-search-box {
-    padding: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    box-sizing: border-box;
-    background-color: #f9f9f9;
-}
-
-/* Adjust width of the dropdown and search box for responsiveness */
-#buyer-dropdown {
-    padding: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    background-color: #f9f9f9;
-    box-sizing: border-box;
-}
-
-/* Style the table header and the search input to align nicely */
-.table-wrapper {
-    margin-top: 20px;
-}
-
-#buyer-search-box {
-    margin-top: 15px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-}
-
-/* Style for the buyer dropdown container */
-.buyer-dropdown-container {
-    margin-bottom: 15px;
-    max-width: 300px;
-    display: inline-block;
-}
-
-#buyer-dropdown {
-    font-size: 14px;
-    border: 1px solid #ccc;
-    padding: 8px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-/* Hover and focus states for input fields */
-#buyer-search-box:focus, #buyer-dropdown:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-/* Adjust the dropdown appearance */
-#buyer-dropdown option {
-    padding: 8px;
-    font-size: 14px;
-}
-
-/* Dropdown visibility when filtering */
-#buyer-dropdown option[style="display: none;"] {
-    display: none;
-}
-
-
-option {
-    font-weight: bold;
-    font-size: 0.8rem;
-}
-
-/* Table Wrapper Styling */
-.table-wrapper {
-    overflow-x: auto;
-    margin-top: 20px;
-}
-
-
-/* Table Styles */
-table {
-    width: 100%;
-    margin: 20px auto;
-    background: white;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-td {
-    border: 1px solid #ccc;
-    padding: 20px;
-    text-align: left;
-    font-size: 1.5rem;
-
-}
-
-th {
-    background: #333;
-    padding: 10px;
-    font-size: 1.5rem;
-    text-align: left;
+		
+.delete-btn {
+	background-color: #ff1a1a;
     color: white;
-    font-weight: bold;
+    border: none;
+    padding: 15px 30px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1.3rem;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    text-align: center;
+	font-weight:bold;
 }
 
-/* Table Row Alternating Colors */
-tbody tr:nth-child(odd) {
-    background-color: #f9f9f9;
+.delete-btn .delete-text {
+	position: absolute;
+	left: 8;
+	transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-tbody tr:nth-child(even) {
-    background-color: #fff;
+.delete-btn i {
+	margin-left: 12px;
+	opacity: 0;
+	transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* Highlight row on hover */
-tbody tr:hover {
-    background-color: #d0e2ff;
+.delete-btn:hover {
+    background-color: #ff1a1a;
 }
 
-#total-quantity, #total-cash, #total-bank, #total-non-cash, #total-bill, #total-taka, #total-discount {
-    font-weight: bold;
+.delete-btn:hover .delete-text {
+    transform: translateX(-100%); /* Slide the text to the left */
+    opacity: 0; /* Fade out the text */
 }
 
-/* General button styling */
-button {
-    font-family: Arial, sans-serif; /* Use a clean font */
-    font-size: 14px; /* Set a readable font size */
-    padding: 10px 20px; /* Add padding for better clickability */
-    margin: 10px; /* Space between buttons */
-    cursor: pointer; /* Change cursor to pointer when hovering */
-    border-radius: 5px; /* Rounded corners */
-    border: 1px solid #ccc; /* Light border around the buttons */
-    transition: background-color 0.3s, border-color 0.3s; /* Smooth transition for hover effect */
+.delete-btn:hover i {
+    transform: translateX(-50%); /* Slide the icon into the center */
+    opacity: 1; /* Fade in the icon */
 }
 
-        #export-excel {
-            background: linear-gradient(to bottom, #2fc36b, #77fbac);
+.delete-text {
+    transition: opacity 0.3s ease;
+}
+
+/* Optional: Style the Delete button on focus (when clicked) */
+.delete-btn:focus {
+    outline: none; /* Remove outline */
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.7); /* Red shadow effect */
+}
+.table-wrapper {
+    overflow-x: auto; /* Enable horizontal scrolling if necessary */
+    width: 100%;
+}
+		
+ #export-btn {
+	 		margin-top:15px;
+			background: linear-gradient(to bottom, #2fc36b, #77fbac);		
             color: white; /* White text color */
             border: none; /* Remove default border */
             padding: 15px 100px; /* Padding around the text */
@@ -291,27 +284,27 @@ button {
 			font-weight:bold;
         }
 
-        #export-excel .excel-text {
+        #export-btn .excel-text {
             position: absolute;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        #export-excel i {
+        #export-btn i {
             opacity: 0;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        #export-excel:hover {
+        #export-btn:hover {
             background: linear-gradient(to bottom, #2fc36b, #77fbac);
         }
 
-        #export-excel:hover .excel-text {
+        #export-btn:hover .excel-text {
             transform: translateX(-100%); /* Slide the text to the left */
             opacity: 0; /* Fade out the text */
         }
 
-        #export-excel:hover i {
-            transform: translateX(0%); /* Slide the icon into the center */
+        #export-btn:hover i {
+            transform: translateX(-0%); /* Slide the icon into the center */
             opacity: 1; /* Fade in the icon */
         }
 
@@ -319,8 +312,8 @@ button {
             transition: opacity 0.3s ease;
         }
 
-        #export-pdf {
-            background: linear-gradient(to bottom, #2dabe2, #83d9ff); /* Red background for delete */
+        #export-pdf-btn {
+            background: linear-gradient(to bottom, #2dabe2, #83d9ff);/* Red background for delete */
             color: white; /* White text color */
             border: none; /* Remove default border */
             padding: 15px 100px; /* Padding around the text */
@@ -336,76 +329,65 @@ button {
 			font-weight:bold;
         }
 
-        #export-pdf .pdf-text {
+        #export-pdf-btn .pdf-text {
             position: absolute;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        #export-pdf i {
+        #export-pdf-btn i {
             opacity: 0;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        #export-pdf:hover {
+        #export-pdf-btn:hover {
             background: linear-gradient(to bottom, #2dabe2, #83d9ff);
         }
 
-        #export-pdf:hover .pdf-text {
+        #export-pdf-btn:hover .pdf-text {
             transform: translateX(-100%); /* Slide the text to the left */
             opacity: 0; /* Fade out the text */
         }
 
-        #export-pdf:hover i {
-            transform: translateX(0%); /* Slide the icon into the center */
+        #export-pdf-btn:hover i {
+            transform: translateX(-0%); /* Slide the icon into the center */
             opacity: 1; /* Fade in the icon */
         }
 
         .pdf-text {
             transition: opacity 0.3s ease;
         }
-
-
+	
+	
 @media (min-width: 1024px) {
-
 body {
-	font-family: Arial, sans-serif;
-	background-color: #f9f9f9;
-	font-size: 1.0rem;
-	margin: 0;
-	padding: 0;
-	display: flex;
-	align-items: center; /* Center vertically */
-	justify-content: center; /* Center horizontally */
-	min-height: 100vh; /* Ensure full height */
-	text-align: center;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    display: flex;
+    min-height: 100vh;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .container {
-	width: 55%;
-	background: #fff;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 60%;
+
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
 }
 
-#buyer-search-box {
-        border: 2px solid #ccc;
-		padding: 10px;
-        border-radius: 5px;
-        font-size: 1rem;
-    }
-		
-h1 {
-	font-size:1.5rem;
-	text-align: center;
-	margin-bottom: 20px;
-}
-		
+
+/* 🏆 Logo */
 .logo img {
     max-width: 100px;
-	margin: 0 auto 10px;
-    display: block;
- }
+    margin-bottom: 5px;
+}
 
 /* 🏠 Navbar */
 .navbar {
@@ -422,6 +404,7 @@ h1 {
     color: white;
     font-size: 1.2rem;
 }
+
 .home-icon img {
     display: block;
     width: 30px;
@@ -442,8 +425,8 @@ h1 {
 .dropbtn:hover {
     background: none;
     transform: scale(1.02);
-}	
-	
+}
+
 .dropbtn img {
     width: 30px;
 	transition: transform 0.3s ease-in-out;
@@ -473,12 +456,12 @@ h1 {
     color: #333;
     font-size: 1rem;
     transition: background 0.3s ease-in-out;
-}	
+}
 
 .dropdown-content a:hover {
     background: #f0f0f0;
 }	
-
+   
 /* 🎯 Active Page Highlight */
 .navbar a.active {
     font-weight: bold;
@@ -492,98 +475,124 @@ h1 {
 	display: inline-block;
 }
 
-/* Search Box Styling */
-#buyer-search-box {
-    padding: 8px;
+
+/* 📝 Form Styling */
+h1 {
+    font-size: 1.3rem;
     margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    box-sizing: border-box;
-    background-color: #f9f9f9;
+    color: #333;
 }
 
-/* Adjust width of the dropdown and search box for responsiveness */
-#buyer-dropdown {
-    padding: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    background-color: #f9f9f9;
-    box-sizing: border-box;
+.search-container {
+    margin-bottom: 20px;
 }
 
-/* Style the table header and the search input to align nicely */
-.table-wrapper {
+.search-container input {
+    width: calc(100% - 20px);
+    max-width: 400px;
+    padding: 10px;
+    font-size: 1rem;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    transition: border 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for border and box-shadow */
+}
+
+
+/* Styling for the dropdown options when hovering */
+.search-container input:hover {
+    border-color: #008cff; /* Highlight the border on hover */
+}
+
+        
+table {
+    width: 100%;
+    border-collapse: collapse;
     margin-top: 20px;
 }
-
-#buyer-search-box {
-    margin-top: 15px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
+        
+table th, table td {
+    text-align: left;
+    padding: 10px;
+	font-size: 1rem;
+    border: 1px solid #ddd;
 }
 
-/* Style for the buyer dropdown container */
-.buyer-dropdown-container {
-    margin-bottom: 15px;
-    max-width: 300px;
-    display: inline-block;
+table th {
+    background: #f4f4f4;
+    font-weight: bold;
+	font-size: 1rem;
 }
 
-#buyer-dropdown {
-    font-size: 14px;
-    border: 1px solid #ccc;
-    padding: 8px;
+table tr:nth-child(even) {
     background-color: #f9f9f9;
-    border-radius: 4px;
-    box-sizing: border-box;
 }
 
-/* Hover and focus states for input fields */
-#buyer-search-box:focus, #buyer-dropdown:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+table tr:hover {
+    background-color: #f1f1f1;
 }
 
-/* Adjust the dropdown appearance */
-#buyer-dropdown option {
-    padding: 8px;
-    font-size: 14px;
-}
-
-/* Dropdown visibility when filtering */
-#buyer-dropdown option[style="display: none;"] {
-    display: none;
-}
-
-
-option {
-    font-weight: bold;
+.error-message {
+    color: red;
     font-size: 1rem;
+    margin-top: 10px;
+    text-align: center;
+}
+	
+        .delete-btn {
+            background-color: #ff1a1a; /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+            padding: 8px 16px; /* Padding around the text */
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 0.8rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+
+        .delete-btn .delete-text {
+            position: absolute;
+            left: 8;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .delete-btn i {
+            margin-left: 12px;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff1a1a;
+        }
+
+        .delete-btn:hover .delete-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+
+        .delete-btn:hover i {
+            transform: translateX(-50%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .delete-text {
+            transition: opacity 0.3s ease;
+        }
+
+/* Optional: Style the Delete button on focus (when clicked) */
+.delete-btn:focus {
+    outline: none; /* Remove outline */
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.7); /* Red shadow effect */
 }
 
-
-td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: left;
-    font-size: 0.9rem;
-
-}
-
-th {
-    background: #333;
-    padding: 10px;
-    font-size: 0.8rem;
-    text-align: left;
-    color: white;
-    font-weight: bold;
-}
-
-   #export-excel {
+#export-btn {
+			margin-top:10px;
             background: linear-gradient(to bottom, #2fc36b, #77fbac);
             color: white; /* White text color */
             border: none; /* Remove default border */
@@ -600,27 +609,27 @@ th {
 			font-weight:bold;
         }
 
-        #export-excel .excel-text {
+        #export-btn .excel-text {
             position: absolute;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        #export-excel i {
+        #export-btn i {
             opacity: 0;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        #export-excel:hover {
-            background: linear-gradient(to bottom, #2fc36b, #77fbac);
+        #export-btn:hover {
+           background: linear-gradient(to bottom, #2fc36b, #77fbac);
         }
 
-        #export-excel:hover .excel-text {
+        #export-btn:hover .excel-text {
             transform: translateX(-100%); /* Slide the text to the left */
             opacity: 0; /* Fade out the text */
         }
 
-        #export-excel:hover i {
-            transform: translateX(0%); /* Slide the icon into the center */
+        #export-btn:hover i {
+            transform: translateX(-0%); /* Slide the icon into the center */
             opacity: 1; /* Fade in the icon */
         }
 
@@ -628,7 +637,7 @@ th {
             transition: opacity 0.3s ease;
         }
 
-        #export-pdf {
+        #export-pdf-btn {
             background: linear-gradient(to bottom, #2dabe2, #83d9ff); /* Red background for delete */
             color: white; /* White text color */
             border: none; /* Remove default border */
@@ -645,33 +654,56 @@ th {
 			font-weight:bold;
         }
 
-        #export-pdf .pdf-text {
+        #export-pdf-btn .pdf-text {
             position: absolute;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        #export-pdf i {
+        #export-pdf-btn i {
             opacity: 0;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        #export-pdf:hover {
+        #export-pdf-btn:hover {
             background: linear-gradient(to bottom, #2dabe2, #83d9ff);
         }
 
-        #export-pdf:hover .pdf-text {
+        #export-pdf-btn:hover .pdf-text {
             transform: translateX(-100%); /* Slide the text to the left */
             opacity: 0; /* Fade out the text */
         }
 
-        #export-pdf:hover i {
-            transform: translateX(0%); /* Slide the icon into the center */
+        #export-pdf-btn:hover i {
+            transform: translateX(-0%); /* Slide the icon into the center */
             opacity: 1; /* Fade in the icon */
         }
 
         .pdf-text {
             transition: opacity 0.3s ease;
-        }	
-
+        }
+		
+		    .edit-btn {
+        background-color: #2fd57a;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        margin: 5px 0px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        transition: background-color 0.3s ease;
+        display: inline-flex
+;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        text-align: center;
+        font-weight: bold;
+    }
 
 }
+/* 🌙 Dark Mode */
+@media (prefers-color-scheme: dark) {
+
+}
+

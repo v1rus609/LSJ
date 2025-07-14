@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Discount</title>
+    <link rel="stylesheet" href="discount.css">
+</head>
+<body>
+
+    <div class="form-container">
+    
+    <div class="container">    
+
+    <div class="navbar">
+        <a href="index.html" class="home-icon">
+                <img src="home-icon.png" alt="Home" width="32">
+        </a>
+        <div class="dropdown">
+            <button class="dropbtn">
+                    <img src="menu-icon.png" alt="Menu" width="24">
+            </button>
+            <div class="dropdown-content">
+            <a href="container.html">Add Container</a>
+            <a href="containers.html">Container List</a>
+            <a href="buyers.html">Add Buyer</a>
+            <a href="inventory.html">Inventory</a>
+            <a href="purchase.html">Sales History</a>
+            <a href="received-payment.html">Received Payment</a>
+            <a href="payment-history.html">Payment History</a>
+            <a href="sales-statement.html">Sales Statement</a>
+            <a href="purchase-return.html">Sales Return</a>
+            <a href="previous-sales-return.html">Previous Sales Return</a>
+			<a href="return-history.html">Return History</a>
+			<a href="discount.html" class="active">Discount</a>
+			<a href="discount-history.html">Discount History</a>
+			<a href="buyer-timeline.html">Buyer Timeline</a>
+            <a href="#" id="logout-btn">Logout</a>            
+            </div>
+        </div>
+    </div>
+
+    <div class="logo">
+         <img src="logo.png" alt="Company Logo">
+    </div>
+
+    <h1>Add Discount</h1>
+    <form action="/discounts/add" method="POST">
+        <label for="discount_date">Date:</label>
+        <input type="date" id="discount_date" name="discount_date" required>
+       
+  	    <label for="buyer-search-box">Search Buyers:</label>
+		<input type="text" id="buyer-search-box" placeholder="Search Buyer..." />
+
+        <label for="buyer">Buyer:</label>
+        <select id="buyer" name="buyer" required>
+		<option value="" disabled selected>Select Buyer</option>
+            <!-- Buyer options will be populated dynamically -->
+        </select>
+
+        <label for="discount_amount">Discount Amount:</label>
+        <input type="number" id="discount_amount" name="discount_amount" required step="0.01" autocomplete="off">
+
+        <button type="submit">Add Discount</button>
+    </form>
+
+    </div>
+
+    <div id="success-popup">
+        Discount Added Successfully!
+    </div>
+
+    <script src="discount.js"></script>
+
+    <script>
+        // Ensure the user is logged in
+        fetch('/check-role')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.loggedIn) {
+                    window.location.href = '/login.html';
+                } else {
+                    if (data.role !== 'Admin') {
+                        window.location.href = '/index.html';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error checking user role:', error);
+                window.location.href = '/login.html';
+            });
+    </script>
+    
+</body>
+</html>
