@@ -11,22 +11,21 @@ function getRawNumber(value) {
 
 // Fetch buyers to populate the dropdown
 function fetchBuyers() {
-fetch('/buyers/list')
-    .then(response => response.json())
-    .then(data => {
-        const buyerFilter = document.getElementById('buyer-filter');
-        buyerFilter.innerHTML = '<option value="all" data-id="0">All Buyers</option>'; // Default option
+    fetch('/buyers/list')
+        .then(response => response.json())
+        .then(data => {
+            const buyerFilter = document.getElementById('buyer-filter');
+            buyerFilter.innerHTML = '<option value="all" data-id="0">All Buyers</option>'; // Default option
 
-        data.forEach(buyer => {
-            const option = document.createElement('option');
-            option.value = buyer.name;
-            option.textContent = buyer.name;
-            option.setAttribute('data-id', buyer.id); // Store buyer ID in option
-            buyerFilter.appendChild(option);
-        });
-    })
-    .catch(error => console.error('Error fetching buyers:', error));
-
+            data.forEach(buyer => {
+                const option = document.createElement('option');
+                option.value = buyer.name;
+                option.textContent = buyer.name;
+                option.setAttribute('data-id', buyer.id); // Store buyer ID in option
+                buyerFilter.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching buyers:', error));
 }
 
 // Buyer search box functionality
@@ -38,117 +37,165 @@ document.getElementById('buyer-search-box').addEventListener('input', function (
     // Loop through the options and hide those that don't match the search value
     Array.from(options).forEach(option => {
         const optionText = option.text.toLowerCase();
-        if (optionText.includes(searchValue)) {
-            option.style.display = '';
-        } else {
-            option.style.display = 'none';
-        }
+        option.style.display = optionText.includes(searchValue) ? '' : 'none';
     });
-
 });
 
-// Fetch sales statement and purchase return data with filtering (without date filter)
+// Fetch sales + returns + discounts with filtering (no date filter)
 function fetchSalesAndReturns(buyerName = 'all') {
-    fetch('/buyers/list') // ✅ Fetch buyers first
+    // 1) Fetch buyers first
+    fetch('/buyers/list')
         .then(response => response.json())
         .then(buyersData => {
-            console.log('✅ Buyers Data:', buyersData); // Debugging
-
-            // ✅ Append filters to API request (removed date filters)
-            let query = `/sales/statement?buyer_name=${buyerName}`;
-
-            fetch(query)
-                .then(response => response.json())
-                .then(salesData => {
-                    console.log('✅ Sales Data:', salesData); // Debugging
-
-                    fetch('/purchase-return/list')
-                        .then(response => response.json())
-                        .then(purchaseReturnsData => {
-                            console.log('✅ Purchase Returns Data:', purchaseReturnsData); // Debugging
-
-                            updateSalesTable(salesData, purchaseReturnsData, buyersData); // ✅ Pass buyersData
-                        })
-                        .catch(error => console.error('❌ Error fetching purchase return data:', error));
-                })
-                .catch(error => console.error('❌ Error fetching sales statement:', error));
+            // 2) Fetch all data in parallel
+            const query = `/sales/statement?buyer_name=${encodeURIComponent(buyerName)}`;
+            return Promise.all([
+                Promise.resolve(buyersData),
+                fetch(query).then(r => r.json()),
+                fetch('/purchase-return/list').then(r => r.json()),
+                fetch('/discounts/list').then(r => r.json()) // NEW: discounts
+            ]);
         })
-        .catch(error => console.error('❌ Error fetching buyers:', error));
+        .then(([buyersData, salesData, purchaseReturnsData, discountsData]) => {
+            updateSalesTable(salesData, purchaseReturnsData, buyersData, discountsData); // pass discounts
+        })
+        .catch(error => {
+            console.error('❌ Error in fetchSalesAndReturns:', error);
+            const err = document.getElementById('error-message');
+            if (err) err.style.display = 'block';
+        });
 }
 
-// ✅ Update Sales Table Dynamically
-function updateSalesTable(salesData, purchaseReturnsData, buyersData) {
+// ✅ Update Sales Table Dynamically (aggregates per buyer to avoid double counting)
+function updateSalesTable(salesData, purchaseReturnsData, buyersData, discountsData) {
     const tableBody = document.getElementById('sales-statement-table').querySelector('tbody');
     tableBody.innerHTML = ''; // Clear previous rows
 
+    // Footer totals
     let totalPurchase = 0;
     let totalPaid = 0;
     let totalUnpaid = 0;
-    let totalAdvanceReceipt = 0; // For Advance Receipt (Negative Opening Balance)
+    let totalAdvanceReceipt = 0; // negative OB summed here
+    let totalDiscount = 0;       // NEW: sum of discounts
 
-    // Keep track of the serial number
+    // Serial number
     let serialNumber = 1;
 
-    const buyerIdMap = {};
-    buyersData.forEach(buyer => {
-        buyerIdMap[buyer.name] = buyer.id;
+    // Build lookup maps
+    const buyerIdByName = {};
+    buyersData.forEach(b => { buyerIdByName[b.name] = b.id; });
+
+    // --- Aggregate raw sales per buyer first ---
+    // salesData can have multiple rows per buyer; we collapse them.
+    const salesAgg = new Map();
+    (salesData || []).forEach(rec => {
+        const name = rec.buyer_name || 'N/A';
+        const prev = salesAgg.get(name) || { total_purchase: 0, total_paid: 0, total_unpaid: 0 };
+        prev.total_purchase += Number(rec.total_purchase || 0);
+        prev.total_paid += Number(rec.total_paid || 0);
+        prev.total_unpaid += Number(rec.total_unpaid || 0); // not used in math, but kept for reference
+        salesAgg.set(name, prev);
     });
 
-    salesData.forEach((record) => {
-        const buyerName = record.buyer_name || 'N/A';
-        const totalPurchaseOriginal = record.total_purchase || 0;
-        const totalPaidAmount = record.total_paid || 0;
-        const totalUnpaidAmount = record.total_unpaid || 0;
-        const buyerId = buyerIdMap[buyerName];
+    // Sum returns by buyerId
+    const returnsByBuyerId = (purchaseReturnsData || []).reduce((acc, row) => {
+        const id = String(row.buyer_id || '');
+        const amt = Number(row.total_amount || 0);
+        acc[id] = (acc[id] || 0) + amt;
+        return acc;
+    }, {});
 
+    // Sum discounts by buyer name (your /discounts/list returns buyer_name)
+    const discountsByBuyerName = (discountsData || []).reduce((acc, row) => {
+        const name = row.buyer_name || 'N/A';
+        const amt = Number(row.discount_amount || 0);
+        acc[name] = (acc[name] || 0) + amt;
+        return acc;
+    }, {});
+
+    // Prepare list of buyers we will render (sorted by name for stable order)
+    const buyersToRender = Array.from(salesAgg.keys()).sort((a, b) => a.localeCompare(b));
+
+    // Fetch each buyer's opening balance in parallel, compute their row, then render
+    const rowPromises = buyersToRender.map(async (buyerName) => {
+        const buyerId = buyerIdByName[buyerName];
         if (!buyerId) {
             console.warn(`⚠ No matching buyer_id found for ${buyerName}`);
-            return;
         }
 
-        // Calculate Purchase Returns for this buyer
-        const buyerReturns = purchaseReturnsData
-            .filter(returnData => returnData.buyer_id == buyerId)
-            .reduce((sum, returnItem) => sum + (returnItem.total_amount || 0), 0);
+        // Opening balance
+        let openingBalance = 0;
+        if (buyerId) {
+            try {
+                const obRes = await fetch(`/buyers/opening-balance/${buyerId}`);
+                if (obRes.ok) {
+                    const obData = await obRes.json();
+                    openingBalance = Number(obData.opening_balance || 0);
+                }
+            } catch (e) {
+                console.error('❌ Error fetching opening balance for buyer:', buyerName, e);
+            }
+        }
 
-        fetch(`/buyers/opening-balance/${buyerId}`)
-            .then(response => response.json())
-            .then(openingBalanceData => {
-                const openingBalance = openingBalanceData.opening_balance || 0;
+        const positiveOB = Math.max(0, openingBalance);
+        const negativeOB = Math.min(0, openingBalance);
 
-                const positiveOpeningBalance = Math.max(0, openingBalance); 
-                const negativeOpeningBalance = Math.min(0, openingBalance); 
+        const agg = salesAgg.get(buyerName) || { total_purchase: 0, total_paid: 0 };
+        const totalPurchaseOriginal = Number(agg.total_purchase || 0);
+        const totalPaidAmount = Number(agg.total_paid || 0);
 
-                const adjustedPurchaseAmount = totalPurchaseOriginal - buyerReturns;
-                const adjustedPurchaseWithOpeningBalance = adjustedPurchaseAmount + positiveOpeningBalance;
-                const adjustedBalance = adjustedPurchaseWithOpeningBalance - totalPaidAmount + negativeOpeningBalance;
+        const buyerReturns = buyerId ? (returnsByBuyerId[String(buyerId)] || 0) : 0;
+        const totalDiscountForBuyer = Number(discountsByBuyerName[buyerName] || 0);
 
-                totalPurchase += adjustedPurchaseWithOpeningBalance;
-                totalPaid += totalPaidAmount;
-                totalUnpaid += adjustedBalance;
-                totalAdvanceReceipt += negativeOpeningBalance;
+        // Column calculations
+        const adjustedPurchaseAmount = totalPurchaseOriginal - buyerReturns; // purchases minus returns
+        const amountCol = adjustedPurchaseAmount + positiveOB;               // + positive opening balance
+        const advanceReceiptCol = negativeOB;                                // negative opening balance
+        const receiptCol = totalPaidAmount;                                   // total paid
+        const discountCol = totalDiscountForBuyer;                            // NEW: discount column
 
-                // Create Row with Correct Serial Number
-                const row = `
-                    <tr>
-                        <td>${serialNumber++}</td> <!-- Increment serial number for each row -->
-                        <td>${buyerName}</td>
-                        <td>${formatNumberWithCommas(adjustedPurchaseWithOpeningBalance)}</td>
-                        <td>${formatNumberWithCommas(negativeOpeningBalance)}</td>
-                        <td>${formatNumberWithCommas(totalPaidAmount)}</td>
-                        <td>${formatNumberWithCommas(adjustedBalance)}</td>
-                    </tr>
-                `;
-                tableBody.innerHTML += row;
+        // Balance after all adjustments
+        const balanceCol = amountCol + advanceReceiptCol - receiptCol - discountCol;
 
-                // Update Footer Totals
-                document.getElementById('sum-total-purchase').textContent = formatNumberWithCommas(totalPurchase);
-                document.getElementById('sum-total-advance-receipt').textContent = formatNumberWithCommas(totalAdvanceReceipt);
-                document.getElementById('sum-total-paid').textContent = formatNumberWithCommas(totalPaid);
-                document.getElementById('sum-total-unpaid').textContent = formatNumberWithCommas(totalUnpaid);
-            })
-            .catch(error => console.error('❌ Error fetching opening balance for buyer:', error));
+        // Update footer totals
+        totalPurchase += amountCol;
+        totalPaid += receiptCol;
+        totalAdvanceReceipt += advanceReceiptCol;
+        totalDiscount += discountCol;
+        totalUnpaid += balanceCol;
+
+        // Build row HTML
+        return `
+            <tr>
+                <td>${serialNumber++}</td>
+                <td>${buyerName}</td>
+                <td>${formatNumberWithCommas(amountCol)}</td>
+                <td>${formatNumberWithCommas(advanceReceiptCol)}</td>
+                <td>${formatNumberWithCommas(receiptCol)}</td>
+                <td>${formatNumberWithCommas(discountCol)}</td>
+                <td>${formatNumberWithCommas(balanceCol)}</td>
+            </tr>
+        `;
     });
+
+    Promise.all(rowPromises)
+        .then(rows => {
+            // Render all rows at once
+            tableBody.innerHTML = rows.join('');
+
+            // Update Footer Totals (only set discount cell if it exists in DOM)
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = formatNumberWithCommas(val);
+            };
+
+            setText('sum-total-purchase', totalPurchase);
+            setText('sum-total-advance-receipt', totalAdvanceReceipt);
+            setText('sum-total-paid', totalPaid);
+            setText('sum-total-discount', totalDiscount); // NEW
+            setText('sum-total-unpaid', totalUnpaid);
+        })
+        .catch(err => console.error('❌ Error building table rows:', err));
 }
 
 function renderTable(buyerData) {
@@ -171,7 +218,7 @@ function renderTable(buyerData) {
     });
 }
 
-// ✅ Function to Fetch and Update Balance Table
+// ✅ Function to Fetch and Update Balance Table (legacy, only call if you have updateBalanceTable)
 function fetchSalesAndBalanceUpdates() {
     fetch('/buyers/list')
         .then(response => response.json())
@@ -182,6 +229,8 @@ function fetchSalesAndBalanceUpdates() {
                     fetch('/purchase-return/list')
                         .then(response => response.json())
                         .then(purchaseReturnsData => {
+                            // NOTE: updateBalanceTable is not defined in your snippet.
+                            // If you don't use this, you can remove this whole function.
                             updateBalanceTable(salesData, purchaseReturnsData, buyersData);
                         })
                         .catch(error => console.error('❌ Error fetching purchase return data:', error));
@@ -194,11 +243,10 @@ function fetchSalesAndBalanceUpdates() {
 // ✅ Add event listener for filters (without date filter)
 document.getElementById('apply-filters').addEventListener('click', function () {
     const buyerName = document.getElementById('buyer-filter').value;
-    
     console.log(`🔍 Applying filters: Buyer=${buyerName}`);
-    
     fetchSalesAndReturns(buyerName); // ✅ Pass selected buyer filter
 });
+
 
 // Add event listener for export to Excel
 document.getElementById('export-sales-statement').addEventListener('click', function () {

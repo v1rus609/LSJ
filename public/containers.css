@@ -356,7 +356,65 @@ table tr:hover {
         .pdf-text {
             transition: opacity 0.3s ease;
         }
+		
+		.date-filter {
+    margin: 8px 0;
+    display: flex
+;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+    label {
+        font-weight: bold;
+        margin-right: 5px;
+        font-size: 0.8rem;
+    }
 	
+	.date-filter input {
+        padding: 5px;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        font-size: 0.8rem;
+    }
+	
+	
+	#apply-date-filter {
+        padding: 7px 10px;
+        font-size: 0.8rem;
+        color: #fff;
+        background: linear-gradient(to bottom, #37b0e5, #76d2fb);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
+    }
+	
+	#apply-date-filter:hover {
+		transform: scale(1.1); /* Smoothly enlarge the icon on hover */
+	}
+	
+	#clear-date-filter {
+        padding: 7px 10px;
+        font-size: 0.8rem;
+        color: #fff;
+        background: linear-gradient(to bottom, #ff6772, #fb3d3d);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
+    }
+	
+	#clear-date-filter:hover {
+		transform: scale(1.1); /* Smoothly enlarge the icon on hover */
+	}
+	
+	
+	    #container-table td:last-child {
+        text-align: center;
+    }
 	
 @media (min-width: 1024px) {
 body {
@@ -682,24 +740,72 @@ table tr:hover {
             transition: opacity 0.3s ease;
         }
 		
-		    .edit-btn {
-        background-color: #2fd57a;
+        .edit-btn {
+            background-color: #2fd57a; /* Red background for delete */
+            color: white; /* White text color */
+            border: none; /* Remove default border */
+			padding: 8px 15px;
+			margin: 5px 0px;
+            cursor: pointer; /* Change cursor to pointer */
+            border-radius: 4px; /* Rounded corners */
+            font-size: 0.8rem; /* Font size for the button */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center; /* Center align text */
+			font-weight:bold;
+        }
+		
+		.delete-btn {
+        background-color: #ff1a1a;
         color: white;
         border: none;
-        padding: 8px 15px;
+        padding: 8px 20px;
         margin: 5px 0px;
         cursor: pointer;
         border-radius: 4px;
         font-size: 0.8rem;
         transition: background-color 0.3s ease;
-        display: inline-flex
-;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         position: relative;
         text-align: center;
         font-weight: bold;
     }
+	
+	        .edit-btn .edit-text {
+            position: absolute;
+            left: 8;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .edit-btn i {
+            margin-left: 18px;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .edit-btn:hover {
+            background-color: #2fd57a;
+        }
+
+        .edit-btn:hover .edit-text {
+            transform: translateX(-100%); /* Slide the text to the left */
+            opacity: 0; /* Fade out the text */
+        }
+		        .edit-btn:hover i {
+            transform: translateX(-50%); /* Slide the icon into the center */
+            opacity: 1; /* Fade in the icon */
+        }
+
+        .edit-text {
+            transition: opacity 0.3s ease;
+        }
+		
+}
 
 }
 /* 🌙 Dark Mode */

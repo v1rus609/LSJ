@@ -45,8 +45,18 @@
         <div class="search-container">
             <input type="text" id="search-box" placeholder="Search by Container Number..." />
         </div>
+		<div class="date-filter" style="margin: 8px 0; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+  <label for="start-date" style="min-width:40px;">Start</label>
+  <input type="date" id="start-date" placeholder="mm/dd/yyyy" />
+
+  <label for="end-date" style="min-width:32px;">End</label>
+  <input type="date" id="end-date" placeholder="mm/dd/yyyy" />
+
+  <button id="apply-date-filter">Apply Filter</button>
+  <button id="clear-date-filter" type="button">Clear</button>
+</div>
         <div class="table-wrapper">
-            <table>
+             <table id="container-table">
                 <thead>
                     <tr>
                         <th>ID</th>

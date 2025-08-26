@@ -1,462 +1,592 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const searchBox = document.getElementById('search-box');
-    const containerList = document.getElementById('container-list');
-    let containerData = [];
+/* containers.js — full version */
 
-    // Fetch container data and render the table
-    fetch('/containers/list')
-        .then(response => response.json())
-        .then(data => {
-            containerData = data.map(container => ({
-                id: container.id,
-                container_number: container.container_number,
-                weight: container.weight,
-                arrival_date: container.arrival_date,
-                total_weight_sold: container.total_weight_sold,
-                total_weight_returned: container.total_weight_returned,
-                remaining_weight: container.remaining_weight
-            }));
+// ---------- Globals ----------
+let containerData = [];
+let isAdmin = false;
 
-            // Render the table after fetching the container data
-            renderTable(containerData);
-        })
-        .catch(error => {
-            console.error('Error fetching containers:', error);
-            document.getElementById('error-message').style.display = 'block'; // Show error message if data fetch fails
-        });
+// Cache common DOM nodes once
+const containerList = document.getElementById('container-list');
+const searchBox     = document.getElementById('search-box');
+const startInput    = document.getElementById('start-date');
+const endInput      = document.getElementById('end-date');
+const applyBtn      = document.getElementById('apply-date-filter');
+const clearBtn      = document.getElementById('clear-date-filter');
+
+document.addEventListener('DOMContentLoaded', init);
+
+async function init() {
+  // 1) Role check first (to set isAdmin)
+  await checkRoleAndSecureUI();
+
+  // 2) Fetch and render table
+  await loadContainers();
+
+  // 3) Hook up filters/buttons
+  wireUpFiltersAndActions();
+
+  // 4) Wire up dropdown & logout
+  wireUpDropdown();
+  wireUpLogout();
+}
+
+/* -------------------------------
+   Role check & Admin visibility
+--------------------------------*/
+async function checkRoleAndSecureUI() {
+  try {
+    const res = await fetch('/check-role');
+    const data = await res.json();
+
+    if (!data?.loggedIn) {
+      window.location.href = '/login.html';
+      return;
+    }
+
+    isAdmin = data.role === 'Admin';
+    window.isAdmin = isAdmin; // keep your global if other scripts use it
+
+    // Hide admin-only navbar links for non-admin
+    if (!isAdmin) {
+      document.querySelectorAll('.admin-only').forEach(link => link.style.display = 'none');
+    }
+  } catch (err) {
+    console.error('Error checking user role:', err);
+    window.location.href = '/login.html';
+  }
+}
+
+/* -------------------------------
+   Data load & render
+--------------------------------*/
+async function loadContainers() {
+  try {
+    const response = await fetch('/containers/list');
+    const data = await response.json();
+
+    containerData = data.map(container => ({
+      id: container.id,
+      container_number: container.container_number,
+      weight: Number(container.weight) || 0,
+      arrival_date: container.arrival_date,
+      total_weight_sold: Number(container.total_weight_sold) || 0,
+      total_weight_returned: Number(container.total_weight_returned) || 0,
+      remaining_weight: Number(container.remaining_weight) || 0
+    }));
+
+    // Render full table (no filters initially)
+    renderTable(containerData);
+  } catch (err) {
+    console.error('Error fetching containers:', err);
+    const errorMsg = document.getElementById('error-message');
+    if (errorMsg) errorMsg.style.display = 'block';
+  }
+}
 
 function renderTable(data) {
-    containerList.innerHTML = ''; // Clear existing rows
-    let totalSold = 0, totalReturned = 0, totalRemaining = 0, totalWeight = 0; // Initialize totals
+  containerList.innerHTML = '';
+  let totalSold = 0, totalReturned = 0, totalRemaining = 0, totalWeight = 0;
 
-    data.forEach((container, index) => {
-        const arrivalDate = new Date(container.arrival_date);
-        const formattedDate = new Intl.DateTimeFormat('en-GB').format(arrivalDate); // Format date as dd/mm/yyyy
+  data.forEach((container, index) => {
+    const formattedDate = formatDateDDMMYYYY(container.arrival_date);
 
-        // Accumulate totals
-        totalSold += parseFloat(container.total_weight_sold) || 0;
-        totalReturned += parseFloat(container.total_weight_returned) || 0;
-        totalRemaining += parseFloat(container.remaining_weight) || 0;
-        totalWeight += parseFloat(container.weight) || 0; // Accumulate total weight
+    totalSold      += container.total_weight_sold || 0;
+    totalReturned  += container.total_weight_returned || 0;
+    totalRemaining += container.remaining_weight || 0;
+    totalWeight    += container.weight || 0;
 
-        const row = `
-            <tr data-id="${container.id}">
-                <td>${index + 1}</td>
-                <td>${formattedDate}</td>
-                <td>${container.container_number}</td>
-                <td>
-                    <span class="weight-display" data-id="${container.id}">${container.weight}</span>
-                    <input class="weight-input" type="number" value="${container.weight}" data-id="${container.id}" style="display: none;" />
-                </td>
-                <td>${formatNumberWithCommas(container.total_weight_sold)}</td>
-                <td>${formatNumberWithCommas(container.total_weight_returned)}</td>
-                <td>${formatNumberWithCommas(container.remaining_weight)}</td>
-                <td>
-                    <button class="edit-btn" data-id="${container.id}">Edit</button>
-                    <button class="delete-btn" data-id="${container.id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>
-                </td>
-            </tr>
-        `;
-        containerList.innerHTML += row;
-    });
+    const row = document.createElement('tr');
+    row.setAttribute('data-id', container.id);
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${formattedDate}</td>
+      <td>${escapeHTML(container.container_number ?? '')}</td>
+      <td>
+        <span class="weight-display" data-id="${container.id}">${formatNumber(container.weight)}</span>
+        <input class="weight-input" type="number" value="${container.weight}" data-id="${container.id}" style="display:none;width:100px;" />
+      </td>
+      <td>${formatNumber(container.total_weight_sold)}</td>
+      <td>${formatNumber(container.total_weight_returned)}</td>
+      <td>${formatNumber(container.remaining_weight)}</td>
+      <td>
+		<button class="edit-btn" data-id="${container.id}"><span class="edit-text">Edit</span><i class="fas fa-edit"></i></button>
+		<button class="delete-btn" data-id="${container.id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>	
+      </td>
+    `;
+    containerList.appendChild(row);
+  });
 
+  // Totals row
+  const totalRow = document.createElement('tr');
+  totalRow.className = 'total-row';
+  totalRow.innerHTML = `
+    <td colspan="3"><strong>Totals:</strong></td>
+    <td><strong>${formatNumber(totalWeight)}</strong></td>
+    <td><strong>${formatNumber(totalSold)}</strong></td>
+    <td><strong>${formatNumber(totalReturned)}</strong></td>
+    <td><strong>${formatNumber(totalRemaining)}</strong></td>
+    <td></td>
+  `;
+  containerList.appendChild(totalRow);
 
-        // Totals Row (including total of Weight column)
-        const totalRow = `
-            <tr class="total-row">
-                <td colspan="3"><strong>Totals:</strong></td>
-                <td><strong>${formatNumberWithCommas(totalWeight)}</strong></td>
-                <td><strong>${formatNumberWithCommas(totalSold)}</strong></td>
-                <td><strong>${formatNumberWithCommas(totalReturned)}</strong></td>
-                <td><strong>${formatNumberWithCommas(totalRemaining)}</strong></td>
-                <td></td> <!-- Empty cell for Action column -->
-            </tr>
-        `;
-        containerList.innerHTML += totalRow;
+  // Wire up per-row buttons
+  containerList.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', handleEditContainer);
+  });
+  containerList.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', handleDeleteContainer);
+  });
 
-        // Add event listeners for "Edit" and "Delete" buttons
-        document.querySelectorAll('.edit-btn').forEach(button => {
-            button.addEventListener('click', handleEditContainer);
-        });
-
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', handleDeleteContainer);
-        });
-
-        // 🧼 CLEANUP: If not admin, hide delete buttons and action column
-        if (!window.isAdmin) {
-            // Hide all delete buttons
-            document.querySelectorAll('.delete-btn').forEach(btn => btn.style.display = 'none');
-
-            // Hide the 8th <td> (action column) in all rows
-            containerList.querySelectorAll('tr').forEach(row => {
-                const cells = row.querySelectorAll('td');
-                if (cells.length > 7) {
-                    cells[7].style.display = 'none';
-                }
-            });
-
-            // Hide totals row last column
-            const totalRow = document.querySelector('.total-row');
-            if (totalRow) {
-                const cells = totalRow.querySelectorAll('td');
-                if (cells.length > 7) {
-                    cells[7].style.display = 'none';
-                }
-            }
-        }
-    }
-
-    // Helper function to format numbers with commas
-    function formatNumberWithCommas(number) {
-        return parseFloat(number).toLocaleString('en-US');
-    }
-
-    // Filter containers based on search input
-    searchBox.addEventListener('input', function () {
-        const searchValue = this.value.toLowerCase();
-        const filteredData = containerData.filter(container =>
-            container.container_number.toLowerCase().includes(searchValue) // Match the search value with container number
-        );
-        renderTable(filteredData); // Re-render the table with the filtered data
-    });
-
-    // Handle Edit Button Click
-    function handleEditContainer(event) {
-        const containerId = parseInt(event.target.dataset.id); // Convert the ID to a number
-        console.log('Container ID:', containerId); // Log the container ID to ensure it's a number
-
-        // Find the container by ID from containerData
-        const container = containerData.find(c => c.id === containerId);  // Ensure both sides are numbers
-
-        if (!container) {
-            console.error('Container not found!');
-            alert('Container not found!');
-            return;
-        }
-
-        const weightInput = document.querySelector(`.weight-input[data-id="${containerId}"]`);
-        const weightDisplay = document.querySelector(`.weight-display[data-id="${containerId}"]`);
-
-        // Show the weight input field and hide the display
-        weightInput.style.display = 'inline';
-        weightDisplay.style.display = 'none';
-        weightInput.focus();
-
-        // When the user leaves the input field (on blur)
-        weightInput.addEventListener('blur', function () {
-            const newWeight = parseFloat(weightInput.value);
-            const oldWeight = container.weight;
-
-            if (newWeight !== oldWeight) {
-                // Show a confirmation dialog
-                const confirmChange = confirm('Are you sure you want to change the weight?');
-                if (confirmChange) {
-                    // Handle the weight update
-                    const weightDifference = newWeight - oldWeight;
-
-                    // Update the remaining weight based on the change in weight
-                    let updatedRemainingWeight;
-                    if (weightDifference > 0) {
-                        // If new weight is greater, add the difference to remaining weight
-                        updatedRemainingWeight = container.remaining_weight + weightDifference;
-                    } else {
-                        // If new weight is less, subtract the difference from remaining weight
-                        updatedRemainingWeight = container.remaining_weight - Math.abs(weightDifference);
-                    }
-
-                    console.log('Updated Remaining Weight:', updatedRemainingWeight);
-
-                    // Update the container data in the backend
-                    fetch(`/container/update/${containerId}`, {
-                        method: 'POST',
-                        body: JSON.stringify({ weight: newWeight, remaining_weight: updatedRemainingWeight }),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Container weight updated successfully');
-                            // Update container data in memory
-                            container.weight = newWeight;
-                            container.remaining_weight = updatedRemainingWeight;
-                            renderTable(containerData); // Re-render table
-                        } else {
-                            alert('Failed to update container weight');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error updating container:', error);
-                    });
-                } else {
-                    // If user cancels, revert the input field to the old weight
-                    weightInput.value = oldWeight;
-                    weightInput.style.display = 'none';
-                    weightDisplay.style.display = 'inline';
-                }
-            } else {
-                // If no change, just hide the input field and show the display again
-                weightInput.style.display = 'none';
-                weightDisplay.style.display = 'inline';
-            }
-        });
-    }
-
-    // Handle Delete Button Click
-    function handleDeleteContainer(event) {
-        const containerId = event.target.dataset.id;
-
-        if (confirm("Are you sure you want to delete this container?")) {
-            // Send a request to the backend to delete the container
-            fetch(`/container/delete/${containerId}`, {
-                method: 'DELETE',
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Container deleted successfully");
-                    // Re-fetch the container list after deletion
-                    fetch('/containers/list')
-                        .then(response => response.json())
-                        .then(data => {
-                            containerData = data.map(container => ({
-                                id: container.id,
-                                container_number: container.container_number,
-                                weight: container.weight,
-                                arrival_date: container.arrival_date,
-                                total_weight_sold: container.total_weight_sold,
-                                total_weight_returned: container.total_weight_returned,
-                                remaining_weight: container.remaining_weight
-                            }));
-                            renderTable(containerData);
-                        });
-                } else {
-                    alert("Failed to delete container.");
-                }
-            })
-            .catch(error => {
-                console.error('Error deleting container:', error);
-                alert('Failed to delete container.');
-            });
-        }
-    }
-});
-
-
-// Export table to Excel
-function exportToExcel() {
-    const table = document.getElementById('container-list');  // Table element
-    const workbook = XLSX.utils.table_to_book(table, { sheet: "Container List" });  // Convert table to workbook
-    XLSX.writeFile(workbook, 'Container_List.xlsx');  // Download the Excel file
+  // Apply admin visibility on the freshly rendered table
+  applyAdminVisibility();
 }
 
-function exportToPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+function applyAdminVisibility() {
+  const actionHeader = document.getElementById('action-column');
 
-    // Get current date and time
-    const currentDate = new Date();
-    const formattedDate = currentDate.toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    }).replace(/\//g, "-"); // Convert to "DD-MM-YYYY"
+  if (!isAdmin) {
+    // Hide Action header
+    if (actionHeader) actionHeader.style.display = 'none';
 
-    let formattedTime = currentDate.toLocaleTimeString('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
+    // Hide delete buttons
+    containerList.querySelectorAll('.delete-btn').forEach(btn => btn.style.display = 'none');
+
+    // Hide 8th column (Action) in all rows
+    containerList.querySelectorAll('tr').forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if (cells.length > 7 && cells[7]) {
+        cells[7].style.display = 'none';
+      }
     });
-
-    formattedTime = formattedTime.replace(/[:\s]/g, "-").toUpperCase(); // Convert time to uppercase "HH-MM-AM/PM"
-
-    // Generate filename without buyer details
-    const fileName = `Container_List_${formattedDate}_${formattedTime}.pdf`;
-
-    // Proceed to generate the PDF without including the buyer's name or location
-    generatePDF(doc, formattedDate, fileName);
+  } else {
+    // Ensure visible for admins
+    if (actionHeader) actionHeader.style.display = '';
+    containerList.querySelectorAll('tr').forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if (cells.length > 7 && cells[7]) {
+        cells[7].style.display = '';
+      }
+    });
+  }
 }
+
+/* -------------------------------
+   Filters (search + date range)
+--------------------------------*/
+
+// Unified filter for search + date (inclusive)
+function applyFilters() {
+  const q = (searchBox?.value || '').toLowerCase().trim();
+
+  const startDate = startInput?.value ? new Date(startInput.value + 'T00:00:00.000') : null;
+  const endDate   = endInput?.value   ? new Date(endInput.value   + 'T23:59:59.999') : null;
+
+  const filtered = containerData.filter(c => {
+    const matchesSearch = (c.container_number ?? '').toLowerCase().includes(q);
+
+    const ad = toStartOfDay(c.arrival_date);
+    if (!ad) return false;
+
+    const inRange =
+      (!startDate || ad >= startDate) &&
+      (!endDate   || ad <= endDate);
+
+    return matchesSearch && inRange;
+  });
+
+  renderTable(filtered);
+}
+
+function wireUpFiltersAndActions() {
+  // Apply button
+  applyBtn?.addEventListener('click', applyFilters);
+
+  // Clear button
+  clearBtn?.addEventListener('click', () => {
+    if (startInput) startInput.value = '';
+    if (endInput)   endInput.value   = '';
+    applyFilters();
+  });
+
+  // Re-filter as the user types in the search box
+  searchBox?.addEventListener('input', applyFilters);
+
+  // Convenience: Enter key on date inputs
+  [startInput, endInput].forEach(inp => {
+    inp?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') applyFilters();
+    });
+  });
+}
+
+/* -------------------------------
+   Row actions: edit & delete
+--------------------------------*/
+function handleEditContainer(e) {
+  const containerId = Number(e.currentTarget.dataset.id);
+  const container = containerData.find(c => Number(c.id) === containerId);
+
+  if (!container) {
+    alert('Container not found!');
+    return;
+  }
+
+  const weightInput  = document.querySelector(`.weight-input[data-id="${containerId}"]`);
+  const weightDisplay = document.querySelector(`.weight-display[data-id="${containerId}"]`);
+
+  if (!weightInput || !weightDisplay) return;
+
+  // Show input
+  weightInput.style.display = 'inline';
+  weightDisplay.style.display = 'none';
+  weightInput.focus();
+
+  const onBlur = async () => {
+    const newWeight = Number(weightInput.value);
+    const oldWeight = Number(container.weight);
+
+    // If changed, confirm and update
+    if (!Number.isNaN(newWeight) && newWeight !== oldWeight) {
+      const ok = confirm('Are you sure you want to change the weight?');
+      if (ok) {
+        const diff = newWeight - oldWeight;
+        let updatedRemaining = Number(container.remaining_weight);
+
+        if (diff > 0) updatedRemaining += diff;
+        else          updatedRemaining -= Math.abs(diff);
+
+        try {
+          const res = await fetch(`/container/update/${containerId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ weight: newWeight, remaining_weight: updatedRemaining })
+          });
+          const data = await res.json();
+          if (data?.success) {
+            alert('Container weight updated successfully.');
+            container.weight = newWeight;
+            container.remaining_weight = updatedRemaining;
+            applyFilters(); // re-render with current filters
+          } else {
+            alert('Failed to update container weight.');
+          }
+        } catch (err) {
+          console.error('Error updating container:', err);
+          alert('Error updating container.');
+        }
+      } else {
+        // Revert in UI
+        weightInput.value = oldWeight;
+      }
+    }
+
+    // Hide input, show display
+    weightInput.style.display = 'none';
+    weightDisplay.style.display = 'inline';
+    weightInput.removeEventListener('blur', onBlur);
+  };
+
+  weightInput.addEventListener('blur', onBlur);
+}
+
+async function handleDeleteContainer(e) {
+  const containerId = e.currentTarget.dataset.id;
+  const ok = confirm('Are you sure you want to delete this container?');
+  if (!ok) return;
+
+  try {
+    const res = await fetch(`/container/delete/${containerId}`, { method: 'DELETE' });
+    const data = await res.json();
+
+    if (data?.success) {
+      alert('Container deleted successfully.');
+      // Refresh list
+      await loadContainers();
+      applyFilters(); // keep current filters after reload
+    } else {
+      alert('Failed to delete container.');
+    }
+  } catch (err) {
+    console.error('Error deleting container:', err);
+    alert('Failed to delete container.');
+  }
+}
+
+/* -------------------------------
+   Export functions (Excel/PDF)
+   (Used by onclick on buttons)
+--------------------------------*/
+window.exportToExcel = function exportToExcel() {
+  // We export the visible body rows (excluding totals row, which we add manually)
+  const tableEl = document.createElement('table');
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  [
+    'ID','Arrival Date','Container Number','Weight','Sold','Returned','Remaining Weight'
+  ].forEach(h => {
+    const th = document.createElement('th');
+    th.textContent = h;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  tableEl.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+
+  // Build rows from current rendered rows (excluding totals row)
+  const rows = containerList.querySelectorAll('tr:not(.total-row)');
+  rows.forEach(r => {
+    const cells = r.querySelectorAll('td');
+    if (cells.length >= 7) {
+      const tr = document.createElement('tr');
+      for (let i = 0; i < 7; i++) {
+        const td = document.createElement('td');
+        td.textContent = cells[i].innerText.trim();
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+  });
+
+  // Append totals row if present
+  const totals = document.querySelector('.total-row');
+  if (totals) {
+    const cells = totals.querySelectorAll('td');
+    const tr = document.createElement('tr');
+    for (let i = 0; i < 7; i++) {
+      const td = document.createElement('td');
+      td.textContent = cells[i]?.innerText.trim() || '';
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+
+  tableEl.appendChild(tbody);
+
+  // Use xlsx
+  const wb = XLSX.utils.table_to_book(tableEl, { sheet: 'Container List' });
+  XLSX.writeFile(wb, 'Container_List.xlsx');
+};
+
+window.exportToPDF = function exportToPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  // Date/time for file name
+  const currentDate = new Date();
+  const formattedDate = currentDate.toLocaleDateString('en-GB', {
+    day: '2-digit', month: '2-digit', year: 'numeric'
+  }).replace(/\//g, '-');
+
+  let formattedTime = currentDate.toLocaleTimeString('en-GB', {
+    hour: '2-digit', minute: '2-digit', hour12: true
+  });
+  formattedTime = formattedTime.replace(/[:\s]/g, '-').toUpperCase();
+
+  const fileName = `Container_List_${formattedDate}_${formattedTime}.pdf`;
+
+  generatePDF(doc, formattedDate, fileName);
+};
 
 function generatePDF(doc, formattedDate, fileName) {
-    const pageWidth = doc.internal.pageSize.width;
-    const pageHeight = doc.internal.pageSize.height;
-    const headerBarHeight = 18;
-    let startY = headerBarHeight + 10;
-    let firstPage = true;
+  const pageWidth = doc.internal.pageSize.width;
+  const pageHeight = doc.internal.pageSize.height;
+  const headerBarHeight = 18;
+  let startY = headerBarHeight + 10;
+  let firstPage = true;
 
-    // Load watermark image
-    const watermarkImg = new Image();
-    watermarkImg.src = "/public/watermark.png";
+  const watermarkImg = new Image();
+  watermarkImg.src = '/public/watermark.png';
 
-    watermarkImg.onload = function () {
-        function addHeaderAndFooterAndWatermark(doc, pageNumber) {
-            doc.setGState(new doc.GState({ opacity: 0.2 }));
-            const watermarkX = pageWidth / 4;
-            const watermarkY = pageHeight / 3;
-            const watermarkWidth = pageWidth / 2;
-            const watermarkHeight = pageHeight / 4;
+  watermarkImg.onload = () => {
+    function addHeaderAndFooterAndWatermark(data) {
+      // watermark
+      doc.setGState(new doc.GState({ opacity: 0.2 }));
+      const watermarkX = pageWidth / 4;
+      const watermarkY = pageHeight / 3;
+      const watermarkWidth = pageWidth / 2;
+      const watermarkHeight = pageHeight / 4;
+      doc.addImage(watermarkImg, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+      doc.setGState(new doc.GState({ opacity: 1 }));
 
-            doc.addImage(watermarkImg, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
-            doc.setGState(new doc.GState({ opacity: 1 }));
+      // header bar + logo + title
+      doc.setFillColor(49, 178, 230);
+      doc.rect(0, 0, pageWidth, headerBarHeight, 'F');
+      try {
+        doc.addImage('/public/lsg.png', 'PNG', 14, 5, 30, 10);
+      } catch (e) {
+        // ignore if image missing
+      }
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(255, 255, 255);
+      doc.text('Container List', pageWidth - 50, 11);
 
-            doc.setFillColor(49, 178, 230);
-            doc.rect(0, 0, pageWidth, headerBarHeight, 'F');
-            doc.addImage('/public/lsg.png', 'PNG', 14, 5, 30, 10);
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(255, 255, 255);
-            doc.text("Container List", pageWidth - 50, 11);
+      // Date (first page only)
+      if (firstPage) {
+        const dateLabel = 'Date:';
+        const dateText = `${formattedDate}`;
+        const dateLabelWidth = doc.getTextWidth(dateLabel);
+        const xPosition = pageWidth - dateLabelWidth - 40;
+        doc.setFontSize(9);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'bold');
+        doc.text(dateLabel, xPosition, 25);
+        doc.setFont('helvetica', 'normal');
+        doc.text(dateText, xPosition + dateLabelWidth + 5, 25);
+        firstPage = false;
+      }
 
-            if (firstPage) {
-                const dateLabel = "Date:";
-                const dateText = `${formattedDate}`;
-                const dateLabelWidth = doc.getTextWidth(dateLabel);
-                const xPosition = pageWidth - dateLabelWidth - 40;
-                doc.setFontSize(9);
-                doc.setTextColor(0, 0, 0);
-                doc.setFont("helvetica", "bold");
-                doc.text(dateLabel, xPosition, 25);
-                doc.setFont("helvetica", "normal");
-                doc.text(dateText, xPosition + dateLabelWidth + 5, 25);
-                firstPage = false;
-            }
+      // footer
+      const line1 = 'Thank You For Your Business';
+      const line2 = 'Generated by bYTE Ltd.';
+      const line3 = 'For inquiries, contact support@lsgroup.com.bd';
 
-            const line1 = "Thank You For Your Business";
-            const line2 = "Generated by bYTE Ltd.";
-            const line3 = "For inquiries, contact support@lsgroup.com.bd";
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(0, 0, 0);
 
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.setTextColor(0, 0, 0);
+      const line1Width = doc.getTextWidth(line1);
+      const line2Width = doc.getTextWidth(line2);
+      const line3Width = doc.getTextWidth(line3);
 
-            const line1Width = doc.getTextWidth(line1);
-            const line2Width = doc.getTextWidth(line2);
-            const line3Width = doc.getTextWidth(line3);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text(line1, (pageWidth - line1Width) / 2.3, pageHeight - 30);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.text(line2, (pageWidth - line2Width) / 2, pageHeight - 20);
+      doc.text(line3, (pageWidth - line3Width) / 2, pageHeight - 15);
+    }
 
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.text(line1, (pageWidth - line1Width) / 2.3, pageHeight - 30);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.text(line2, (pageWidth - line2Width) / 2, pageHeight - 20);
-            doc.text(line3, (pageWidth - line3Width) / 2, pageHeight - 15);
-        }
+    // Build table rows from visible table (exclude totals row here; we’ll add a foot)
+    const rows = containerList.querySelectorAll('tr:not(.total-row)');
+    const bodyRows = [];
+    let totalWeight = 0, totalSold = 0, totalReturned = 0, totalRemaining = 0;
 
-        // Read data from the visible HTML table
-        const table = document.getElementById('container-list');
-        const rows = table.querySelectorAll('tr:not(.total-row)'); // exclude totals row
+    rows.forEach(r => {
+      const cells = r.querySelectorAll('td');
+      if (cells.length >= 7) {
+        bodyRows.push([
+          cells[0].innerText.trim(),
+          cells[1].innerText.trim(),
+          cells[2].innerText.trim(),
+          cells[3].innerText.trim(),
+          cells[4].innerText.trim(),
+          cells[5].innerText.trim(),
+          cells[6].innerText.trim()
+        ]);
 
-        const tableRows = [];
-        let totalWeight = 0, totalSold = 0, totalReturned = 0, totalRemaining = 0;
+        totalWeight    += parseFloat((cells[3].innerText || '0').replace(/,/g, '')) || 0;
+        totalSold      += parseFloat((cells[4].innerText || '0').replace(/,/g, '')) || 0;
+        totalReturned  += parseFloat((cells[5].innerText || '0').replace(/,/g, '')) || 0;
+        totalRemaining += parseFloat((cells[6].innerText || '0').replace(/,/g, '')) || 0;
+      }
+    });
 
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            if (cells.length >= 7) {
-                const rowData = [
-                    cells[0].innerText.trim(), // ID
-                    cells[1].innerText.trim(), // Arrival Date
-                    cells[2].innerText.trim(), // Container #
-                    cells[3].innerText.trim(), // Weight
-                    cells[4].innerText.trim(), // Sold
-                    cells[5].innerText.trim(), // Returned
-                    cells[6].innerText.trim()  // Remaining
-                ];
-                tableRows.push(rowData);
+    const foot = [[
+      { content: 'Totals:', colSpan: 3, styles: { halign: 'right', fontStyle: 'bold' } },
+      totalWeight.toLocaleString('en-US'),
+      totalSold.toLocaleString('en-US'),
+      totalReturned.toLocaleString('en-US'),
+      totalRemaining.toLocaleString('en-US')
+    ]];
 
-                // Add to totals
-                totalWeight += parseFloat(cells[3].innerText.replace(/,/g, '')) || 0;
-                totalSold += parseFloat(cells[4].innerText.replace(/,/g, '')) || 0;
-                totalReturned += parseFloat(cells[5].innerText.replace(/,/g, '')) || 0;
-                totalRemaining += parseFloat(cells[6].innerText.replace(/,/g, '')) || 0;
-            }
-        });
+    doc.autoTable({
+      head: [['ID', 'Arrival Date', 'Container Number', 'Weight', 'Sold', 'Returned', 'Remaining Weight']],
+      body: bodyRows,
+      foot,
+      showFoot: 'lastPage',
+      theme: 'grid',
+      startY: headerBarHeight + 10,
+      margin: { horizontal: 10, top: 20, bottom: 40 },
+      headStyles: { fillColor: [0, 0, 0], textColor: [255, 255, 255], fontSize: 8, fontStyle: 'bold' },
+      bodyStyles: { fontSize: 8, textColor: [0, 0, 0] },
+      footStyles: { fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10, fontStyle: 'bold' },
+      didDrawPage: addHeaderAndFooterAndWatermark
+    });
 
-        const foot = [[
-            { content: "Totals:", colSpan: 3, styles: { halign: 'right', fontStyle: 'bold' } },
-            totalWeight.toLocaleString('en-US'),
-            totalSold.toLocaleString('en-US'),
-            totalReturned.toLocaleString('en-US'),
-            totalRemaining.toLocaleString('en-US')
-        ]];
-
-        const options = {
-            head: [['ID', 'Arrival Date', 'Container Number', 'Weight', 'Sold', 'Returned', 'Remaining Weight']],
-            body: tableRows,
-            foot: foot,
-            showFoot: 'lastPage',
-            theme: 'grid',
-            startY: startY,
-            margin: { horizontal: 10, top: 20, bottom: 40 },
-            headStyles: {
-                fillColor: [0, 0, 0],
-                textColor: [255, 255, 255],
-                fontSize: 8,
-                fontStyle: 'bold',
-            },
-            bodyStyles: {
-                fontSize: 8,
-                textColor: [0, 0, 0],
-            },
-            footStyles: {
-                fillColor: [220, 220, 220],
-                textColor: [0, 0, 0],
-                fontSize: 10,
-                fontStyle: 'bold',
-            },
-            pageBreak: 'auto',
-            showHead: 'everyPage',
-            didDrawPage: function (data) {
-                if (data.pageNumber > 1) {
-                    startY = data.cursor + 30;
-                }
-                addHeaderAndFooterAndWatermark(doc, data.pageNumber);
-            },
-        };
-
-        doc.autoTable(options);
-        doc.save(fileName);
-    };
+    doc.save(fileName);
+  };
 }
 
+/* -------------------------------
+   Navbar dropdown & Logout
+--------------------------------*/
+function wireUpDropdown() {
+  const dropdownButton = document.querySelector('.dropbtn');
+  const dropdownContent = document.querySelector('.dropdown-content');
+  if (!dropdownButton || !dropdownContent) return;
 
+  dropdownButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+  });
 
+  document.addEventListener('click', () => {
+    dropdownContent.style.display = 'none';
+  });
+}
 
-    document.getElementById('logout-btn')?.addEventListener('click', function (e) {
-        e.preventDefault();
-        fetch('/logout', { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = '/login.html';
-                } else {
-                    alert('Logout failed.');
-                }
-            })
-            .catch(err => {
-                console.error('Logout error:', err);
-                alert('Something went wrong during logout.');
-            });
-    });
+function wireUpLogout() {
+  const logoutBtn = document.getElementById('logout-btn');
+  if (!logoutBtn) return;
+  logoutBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/logout', { method: 'POST' });
+      const data = await res.json();
+      if (data?.success) window.location.href = '/login.html';
+      else alert('Logout failed.');
+    } catch (err) {
+      console.error('Logout error:', err);
+      alert('Something went wrong during logout.');
+    }
+  });
+}
 
+/* -------------------------------
+   Helpers
+--------------------------------*/
+function formatNumber(n) {
+  const num = Number(n);
+  return Number.isFinite(num) ? num.toLocaleString('en-US') : '0';
+}
 
-document.addEventListener("DOMContentLoaded", function() {
-    // Get the dropdown button and menu
-    const dropdownButton = document.querySelector(".dropbtn");
-    const dropdownContent = document.querySelector(".dropdown-content");
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
-    // Toggle dropdown visibility when button is clicked
-    dropdownButton.addEventListener("click", function(event) {
-        // Prevent the event from bubbling up to the document
-        event.stopPropagation();
+function formatDateDDMMYYYY(value) {
+  // Accepts ISO strings or dd/mm/yyyy
+  const iso = new Date(value);
+  if (!isNaN(iso)) {
+    return new Intl.DateTimeFormat('en-GB').format(iso);
+  }
+  const m = /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/.exec(String(value).trim());
+  if (m) {
+    const day = Number(m[1]).toString().padStart(2, '0');
+    const month = Number(m[2]).toString().padStart(2, '0');
+    const year = m[3];
+    return `${day}/${month}/${year}`;
+  }
+  return '';
+}
 
-        // Toggle the display of the dropdown
-        dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
-    });
-
-    // Hide the dropdown if the user clicks anywhere else on the document
-    document.addEventListener("click", function() {
-        dropdownContent.style.display = "none";
-    });
-});
+function toStartOfDay(d) {
+  // Accepts ISO-ish or dd/mm/yyyy
+  const dt = new Date(d);
+  if (!isNaN(dt)) {
+    dt.setHours(0, 0, 0, 0);
+    return dt;
+  }
+  const m = /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/.exec(String(d).trim());
+  if (m) {
+    const day = Number(m[1]), month = Number(m[2]) - 1, year = Number(m[3]);
+    const dd = new Date(year, month, day, 0, 0, 0, 0);
+    return isNaN(dd) ? null : dd;
+  }
+  return null;
+}
