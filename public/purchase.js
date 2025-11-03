@@ -384,44 +384,40 @@ function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Ensure buyer dropdown exists
-    const buyerDropdown = document.getElementById('buyer-filter'); 
-    const selectedBuyerId = buyerDropdown.value; // Get selected buyer's ID
-    const buyerName = buyerDropdown.selectedOptions[0] ? buyerDropdown.selectedOptions[0].text : "All Buyers"; // Get selected buyer's name or 'All Buyers'
+    const buyerDropdown = document.getElementById('buyer-filter');
+    const selectedBuyerId = buyerDropdown.value;
+    const buyerName = buyerDropdown.selectedOptions[0]
+        ? buyerDropdown.selectedOptions[0].text
+        : "All Buyers";
 
-    // Replace spaces with underscores in the buyer's name to avoid filename issues
     const sanitizedBuyerName = buyerName.replace(/\s+/g, "_");
 
-    // Get current date and time
     const currentDate = new Date();
     const formattedDate = currentDate.toLocaleDateString('en-GB', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
-    }).replace(/\//g, "-"); // Convert to "DD-MM-YYYY"
+    }).replace(/\//g, "-");
 
     let formattedTime = currentDate.toLocaleTimeString('en-GB', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true
     });
+    formattedTime = formattedTime.replace(/[:\s]/g, "-").toUpperCase();
 
-    formattedTime = formattedTime.replace(/[:\s]/g, "-").toUpperCase(); // Convert time to uppercase "HH-MM-AM/PM"
-
-    // **Generate filename without location**
     const fileName = `Sales_History_${sanitizedBuyerName}_${formattedDate}_${formattedTime}.pdf`;
 
-    // Fetch Buyer Location if a specific buyer is selected
     let buyerLocation = '';
-    if (selectedBuyerId !== "0") { 
+    if (selectedBuyerId !== "0") {
         fetch(`/buyers/location/${selectedBuyerId}`)
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
-                buyerLocation = data.location || ''; // Assign buyer's location if available
+                buyerLocation = data.location || '';
                 generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName);
             })
-            .catch(error => {
-                console.error('Error fetching buyer location:', error);
+            .catch(err => {
+                console.error('Error fetching buyer location:', err);
                 generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName);
             });
     } else {
@@ -433,134 +429,117 @@ function generatePDF(doc, buyerName, buyerLocation, formattedDate, fileName) {
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
     const headerBarHeight = 18;
-    let startY = headerBarHeight + 30; // Default starting position for the first page
+    let startY = headerBarHeight + 30;
+    let firstPage = true;
 
-    // Add the watermark first (on top of everything, faint transparency)
-    const watermarkPath = "/public/watermark.png"; // Use your actual watermark path
     const watermarkImg = new Image();
-    watermarkImg.src = watermarkPath;
+    watermarkImg.src = "/public/watermark.png";
 
     watermarkImg.onload = function () {
-        // Function to add Header, Footer, and Watermark to every page
-        function addHeaderAndFooterAndWatermark(doc, pageNumber) {
-            // --- Watermark (on every page) ---
-            doc.setGState(new doc.GState({ opacity: 0.2 })); // Faint watermark
+        // header + watermark (on every page)
+        function drawHeaderAndWatermark(pageNumber) {
+            // watermark
+            doc.setGState(new doc.GState({ opacity: 0.2 }));
             const watermarkX = pageWidth / 4;
             const watermarkY = pageHeight / 3;
             const watermarkWidth = pageWidth / 2;
             const watermarkHeight = pageHeight / 4;
-
-            // Add watermark image on top of everything (behind the content)
             doc.addImage(watermarkImg, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
-            doc.setGState(new doc.GState({ opacity: 1 })); // Reset opacity for normal content
+            doc.setGState(new doc.GState({ opacity: 1 }));
 
-            // --- Header ---
+            // header bar
             doc.setFillColor(49, 178, 230);
             doc.rect(0, 0, pageWidth, headerBarHeight, 'F');
-            doc.addImage('/public/lsg.png', 'PNG', 14, 5, 30, 10); // Add logo
+            try {
+                doc.addImage('/public/lsg.png', 'PNG', 14, 5, 30, 10);
+            } catch (e) {}
             doc.setFontSize(14);
             doc.setFont("helvetica", "bold");
             doc.setTextColor(255, 255, 255);
-            doc.text("Sales History", pageWidth - 50, 11); // Header title
+            doc.text("Sales History", pageWidth - 50, 11);
 
-            // --- INVOICE TO Section (Only on the first page) ---
+            // invoice to + date only on first page
             if (pageNumber === 1) {
                 const invoiceYPosition = 30;
-                doc.setFont("helvetica", "normal");
+                doc.setFont("helvetica", "bold");
                 doc.setFontSize(9);
                 doc.setTextColor(0, 0, 0);
-                doc.setFont("helvetica", "bold");
                 doc.text("INVOICE TO:", 14, invoiceYPosition);
                 doc.setFont("helvetica", "normal");
                 doc.text(buyerName, 14, invoiceYPosition + 5);
-
                 if (buyerLocation) {
                     doc.text(buyerLocation, 14, invoiceYPosition + 10);
                 }
 
-                // --- Date Section ---
                 const dateLabel = "DATE:";
                 const dateText = `${formattedDate}`;
                 const dateLabelWidth = doc.getTextWidth(dateLabel);
-                const xPosition = pageWidth - dateLabelWidth - 40; // Right align
+                const xPosition = pageWidth - dateLabelWidth - 40;
                 doc.setFont("helvetica", "bold");
                 doc.text(dateLabel, xPosition, invoiceYPosition);
                 doc.setFont("helvetica", "normal");
                 doc.text(dateText, xPosition, invoiceYPosition + 5);
             }
-
-            // --- Footer Section (on every page) ---
-            const line1 = "Thank You For Your Business";
-            const line2 = "Generated by bYTE Ltd.";
-            const line3 = "For inquiries, contact support@lsgroup.com.bd";
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.setTextColor(0, 0, 0); // Footer text color
-
-            const line1Width = doc.getTextWidth(line1);
-            const line2Width = doc.getTextWidth(line2);
-            const line3Width = doc.getTextWidth(line3);
-
-            const xPosition1 = (pageWidth - line1Width) / 2.3;
-            const xPosition2 = (pageWidth - line2Width) / 2;
-            const xPosition3 = (pageWidth - line3Width) / 2;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.text(line1, xPosition1, pageHeight - 30);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.text(line2, xPosition2, pageHeight - 20);
-            doc.text(line3, xPosition3, pageHeight - 15);
         }
 
-        // --- Table Section ---
+        // table
         const table = document.getElementById('purchase-table');
-        
-        // Define options for jsPDF autoTable
-        const options = {
+
+        doc.autoTable({
             html: table,
             theme: 'grid',
-            startY: startY,  // Start position for table content
+            startY: startY,
             margin: { horizontal: 10, top: 20, bottom: 40 },
             headStyles: {
-                fillColor: [0, 0, 0], // Black background for table header
-                textColor: [255, 255, 255], // White text in header
+                fillColor: [0, 0, 0],
+                textColor: [255, 255, 255],
                 fontSize: 8,
-                fontStyle: 'bold',
+                fontStyle: 'bold'
             },
             bodyStyles: {
-                fontSize: 9,
-                textColor: [0, 0, 0],
-                fillColor: null, // No background for table cells
+                fontSize: 8,
+                textColor: [0, 0, 0]
             },
             footStyles: {
                 fillColor: [220, 220, 220],
                 textColor: [0, 0, 0],
-                fontSize: 10,
-                fontStyle: 'bold',
+                fontSize: 8,
+                fontStyle: 'bold'
             },
-            pageBreak: 'auto', // Allow page breaks automatically
-            showHead: 'everyPage', // Ensure header shows on every page
+            pageBreak: 'auto',
+            showHead: 'everyPage',
+            showFoot: 'lastPage',
             didDrawPage: function (data) {
-                // Adjust the startY for subsequent pages to create a gap between header and table
+                // only header + watermark here
+                drawHeaderAndWatermark(data.pageNumber);
                 if (data.pageNumber > 1) {
-                    startY = data.cursor + 30; // Adjust cursor for subsequent pages
+                    startY = data.cursor + 30;
                 }
-                
-                // Add watermark to each page
-                addHeaderAndFooterAndWatermark(doc, data.pageNumber); // Add header, footer, and watermark to every page
-            },
-        };
+            }
+        });
 
-        // Create the table with autoTable and handle page breaks
-        doc.autoTable(options);
+        // footer: draw ONLY on last page
+        const totalPages = doc.internal.getNumberOfPages();
+        doc.setPage(totalPages);
 
-        // Save PDF with dynamic filename
+        const line1 = "Thank You For Your Business";
+        const line2 = "Generated by bYTE Ltd.";
+        const line3 = "For inquiries, contact support@lsgroup.com.bd";
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text(line1, (pageWidth - doc.getTextWidth(line1)) / 2, pageHeight - 30);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.text(line2, (pageWidth - doc.getTextWidth(line2)) / 2, pageHeight - 20);
+        doc.text(line3, (pageWidth - doc.getTextWidth(line3)) / 2, pageHeight - 15);
+
         doc.save(fileName);
     };
 }
+
 
 
 

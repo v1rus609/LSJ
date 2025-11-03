@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <title>Discount History</title>
+    <meta charset="UTF-8" />
     <link rel="stylesheet" href="discount-history.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -10,6 +11,7 @@
 </head>
 <body>
     <div class="container">
+        <!-- Navbar -->
         <div class="navbar">
             <a href="index.html" class="home-icon">
                 <img src="home-icon.png" alt="Home" width="32">
@@ -19,102 +21,65 @@
                     <img src="menu-icon.png" alt="Menu">
                 </button>
                 <div class="dropdown-content">
-					<a href="container.html" class="admin-only">Add Container</a>
-					<a href="containers.html">Container List</a>
-					<a href="buyers.html">Add Buyer</a>
-					<a href="inventory.html" class="admin-only">Inventory</a>
-					<a href="purchase.html">Sales History</a>
-					<a href="received-payment.html" class="admin-only">Received Payment</a>
-					<a href="payment-history.html">Payment History</a>
-					<a href="sales-statement.html">Sales Statement</a>
-					<a href="purchase-return.html" class="admin-only">Sales Return</a>
-					<a href="previous-sales-return.html"class="admin-only">Previous Sales Return</a>
-					<a href="return-history.html">Return History</a>
-					<a href="discount.html">Discount</a>
-					<a href="discount-history.html" class="active">Discount History</a>
-					<a href="buyer-timeline.html">Buyer Timeline</a>
-					<a href="#" id="logout-btn"class="active2">Logout</a>
+                    <a href="container.html" class="admin-only">Add Container</a>
+                    <a href="containers.html">Container List</a>
+                    <a href="buyers.html">Add Buyer</a>
+                    <a href="inventory.html" class="admin-only">Inventory</a>
+                    <a href="purchase.html">Sales History</a>
+                    <a href="received-payment.html" class="admin-only">Received Payment</a>
+                    <a href="payment-history.html">Payment History</a>
+                    <a href="sales-statement.html">Sales Statement</a>
+                    <a href="purchase-return.html" class="admin-only">Sales Return</a>
+                    <a href="previous-sales-return.html" class="admin-only">Previous Sales Return</a>
+                    <a href="return-history.html">Return History</a>
+                    <a href="discount.html">Discount</a>
+                    <a href="discount-history.html" class="active">Discount History</a>
+                    <a href="buyer-timeline.html">Buyer Timeline</a>
+                    <a href="#" id="logout-btn" class="active2">Logout</a>
                 </div>
             </div>
         </div>
 
+        <!-- Logo -->
         <div class="logo">
             <img src="logo.png" alt="Company Logo">
         </div>
 
         <h1>Discount History</h1>
 
+        <!-- Search -->
         <div class="search-container">
             <input type="text" id="buyer-search-box" placeholder="Search by Buyer...">
         </div>
 
+        <!-- Table -->
         <div class="table-wrapper">
-            <table>
+            <table id="discount-table">
                 <thead>
                     <tr>
                         <th>SL</th>
                         <th>Date</th>
                         <th>Buyer</th>
                         <th>Discount Amount</th>
-                        <th>Action</th>
+                        <th id="action-column">Action</th>
                     </tr>
                 </thead>
                 <tbody id="discount-list">
-                    <!-- Dynamically populated rows will go here -->
+                    <!-- rows go here -->
                 </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="3" style="text-align:right;"><strong>Total:</strong></td>
+                        <td id="discount-total">0</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
 
         <button id="export-btn">Export to Excel</button>
-<button id="export-pdf-btn">Export to PDF</button>
-
+        <button id="export-pdf-btn">Export to PDF</button>
     </div>
-
-	<script>
-    fetch('/check-role')
-        .then(response => response.json())
-        .then(data => {
-            if (!data.loggedIn) {
-                window.location.href = '/login.html'; // Redirect if not logged in
-            } else {
-                // Store role flag globally
-                window.isAdmin = (data.role === 'Admin');
-
-                if (!window.isAdmin) {
-                    // 🔒 Hide Action column header
-                    const actionHeader = document.getElementById('action-column');
-                    if (actionHeader) actionHeader.style.display = 'none';
-
-                    // 🔒 Hide Action column cells in all data rows
-                    const allRows = document.querySelectorAll('#container-list tr');
-                    allRows.forEach(row => {
-                        const cells = row.querySelectorAll('td');
-                        if (cells.length > 7) {
-                            cells[7].style.display = 'none';
-                        }
-                    });
-
-                    // 🔒 Hide the Action column in the totals row
-                    const totalRow = document.querySelector('.total-row');
-                    if (totalRow) {
-                        const cells = totalRow.querySelectorAll('td');
-                        if (cells.length > 7) {
-                            cells[7].style.display = 'none';
-                        }
-
-                    }
-					// 🔒 Hide Admin-only navbar links
-                    const protectedLinks = document.querySelectorAll('.admin-only');
-                    protectedLinks.forEach(link => link.style.display = 'none');
-                }
-                
-            }
-        })
-        .catch(error => {
-            console.error('Error checking user role:', error);
-            window.location.href = '/login.html'; // Redirect on error
-        });
-</script>
 
     <script src="discount-history.js"></script>
 </body>

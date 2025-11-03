@@ -1,326 +1,383 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const discountList = document.getElementById('discount-list');
-    const buyerSearchBox = document.getElementById('buyer-search-box');
+document.addEventListener('DOMContentLoaded', async function () {
+    const discountList      = document.getElementById('discount-list');
+    const buyerSearchBox    = document.getElementById('buyer-search-box');
     const exportExcelButton = document.getElementById('export-btn');
-    const exportPdfButton = document.getElementById('export-pdf-btn');
-    
-    let discountData = [];
+    const exportPdfButton   = document.getElementById('export-pdf-btn');
+    const actionHeader      = document.getElementById('action-column');
 
-    // Fetch discount data from the backend
+    let discountData = [];
+    window.isAdmin = true; // will be set properly below
+
+    // 1) check role first
+    await checkRole();
+
+    // 2) fetch discounts
     fetch('/discounts/list')
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
-            discountData = data;
-            renderTable(discountData);  // Render the table with all discounts
+            discountData = data || [];
+            renderTable(discountData);
         })
-        .catch(error => {
-            console.error('Error fetching discount data:', error);
-            document.getElementById('error-message').style.display = 'block'; // Show error message if data fetch fails
+        .catch(err => {
+            console.error('Error fetching discount data:', err);
+            if (document.getElementById('error-message')) {
+                document.getElementById('error-message').style.display = 'block';
+            }
         });
 
-    // Function to render the discount table
+    // --------------- role ---------------
+    async function checkRole() {
+        try {
+            const res = await fetch('/check-role');
+            const data = await res.json();
+            if (!data.loggedIn) {
+                window.location.href = '/login.html';
+                return;
+            }
+            window.isAdmin = data.role === 'Admin';
+            if (!window.isAdmin) {
+                // hide admin-only menu links
+                document.querySelectorAll('.admin-only').forEach(link => link.style.display = 'none');
+            }
+        } catch (e) {
+            console.error('Error checking role:', e);
+            window.location.href = '/login.html';
+        }
+    }
+
+    // --------------- render ---------------
     function renderTable(data) {
         if (!data || data.length === 0) {
             discountList.innerHTML = '<tr><td colspan="5">No discounts available.</td></tr>';
+            const totalCell = document.getElementById('discount-total');
+            if (totalCell) totalCell.textContent = '0';
             return;
         }
 
-        discountList.innerHTML = ''; // Clear the existing rows
+        discountList.innerHTML = '';
+        let totalDiscount = 0;
+
         data.forEach((discount, index) => {
-            const formattedDate = formatDate(discount.date); // Format the date
+            const formattedDate = formatDate(discount.date);
+            const amount = Number(discount.discount_amount || 0);
+            totalDiscount += amount;
 
-            const row = `
-                <tr data-id="${discount.id}">
-                    <td>${index + 1}</td>
-                    <td>${formattedDate}</td> <!-- Display the formatted date -->
-                    <td>${discount.buyer_name}</td>
-                    <td>
-                        <span class="discount-display">${formatNumberWithCommas(discount.discount_amount)}</span>
-                        <input class="discount-input" type="number" value="${discount.discount_amount}" style="display: none;" />
-                    </td>
-                    <td>
-                        <button class="edit-btn" data-id="${discount.id}">Edit</button>
-                        <button class="delete-btn" data-id="${discount.id}">Delete</button>
-                    </td>
-                </tr>
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-id', discount.id);
+
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${formattedDate}</td>
+                <td>${discount.buyer_name}</td>
+                <td>
+                    <span class="discount-display">${formatNumberWithCommas(amount)}</span>
+                    <input class="discount-input" type="number" value="${amount}" style="display:none;" />
+                </td>
+                <td class="action-cell">
+                    <button class="edit-btn" data-id="${discount.id}">Edit</button>
+                    <button class="delete-btn" data-id="${discount.id}">Delete</button>
+                </td>
             `;
-            discountList.innerHTML += row;
+            discountList.appendChild(tr);
         });
 
-        // Add event listeners for "Edit" and "Delete" buttons
-        document.querySelectorAll('.edit-btn').forEach(button => {
-            button.addEventListener('click', handleEditDiscount);
+        // update footer total
+        const totalCell = document.getElementById('discount-total');
+        if (totalCell) {
+            totalCell.textContent = formatNumberWithCommas(totalDiscount);
+        }
+
+        // bind edit/delete
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', handleEditDiscount);
+        });
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', handleDeleteDiscount);
         });
 
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', handleDeleteDiscount);
-        });
+        // hide action col for non-admin
+        if (window.isAdmin === false) {
+            if (actionHeader) actionHeader.style.display = 'none';
+            document.querySelectorAll('#discount-table tbody tr').forEach(tr => {
+                const td = tr.querySelector('.action-cell');
+                if (td) td.style.display = 'none';
+            });
+            // also hide action col in footer
+            const footerRow = document.querySelector('#discount-table tfoot tr');
+            if (footerRow && footerRow.children[4]) {
+                footerRow.children[4].style.display = 'none';
+            }
+        } else {
+            if (actionHeader) actionHeader.style.display = '';
+        }
     }
 
-    // Helper function to format numbers with commas
-    function formatNumberWithCommas(number) {
-        return parseFloat(number).toLocaleString('en-US');
+    // --------------- helpers ---------------
+    function formatNumberWithCommas(n) {
+        return Number(n).toLocaleString('en-US');
     }
 
-    // Function to format date in dd/mm/yyyy format
     function formatDate(date) {
         const d = new Date(date);
-        const day = ('0' + d.getDate()).slice(-2);
-        const month = ('0' + (d.getMonth() + 1)).slice(-2);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
         const year = d.getFullYear();
         return `${day}/${month}/${year}`;
     }
 
-    // Export to Excel functionality
-    exportExcelButton.addEventListener('click', function () {
-        const table = document.querySelector('table'); // Get the table
-        const workbook = XLSX.utils.table_to_book(table, { sheet: "Discount List" });
-        XLSX.writeFile(workbook, 'Discount_List.xlsx');
+    // --------------- edit ---------------
+    function handleEditDiscount(e) {
+        const discountId   = e.target.dataset.id;
+        const row          = e.target.closest('tr');
+        const input        = row.querySelector('.discount-input');
+        const displaySpan  = row.querySelector('.discount-display');
+
+        input.style.display = 'inline';
+        displaySpan.style.display = 'none';
+        input.focus();
+
+        input.addEventListener('blur', function onBlur() {
+            input.removeEventListener('blur', onBlur);
+
+            const newVal = Number(input.value);
+            const oldVal = Number(displaySpan.textContent.replace(/,/g, ''));
+
+            if (Number.isNaN(newVal) || newVal < 0) {
+                input.value = oldVal;
+                input.style.display = 'none';
+                displaySpan.style.display = 'inline';
+                return;
+            }
+
+            if (newVal === oldVal) {
+                input.style.display = 'none';
+                displaySpan.style.display = 'inline';
+                return;
+            }
+
+            fetch(`/discounts/edit/${discountId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ discount_amount: newVal })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // update local
+                        const item = discountData.find(d => d.id == discountId);
+                        if (item) item.discount_amount = newVal;
+                        renderTable(discountData);
+                        alert('Discount updated successfully');
+                    } else {
+                        alert('Failed to update discount');
+                        renderTable(discountData);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error updating discount:', err);
+                    alert('Failed to update discount');
+                });
+        });
+    }
+
+    // --------------- delete ---------------
+    function handleDeleteDiscount(e) {
+        const discountId = e.target.dataset.id;
+        if (!confirm('Are you sure you want to delete this discount?')) return;
+
+        fetch(`/discounts/delete/${discountId}`, {
+            method: 'DELETE'
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // refetch or remove from local
+                    discountData = discountData.filter(d => d.id != discountId);
+                    renderTable(discountData);
+                    alert('Discount deleted successfully');
+                } else {
+                    alert('Failed to delete discount');
+                }
+            })
+            .catch(err => {
+                console.error('Error deleting discount:', err);
+                alert('Failed to delete discount');
+            });
+    }
+
+    // --------------- search ---------------
+    buyerSearchBox.addEventListener('input', function () {
+        const q = buyerSearchBox.value.toLowerCase();
+        const filtered = discountData.filter(d => d.buyer_name.toLowerCase().includes(q));
+        renderTable(filtered);
     });
 
-    // Export to PDF functionality
+    // --------------- export excel ---------------
+    exportExcelButton.addEventListener('click', function () {
+        const table = document.getElementById('discount-table');
+        const wb = XLSX.utils.table_to_book(table, { sheet: 'Discount List' });
+        XLSX.writeFile(wb, 'Discount_List.xlsx');
+    });
+
+    // --------------- export pdf ---------------
     exportPdfButton.addEventListener('click', function () {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
-        const currentDate = new Date();
-        const formattedDate = currentDate.toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        }).replace(/\//g, "-"); // Convert to "DD-MM-YYYY"
+        const now = new Date();
+        const formattedDate = now.toLocaleDateString('en-GB').replace(/\//g, '-');
+        let formattedTime = now.toLocaleTimeString('en-GB', {
+            hour: '2-digit', minute: '2-digit', hour12: true
+        }).replace(/[:\s]/g, '-').toUpperCase();
 
-        let formattedTime = currentDate.toLocaleTimeString('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
-
-        formattedTime = formattedTime.replace(/[:\s]/g, "-").toUpperCase(); // Convert time to uppercase "HH-MM-AM/PM"
-
-        // Generate filename without buyer details
         const fileName = `Discount_List_${formattedDate}_${formattedTime}.pdf`;
-
-        // Proceed to generate the PDF without including the buyer's name or location
         generatePDF(doc, formattedDate, fileName);
     });
 
+    // the clean PDF generator
     function generatePDF(doc, formattedDate, fileName) {
-        const pageWidth = doc.internal.pageSize.width;
-        const pageHeight = doc.internal.pageSize.height;
+        const pageWidth       = doc.internal.pageSize.width;
+        const pageHeight      = doc.internal.pageSize.height;
         const headerBarHeight = 18;
-        let startY = headerBarHeight + 10;
-        let firstPage = true;
+        const startY          = headerBarHeight + 10;
 
-            // Load watermark image
-    const watermarkImg = new Image();
-    watermarkImg.src = "/public/watermark.png";
+        const watermarkImg = new Image();
+        watermarkImg.src = '/public/watermark.png';
 
-    watermarkImg.onload = function () {
-        function addHeaderAndFooterAndWatermark(doc, pageNumber) {
-            // --- Watermark (on every page) ---
-            const watermarkX = pageWidth / 4;
-            const watermarkY = pageHeight / 3;
-            const watermarkWidth = pageWidth / 2;
-            const watermarkHeight = pageHeight / 4;
+        watermarkImg.onload = function () {
+            // build body rows and total from current DOM
+            const tableBodyRows = [];
+            let pdfTotal = 0;
 
-            // Add watermark image (scaled to fit in the page)
-            doc.setGState(new doc.GState({ opacity: 0.2 })); // Faint watermark
-            doc.addImage(watermarkImg, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
-            doc.setGState(new doc.GState({ opacity: 1 })); // Reset opacity for normal content
+            const rows = document.querySelectorAll('#discount-list tr');
+            rows.forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                if (tds.length >= 4) {
+                    const id    = tds[0].innerText.trim();
+                    const date  = tds[1].innerText.trim();
+                    const buyer = tds[2].innerText.trim();
+                    const amtTxt = tds[3].innerText.trim();
+                    const amtNum = Number(amtTxt.replace(/,/g, '')) || 0;
+                    pdfTotal += amtNum;
 
-            // --- Header ---
-            doc.setFillColor(49, 178, 230);
-            doc.rect(0, 0, pageWidth, headerBarHeight, 'F');
-            doc.addImage('/public/lsg.png', 'PNG', 14, 5, 30, 10);
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(255, 255, 255);
-            doc.text("Discount List", pageWidth - 50, 11);
-
-            if (firstPage) {
-                const dateLabel = "Date:";
-                const dateText = formattedDate;
-                const dateLabelWidth = doc.getTextWidth(dateLabel);
-                const xPosition = pageWidth - dateLabelWidth - 40;
-                doc.setFontSize(9);
-                doc.setTextColor(0, 0, 0);
-                doc.setFont("helvetica", "bold");
-                doc.text(dateLabel, xPosition, 25);
-                doc.setFont("helvetica", "normal");
-                doc.text(dateText, xPosition + dateLabelWidth + 5, 25);
-                firstPage = false;
-            }
-
-            // --- Footer ---
-            const line1 = "Thank You For Your Business";
-            const line2 = "Generated by bYTE Ltd.";
-            const line3 = "For inquiries, contact support@lsgroup.com.bd";
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.setTextColor(0, 0, 0);
-
-            const line1Width = doc.getTextWidth(line1);
-            const line2Width = doc.getTextWidth(line2);
-            const line3Width = doc.getTextWidth(line3);
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.text(line1, (pageWidth - line1Width) / 2.3, pageHeight - 30);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.text(line2, (pageWidth - line2Width) / 2, pageHeight - 20);
-            doc.text(line3, (pageWidth - line3Width) / 2, pageHeight - 15);
-        }
-
-        // --- Table Section ---
-        const table = document.getElementById('discount-list');
-        const rows = table.querySelectorAll('tr');
-
-        const tableRows = [];
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            if (cells.length >= 4) {
-                const rowData = [
-                    cells[0].innerText.trim(), // ID
-                    cells[1].innerText.trim(), // Date
-                    cells[2].innerText.trim(), // Buyer Name
-                    cells[3].innerText.trim()  // Discount Amount
-                ];
-                tableRows.push(rowData);
-            }
-        });
-
-        const options = {
-            head: [['ID', 'Date', 'Buyer Name', 'Discount Amount']],
-            body: tableRows,
-            theme: 'grid',
-            startY: startY,
-            margin: { horizontal: 10, top: 20, bottom: 40 },
-            headStyles: {
-                fillColor: [0, 0, 0],
-                textColor: [255, 255, 255],
-                fontSize: 8,
-                fontStyle: 'bold',
-            },
-            bodyStyles: {
-                fontSize: 8,
-                textColor: [0, 0, 0],
-            },
-            pageBreak: 'auto',
-            showHead: 'everyPage',
-            didDrawPage: function (data) {
-                if (data.pageNumber > 1) {
-                    startY = data.cursor + 30;
+                    tableBodyRows.push([id, date, buyer, amtTxt]);
                 }
-                addHeaderAndFooterAndWatermark(doc, data.pageNumber);
-            },
+            });
+
+            // footer for table (only on last page)
+            const foot = [[
+                { content: '', styles: { fillColor: [220,220,220] } },
+                { content: '', styles: { fillColor: [220,220,220] } },
+                { content: 'Total', styles: { halign: 'right', fontStyle: 'bold', fillColor: [220,220,220] } },
+                formatNumberWithCommas(pdfTotal)
+            ]];
+
+            function addHeaderAndWatermark(pageNumber) {
+                // watermark
+                doc.setGState(new doc.GState({ opacity: 0.2 }));
+                const wx = pageWidth / 4;
+                const wy = pageHeight / 3;
+                const ww = pageWidth / 2;
+                const wh = pageHeight / 4;
+                doc.addImage(watermarkImg, 'PNG', wx, wy, ww, wh);
+                doc.setGState(new doc.GState({ opacity: 1 }));
+
+                // header
+                doc.setFillColor(49, 178, 230);
+                doc.rect(0, 0, pageWidth, headerBarHeight, 'F');
+                try {
+                    doc.addImage('/public/lsg.png', 'PNG', 14, 5, 30, 10);
+                } catch (e) {}
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(255, 255, 255);
+                doc.text('Discount List', pageWidth - 50, 11);
+
+                // date on first page
+                if (pageNumber === 1) {
+                    const label = 'Date:';
+                    const labelW = doc.getTextWidth(label);
+                    const x = pageWidth - labelW - 40;
+                    doc.setFontSize(9);
+                    doc.setTextColor(0,0,0);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(label, x, 25);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(formattedDate, x + labelW + 5, 25);
+                }
+            }
+
+            doc.autoTable({
+                head: [['ID', 'Date', 'Buyer Name', 'Discount Amount']],
+                body: tableBodyRows,
+                foot: foot,
+                showFoot: 'lastPage',
+                theme: 'grid',
+                startY: startY,
+                margin: { top: 20, bottom: 40, horizontal: 10 },
+                headStyles: {
+                    fillColor: [0, 0, 0],
+                    textColor: [255, 255, 255],
+                    fontSize: 8,
+                    fontStyle: 'bold',
+                },
+                bodyStyles: {
+                    fontSize: 8,
+                    textColor: [0, 0, 0],
+                },
+                footStyles: {
+                    fontSize: 8,
+                    textColor: [0, 0, 0],
+                    fontStyle: 'bold',
+                    fillColor: [220, 220, 220],
+                },
+                pageBreak: 'auto',
+                showHead: 'everyPage',
+                didDrawPage: function (data) {
+                    addHeaderAndWatermark(data.pageNumber);
+                }
+            });
+
+            // after table is done, add footer ONLY on last page
+            const totalPages = doc.internal.getNumberOfPages();
+            doc.setPage(totalPages);
+
+            const line1 = 'Thank You For Your Business';
+            const line2 = 'Generated by bYTE Ltd.';
+            const line3 = 'For inquiries, contact support@lsgroup.com.bd';
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text(line1, (pageWidth - doc.getTextWidth(line1)) / 2, pageHeight - 30);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.text(line2, (pageWidth - doc.getTextWidth(line2)) / 2, pageHeight - 20);
+            doc.text(line3, (pageWidth - doc.getTextWidth(line3)) / 2, pageHeight - 15);
+
+            doc.save(fileName);
         };
 
-        doc.autoTable(options);
-        doc.save(fileName);
-    };
+        watermarkImg.onerror = function () {
+            console.error('Error loading watermark image.');
+        };
+    }
 
-    watermarkImg.onerror = function () {
-        console.error('Error loading watermark image.');
-    };
-}
-
-    // Function to handle the Edit button click
-    function handleEditDiscount(event) {
-        const discountId = event.target.dataset.id; // Get the discountId from the button's data-id
-        const discountRow = event.target.closest('tr');
-        const discountInput = discountRow.querySelector('.discount-input');
-        const discountDisplay = discountRow.querySelector('.discount-display');
-
-        // Show input and hide the display
-        discountInput.style.display = 'inline';
-        discountDisplay.style.display = 'none';
-        discountInput.focus();
-
-        // When the user leaves the input field, update the discount
-        discountInput.addEventListener('blur', function () {
-            const newDiscountAmount = parseFloat(discountInput.value);
-
-            if (newDiscountAmount !== parseFloat(discountDisplay.textContent.replace(/,/g, ''))) {
-                // Make the request to update the discount
-                fetch(`/discounts/edit/${discountId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ discount_amount: newDiscountAmount }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Discount updated successfully');
-                        discountDisplay.textContent = formatNumberWithCommas(newDiscountAmount); // Update the displayed discount amount
-                        discountInput.style.display = 'none';
-                        discountDisplay.style.display = 'inline';
-                    } else {
-                        alert('Failed to update discount');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error updating discount:', error);
-                    alert('Failed to update discount');
-                });
-            } else {
-                // If no change, hide input and show display
-                discountInput.style.display = 'none';
-                discountDisplay.style.display = 'inline';
-            }
+    // --------------- dropdown ---------------
+    const dropdownButton = document.querySelector('.dropbtn');
+    const dropdownContent = document.querySelector('.dropdown-content');
+    if (dropdownButton && dropdownContent) {
+        dropdownButton.addEventListener('click', function (e) {
+            e.stopPropagation();
+            dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', function () {
+            dropdownContent.style.display = 'none';
         });
     }
 
-    // Function to handle the Delete button click
-    function handleDeleteDiscount(event) {
-        const discountId = event.target.dataset.id;
-
-        if (confirm('Are you sure you want to delete this discount?')) {
-            fetch(`/discounts/delete/${discountId}`, {
-                method: 'DELETE',
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Discount deleted successfully');
-                        // Re-fetch the discount list after deletion
-                        fetch('/discounts/list')
-                            .then(response => response.json())
-                            .then(data => {
-                                discountData = data;
-                                renderTable(discountData); // Re-render table
-                            });
-                    } else {
-                        alert('Failed to delete discount');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error deleting discount:', error);
-                    alert('Failed to delete discount');
-                });
-        }
-    }
-
-    // Buyer search functionality
-    buyerSearchBox.addEventListener('input', function () {
-        const searchValue = buyerSearchBox.value.toLowerCase();
-        
-        // Filter the discount data based on the buyer's name
-        const filteredData = discountData.filter(discount => {
-            return discount.buyer_name.toLowerCase().includes(searchValue);
-        });
-
-        // Render the table with filtered data
-        renderTable(filteredData);
-    });
-});
-
-
-
-
-
+    // --------------- logout ---------------
     document.getElementById('logout-btn')?.addEventListener('click', function (e) {
         e.preventDefault();
         fetch('/logout', { method: 'POST' })
@@ -336,25 +393,5 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Logout error:', err);
                 alert('Something went wrong during logout.');
             });
-    });
-
-
-document.addEventListener("DOMContentLoaded", function() {
-    // Get the dropdown button and menu
-    const dropdownButton = document.querySelector(".dropbtn");
-    const dropdownContent = document.querySelector(".dropdown-content");
-
-    // Toggle dropdown visibility when button is clicked
-    dropdownButton.addEventListener("click", function(event) {
-        // Prevent the event from bubbling up to the document
-        event.stopPropagation();
-
-        // Toggle the display of the dropdown
-        dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
-    });
-
-    // Hide the dropdown if the user clicks anywhere else on the document
-    document.addEventListener("click", function() {
-        dropdownContent.style.display = "none";
     });
 });
