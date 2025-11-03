@@ -301,84 +301,98 @@ app.get('/dashboard-metrics', (req, res) => {
         SELECT 
             IFNULL(SUM(sales.paid_amount), 0) + 
             IFNULL((SELECT SUM(cash_amount + bank_amount) FROM payment_history), 0) AS total_paid
-        FROM sales`;
+        FROM sales
+    `;
     const queryTotalBuyers = `SELECT COUNT(*) AS total_buyers FROM buyers`;
     const queryTotalContainers = `SELECT COUNT(*) AS total_containers FROM containers`;
-
-    // Query for calculating total remaining weight dynamically
     const queryRemainingWeight = `
         SELECT 
             SUM(c.weight - IFNULL(s.total_weight_sold, 0) + IFNULL(pr.total_weight_returned, 0)) AS total_remaining_weight
         FROM containers c
-        LEFT JOIN 
-            (SELECT container_id, SUM(weight_sold) AS total_weight_sold FROM sales GROUP BY container_id) s
-            ON c.id = s.container_id
-        LEFT JOIN 
-            (SELECT container_id, SUM(returned_kg) AS total_weight_returned FROM purchase_returns GROUP BY container_id) pr
-            ON c.id = pr.container_id;
+        LEFT JOIN (
+            SELECT container_id, SUM(weight_sold) AS total_weight_sold 
+            FROM sales GROUP BY container_id
+        ) s ON c.id = s.container_id
+        LEFT JOIN (
+            SELECT container_id, SUM(returned_kg) AS total_weight_returned 
+            FROM purchase_returns GROUP BY container_id
+        ) pr ON c.id = pr.container_id
     `;
+    const queryOpeningBalance = `SELECT IFNULL(SUM(opening_balance), 0) AS total_opening_balance FROM buyers`;
+    const queryTotalDiscounts = `SELECT IFNULL(SUM(discount_amount), 0) AS total_discounts FROM discounts`;
 
-    const queryOpeningBalance = `SELECT IFNULL(SUM(opening_balance), 0) AS total_opening_balance FROM buyers`; 
+    const metrics = {
+        total_sell: 0,
+        total_purchase_returns: 0,
+        total_paid: 0,
+        total_unpaid: 0,
+        total_buyers: 0,
+        total_containers: 0,
+        total_remaining_weight: 0,
+        total_opening_balance: 0,
+        total_discounts: 0,
+        net_sale: 0
+    };
 
-    db.serialize(() => {
-        let metrics = {
-            total_sell: 0,
-            total_purchase_returns: 0,
-            total_paid: 0,
-            total_unpaid: 0,
-            total_buyers: 0,
-            total_containers: 0,
-            total_remaining_weight: 0,
-            total_opening_balance: 0
-        };
-
-        db.get(queryTotalSell, (err, row) => {
-            if (err) return res.status(500).send('Error fetching total sales.');
-            metrics.total_sell = row.total_sell || 0;
-        });
+    db.get(queryTotalSell, (err, row) => {
+        if (err) return res.status(500).send('Error fetching total sales.');
+        metrics.total_sell = row.total_sell || 0;
 
         db.get(queryTotalPurchaseReturns, (err, row) => {
             if (err) return res.status(500).send('Error fetching total purchase returns.');
             metrics.total_purchase_returns = row.total_purchase_returns || 0;
+
+            db.get(queryTotalPaid, (err, row) => {
+                if (err) return res.status(500).send('Error fetching total paid.');
+                metrics.total_paid = row.total_paid || 0;
+
+                db.get(queryTotalBuyers, (err, row) => {
+                    if (err) return res.status(500).send('Error fetching total buyers.');
+                    metrics.total_buyers = row.total_buyers || 0;
+
+                    db.get(queryTotalContainers, (err, row) => {
+                        if (err) return res.status(500).send('Error fetching total containers.');
+                        metrics.total_containers = row.total_containers || 0;
+
+                        db.get(queryRemainingWeight, (err, row) => {
+                            if (err) return res.status(500).send('Error fetching remaining weight.');
+                            metrics.total_remaining_weight = row.total_remaining_weight || 0;
+
+                            db.get(queryOpeningBalance, (err, row) => {
+                                if (err) return res.status(500).send('Error fetching opening balance.');
+                                metrics.total_opening_balance = row.total_opening_balance || 0;
+
+                                // 🔥 now pull discounts
+                                db.get(queryTotalDiscounts, (err, row) => {
+                                    if (err) return res.status(500).send('Error fetching discounts.');
+                                    metrics.total_discounts = row.total_discounts || 0;
+
+                                    // 🧮 final math
+                                    metrics.net_sale =
+                                        metrics.total_sell +
+                                        metrics.total_opening_balance -
+                                        metrics.total_purchase_returns;
+
+                                    // deduct discounts too
+                                    metrics.total_unpaid =
+                                        metrics.net_sale -
+                                        metrics.total_paid -
+                                        metrics.total_discounts;
+
+                                    if (isNaN(metrics.total_unpaid)) metrics.total_unpaid = 0;
+                                    if (metrics.total_unpaid < 0) metrics.total_unpaid = 0;
+
+                                    return res.json(metrics);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
         });
-
-        db.get(queryTotalPaid, (err, row) => {
-            if (err) return res.status(500).send('Error fetching total paid.');
-            metrics.total_paid = row.total_paid || 0;
-        });
-
-        db.get(queryTotalBuyers, (err, row) => {
-            if (err) return res.status(500).send('Error fetching total buyers.');
-            metrics.total_buyers = row.total_buyers || 0;
-        });
-
-        db.get(queryTotalContainers, (err, row) => {
-            if (err) return res.status(500).send('Error fetching total containers.');
-            metrics.total_containers = row.total_containers || 0;
-        });
-
-        db.get(queryRemainingWeight, (err, row) => {
-            if (err) return res.status(500).send('Error fetching remaining weight.');
-            metrics.total_remaining_weight = row.total_remaining_weight || 0; // Add remaining weight dynamically
-        });
-
-        db.get(queryOpeningBalance, (err, row) => {
-            if (err) return res.status(500).send('Error fetching opening balance.');
-            metrics.total_opening_balance = row.total_opening_balance || 0;
-        });
-
-        setTimeout(() => {
-            // Calculate Net Sales (Including Opening Balance)
-            metrics.net_sale = metrics.total_sell + metrics.total_opening_balance - metrics.total_purchase_returns;
-
-            // Calculate Total Unpaid Correctly
-            metrics.total_unpaid = metrics.net_sale - metrics.total_paid;
-            if (isNaN(metrics.total_unpaid)) metrics.total_unpaid = 0; // Prevent NaN
-
-            res.json(metrics);
-        }, 500);
     });
 });
+
 
 
 // Handle received payment
