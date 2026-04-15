@@ -904,7 +904,8 @@ app.get('/containers/list', (req, res) => {
             c.id AS container_id,
             c.container_number,
             c.weight AS initial_weight,
-            c.arrival_date
+            c.arrival_date,
+            c.lc_number
         FROM containers c
     `;
 
@@ -914,7 +915,7 @@ app.get('/containers/list', (req, res) => {
             return res.status(500).json({ error: 'Failed to fetch containers' });
         }
 
-        res.json(rows);  // Return containers without remaining_weight
+        res.json(rows);  // Return containers with lc_number field
     });
 });
 
