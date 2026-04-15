@@ -4,14 +4,16 @@ const sqlite3 = require('sqlite3').verbose();
 
 const db = new sqlite3.Database('./database.db');
 
-// ✅ Add a new container
+// ✅ Add a new container (Updated with lc_number)
 router.post('/add', (req, res) => {
-    const { container_number, weight, arrival_date } = req.body;
+    // 1. Extract lc_number from the request body
+    const { container_number, lc_number, weight, arrival_date } = req.body; 
     const query = `
-        INSERT INTO containers (container_number, weight, arrival_date, remaining_weight) 
-        VALUES (?, ?, ?, ?)
+        INSERT INTO containers (container_number, lc_number, weight, arrival_date, remaining_weight) 
+        VALUES (?, ?, ?, ?, ?)
     `;
-    db.run(query, [container_number, weight, arrival_date, weight], function (err) {
+    // 2. Pass lc_number to the database
+    db.run(query, [container_number, lc_number, weight, arrival_date, weight], function (err) {
         if (err) {
             return res.status(500).send(err.message);
         }
@@ -20,11 +22,11 @@ router.post('/add', (req, res) => {
     });
 });
 
-// ✅ **Get All Containers with Updated Total Sold**
+// ✅ **Get All Containers with Updated Total Sold** (Updated with lc_number)
 router.get('/list', (req, res) => {
  const query = `
         SELECT 
-			c.id, c.container_number, c.weight, c.arrival_date,
+            c.id, c.container_number, c.lc_number, c.weight, c.arrival_date, -- 3. Fetch lc_number here
             IFNULL(s.total_weight_sold, 0) AS total_weight_sold,
             IFNULL(pr.total_weight_returned, 0) AS total_weight_returned,
             (c.weight - IFNULL(s.total_weight_sold, 0) + IFNULL(pr.total_weight_returned, 0)) AS remaining_weight
