@@ -63,6 +63,7 @@ async function loadContainers() {
     const response = await fetch('/containers/list');
     const data = await response.json();
 
+    // Map the response data and include LC Number
     containerData = data.map(container => ({
       id: container.id,
       container_number: container.container_number,
@@ -70,7 +71,8 @@ async function loadContainers() {
       arrival_date: container.arrival_date,
       total_weight_sold: Number(container.total_weight_sold) || 0,
       total_weight_returned: Number(container.total_weight_returned) || 0,
-      remaining_weight: Number(container.remaining_weight) || 0
+      remaining_weight: Number(container.remaining_weight) || 0,
+      lc_number: container.lc_number || 'N/A'  // Include lc_number in the data
     }));
 
     // Render full table (no filters initially)
@@ -83,61 +85,63 @@ async function loadContainers() {
 }
 
 function renderTable(data) {
-  containerList.innerHTML = '';
-  let totalSold = 0, totalReturned = 0, totalRemaining = 0, totalWeight = 0;
+    containerList.innerHTML = '';
+    let totalSold = 0, totalReturned = 0, totalRemaining = 0, totalWeight = 0;
 
-  data.forEach((container, index) => {
-    const formattedDate = formatDateDDMMYYYY(container.arrival_date);
+    data.forEach((container, index) => {
+        const formattedDate = formatDateDDMMYYYY(container.arrival_date);
 
-    totalSold      += container.total_weight_sold || 0;
-    totalReturned  += container.total_weight_returned || 0;
-    totalRemaining += container.remaining_weight || 0;
-    totalWeight    += container.weight || 0;
+        totalSold      += container.total_weight_sold || 0;
+        totalReturned  += container.total_weight_returned || 0;
+        totalRemaining += container.remaining_weight || 0;
+        totalWeight    += container.weight || 0;
 
-    const row = document.createElement('tr');
-    row.setAttribute('data-id', container.id);
-    row.innerHTML = `
-      <td>${index + 1}</td>
-      <td>${formattedDate}</td>
-      <td>${escapeHTML(container.container_number ?? '')}</td>
-      <td>
-        <span class="weight-display" data-id="${container.id}">${formatNumber(container.weight)}</span>
-        <input class="weight-input" type="number" value="${container.weight}" data-id="${container.id}" style="display:none;width:100px;" />
-      </td>
-      <td>${formatNumber(container.total_weight_sold)}</td>
-      <td>${formatNumber(container.total_weight_returned)}</td>
-      <td>${formatNumber(container.remaining_weight)}</td>
-      <td>
-		<button class="edit-btn" data-id="${container.id}"><span class="edit-text">Edit</span><i class="fas fa-edit"></i></button>
-		<button class="delete-btn" data-id="${container.id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>	
-      </td>
+        const row = document.createElement('tr');
+        row.setAttribute('data-id', container.id);
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${formattedDate}</td>
+            <td>${escapeHTML(container.container_number ?? '')}</td>
+			<td>${escapeHTML(container.lc_number ?? 'N/A')}</td>
+            <td>
+                <span class="weight-display" data-id="${container.id}">${formatNumber(container.weight)}</span>
+                <input class="weight-input" type="number" value="${container.weight}" data-id="${container.id}" style="display:none;width:100px;" />
+            </td>
+            <td>${formatNumber(container.total_weight_sold)}</td>
+            <td>${formatNumber(container.total_weight_returned)}</td>
+            <td>${formatNumber(container.remaining_weight)}</td>
+             <!-- Display LC Number -->
+            <td>
+                <button class="edit-btn" data-id="${container.id}"><span class="edit-text">Edit</span><i class="fas fa-edit"></i></button>
+                <button class="delete-btn" data-id="${container.id}"><span class="delete-text">Delete</span><i class="fas fa-trash-alt"></i></button>    
+            </td>
+        `;
+        containerList.appendChild(row);
+    });
+
+    // Totals row
+    const totalRow = document.createElement('tr');
+    totalRow.className = 'total-row';
+    totalRow.innerHTML = `
+        <td colspan="4"><strong>Totals:</strong></td>
+        <td><strong>${formatNumber(totalWeight)}</strong></td>
+        <td><strong>${formatNumber(totalSold)}</strong></td>
+        <td><strong>${formatNumber(totalReturned)}</strong></td>
+        <td><strong>${formatNumber(totalRemaining)}</strong></td>
+        <td></td>
     `;
-    containerList.appendChild(row);
-  });
+    containerList.appendChild(totalRow);
 
-  // Totals row
-  const totalRow = document.createElement('tr');
-  totalRow.className = 'total-row';
-  totalRow.innerHTML = `
-    <td colspan="3"><strong>Totals:</strong></td>
-    <td><strong>${formatNumber(totalWeight)}</strong></td>
-    <td><strong>${formatNumber(totalSold)}</strong></td>
-    <td><strong>${formatNumber(totalReturned)}</strong></td>
-    <td><strong>${formatNumber(totalRemaining)}</strong></td>
-    <td></td>
-  `;
-  containerList.appendChild(totalRow);
+    // Wire up per-row buttons
+    containerList.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', handleEditContainer);
+    });
+    containerList.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', handleDeleteContainer);
+    });
 
-  // Wire up per-row buttons
-  containerList.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.addEventListener('click', handleEditContainer);
-  });
-  containerList.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', handleDeleteContainer);
-  });
-
-  // Apply admin visibility on the freshly rendered table
-  applyAdminVisibility();
+    // Apply admin visibility on the freshly rendered table
+    applyAdminVisibility();
 }
 
 function applyAdminVisibility() {
@@ -316,12 +320,11 @@ async function handleDeleteContainer(e) {
    (Used by onclick on buttons)
 --------------------------------*/
 window.exportToExcel = function exportToExcel() {
-  // We export the visible body rows (excluding totals row, which we add manually)
   const tableEl = document.createElement('table');
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
   [
-    'ID','Arrival Date','Container Number','Weight','Sold','Returned','Remaining Weight'
+    'ID', 'Arrival Date', 'Container Number', 'LC Number', 'Weight', 'Sold', 'Returned', 'Remaining Weight'
   ].forEach(h => {
     const th = document.createElement('th');
     th.textContent = h;
@@ -336,9 +339,9 @@ window.exportToExcel = function exportToExcel() {
   const rows = containerList.querySelectorAll('tr:not(.total-row)');
   rows.forEach(r => {
     const cells = r.querySelectorAll('td');
-    if (cells.length >= 7) {
+    if (cells.length >= 8) { // Adjusted for LC Number
       const tr = document.createElement('tr');
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 8; i++) {  // Include LC Number
         const td = document.createElement('td');
         td.textContent = cells[i].innerText.trim();
         tr.appendChild(td);
@@ -352,7 +355,7 @@ window.exportToExcel = function exportToExcel() {
   if (totals) {
     const cells = totals.querySelectorAll('td');
     const tr = document.createElement('tr');
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 8; i++) {  // Adjusted for LC Number
       const td = document.createElement('td');
       td.textContent = cells[i]?.innerText.trim() || '';
       tr.appendChild(td);
@@ -452,7 +455,7 @@ function generatePDF(doc, formattedDate, fileName) {
 
     rows.forEach(r => {
       const cells = r.querySelectorAll('td');
-      if (cells.length >= 7) {
+      if (cells.length >= 8) {  // Adjusted for LC Number
         bodyRows.push([
           cells[0].innerText.trim(),
           cells[1].innerText.trim(),
@@ -460,18 +463,19 @@ function generatePDF(doc, formattedDate, fileName) {
           cells[3].innerText.trim(),
           cells[4].innerText.trim(),
           cells[5].innerText.trim(),
-          cells[6].innerText.trim()
+          cells[6].innerText.trim(),
+          cells[7].innerText.trim()  // LC Number
         ]);
 
-        totalWeight    += parseFloat((cells[3].innerText || '0').replace(/,/g, '')) || 0;
-        totalSold      += parseFloat((cells[4].innerText || '0').replace(/,/g, '')) || 0;
-        totalReturned  += parseFloat((cells[5].innerText || '0').replace(/,/g, '')) || 0;
-        totalRemaining += parseFloat((cells[6].innerText || '0').replace(/,/g, '')) || 0;
+        totalWeight    += parseFloat((cells[4].innerText || '0').replace(/,/g, '')) || 0;
+        totalSold      += parseFloat((cells[5].innerText || '0').replace(/,/g, '')) || 0;
+        totalReturned  += parseFloat((cells[6].innerText || '0').replace(/,/g, '')) || 0;
+        totalRemaining += parseFloat((cells[7].innerText || '0').replace(/,/g, '')) || 0;
       }
     });
 
     const foot = [[
-      { content: 'Totals:', colSpan: 3, styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: 'Totals:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } },
       totalWeight.toLocaleString('en-US'),
       totalSold.toLocaleString('en-US'),
       totalReturned.toLocaleString('en-US'),
@@ -480,7 +484,7 @@ function generatePDF(doc, formattedDate, fileName) {
 
     // 3) create the table
     doc.autoTable({
-      head: [['ID', 'Arrival Date', 'Container Number', 'Weight', 'Sold', 'Returned', 'Remaining Weight']],
+      head: [['ID', 'Arrival Date', 'Container Number', 'LC Number', 'Weight', 'Sold', 'Returned', 'Remaining Weight']],
       body: bodyRows,
       foot,
       showFoot: 'lastPage',           // totals only on last page ✅
@@ -531,7 +535,6 @@ function generatePDF(doc, formattedDate, fileName) {
     doc.save(fileName);
   };
 }
-
 
 
 /* -------------------------------

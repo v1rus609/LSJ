@@ -48,12 +48,17 @@
         <form action="/containers/add" method="POST">
             <label for="container_number">Container Number:</label>
             <input type="text" id="container_number" name="container_number" required autocomplete="off">
+			
+			<label for="lc_number">LC Number:</label>
+			<input type="text" id="lc_number" name="lc_number" required autocomplete="off">
 
             <label for="weight">Weight (kg):</label>
             <input type="text" id="weight" name="weight" step="0.01" required autocomplete="off">
 
             <label for="arrival_date">Arrival Date:</label>
             <input type="date" id="arrival_date" name="arrival_date" required>
+			
+
 
             <button type="submit">Add Container</button>
         </form>
